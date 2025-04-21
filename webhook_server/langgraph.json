@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "requisitos": "graph:graph"
+  },
+  "default_graph": "requisitos"
+}

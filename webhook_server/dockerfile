@@ -1,0 +1,21 @@
+# Use uma imagem oficial do Python como base
+FROM python:3.12-slim
+
+# Diretório de trabalho no container
+WORKDIR /app
+
+# Copia apenas requirements.txt primeiro para otimizar cache
+COPY requirements.txt .
+
+# Instala as dependências
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia todos os arquivos necessários
+COPY graph.py .
+COPY webhook_server.py .
+COPY langgraph.json .
+COPY .env .
+COPY .env.example .
+
+# Comando para iniciar o servidor FastAPI
+CMD ["uvicorn", "webhook_server:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
