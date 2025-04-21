@@ -21,8 +21,8 @@ if uploaded_file:
             "chatInput": file_path
         }
         try:
-            #response = requests.post("http://webhook_server:8000/webhook/webui_pipe_webhook", json=payload)
-            response = requests.post("http://localhost:8000/webhook/webui_pipe_webhook", json=payload)
+            response = requests.post("http://webhook_server:8000/webhook/webui_pipe_webhook", json=payload) #docker
+            #response = requests.post("http://localhost:8000/webhook/webui_pipe_webhook", json=payload) #local
 
             if response.status_code == 200:
                 result = response.json().get("output", "")
