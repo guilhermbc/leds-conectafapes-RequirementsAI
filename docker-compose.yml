@@ -1,4 +1,6 @@
+version: '3.9'
 services:
+
   streamlit_app:
     build: ./streamlit_app
     ports:
@@ -7,10 +9,45 @@ services:
       - ./shared/uploads:/app/shared/uploads
     depends_on:
       - webhook_server
+    networks:
+      - lang_net
 
   webhook_server:
     build: ./webhook_server
     ports:
       - "8000:8000"
     volumes:
-      - ./shared/uploads:/app/shared/uploads  
+      - ./shared/uploads:/app/shared/uploads
+    networks:
+      - lang_net
+
+  ollama:
+    image: ollama/ollama:0.6.5
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - lang_net
+    restart: always
+
+  open-webui-new:
+    image: ghcr.io/open-webui/open-webui:v0.6.2
+    container_name: open-webui-new
+    ports:
+      - "3000:8080"
+    environment:
+      - DATABASE_URL=sqlite:///data/db.sqlite3
+    volumes:
+      - open-webui-data:/app/backend/data
+      - open-webui-uploads:/app/backend/data/uploads
+    networks:
+      - lang_net
+    restart: always
+
+volumes:
+  open-webui-data:
+  open-webui-uploads:
+
+networks:
+  lang_net:
+    driver: bridge

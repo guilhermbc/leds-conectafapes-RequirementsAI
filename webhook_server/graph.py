@@ -97,37 +97,37 @@ def copiar_arquivo_webui_para_media(caminho_origem: str, nome_destino: str = Non
     caminho_destino = os.path.join("media", nome_destino)
 
     shutil.copy(caminho_origem, caminho_destino)
-    print(f"✅ Arquivo copiado para: {caminho_destino}")
+    print(f"Arquivo copiado para: {caminho_destino}")
     return caminho_destino
 
 
 def verificar_entrada_func(inputs):
-    print("🔍 Verificando se o vídeo foi fornecido...")
+    print("Verificando se o vídeo foi fornecido...")
 
     video = inputs.get("video_entrevista")
 
     if video:
-        # 🧠 Se for um caminho vindo do WebUI, copie para media/
+        #  Se for um caminho vindo do WebUI, copie para media/
         if video.startswith("/app/backend/data/uploads/"):
             try:
                 video_convertido = copiar_arquivo_webui_para_media(video)
                 inputs["video_entrevista"] = video_convertido
             except Exception as e:
-                print(f"❌ Erro ao copiar arquivo do WebUI: {e}")
+                print(f"Erro ao copiar arquivo do WebUI: {e}")
                 return {
                     **inputs,
                     "mensagem": "Erro ao acessar o vídeo enviado. Verifique o caminho.",
                     "estado": "erro_video"
                 }
 
-        # 🔁 Caminho relativo → tornar absoluto
+        #  Caminho relativo → tornar absoluto
         elif not os.path.isabs(video):
             video = os.path.join(os.getcwd(), video)
             inputs["video_entrevista"] = video
 
-    # 🚫 Se ainda não encontrar ou não existir
+    #  Se ainda não encontrar ou não existir
     if not inputs.get("video_entrevista") or not os.path.exists(inputs["video_entrevista"]):
-        print("🚫 Vídeo não encontrado no estado. Solicitando envio.")
+        print("Vídeo não encontrado no estado. Solicitando envio.")
         return {
             **inputs,
             "mensagem": "Por favor, envie o caminho do vídeo da entrevista no formato .mp3, .mp4 ou .mkv.",
@@ -187,10 +187,10 @@ def analisar_documentacao_func(inputs):
     Você é um especialista em engenharia de requisitos.
 
     Seu objetivo é:
-    1️⃣ Analisar  o minimundo abaixo.
-    2️⃣ Identificar funcionalidades específicas esperadas do sistema (Requisitos Funcionais - RFs).
-    3️⃣ Identificar Regras de Negócio (RNs).
-    4️⃣ Identificar possíveis Requisitos Não Funcionais (RNFs).
+    1 Analisar  o minimundo abaixo.
+    2️ Identificar funcionalidades específicas esperadas do sistema (Requisitos Funcionais - RFs).
+    3️ Identificar Regras de Negócio (RNs).
+    4️ Identificar possíveis Requisitos Não Funcionais (RNFs).
 
     Ao final, você deve:
     - Gerar um rascunho preliminar de requisitos (RFs, RNs, RNFs).
@@ -229,7 +229,7 @@ def extrair_requisitos_func(inputs):
 
     <EXEMPLO DE FORMATO DESEJADO:>
 
-    🔹 Tabela de Requisitos Funcionais (RFs)
+    ## Tabela de Requisitos Funcionais (RFs)
     | ID    | Descrição                                                                                       | Prioridade | Requisitos Relacionados |
     |-------|--------------------------------------------------------------------------------------------------|------------|--------------------------|
     | RF001 | O sistema deve permitir o cadastro e acompanhamento de bolsistas pelos coordenadores.           | Alta       | RF002, RF003             |
@@ -238,7 +238,7 @@ def extrair_requisitos_func(inputs):
     | RF004 | <!-- Adicione aqui o próximo requisito seguindo o mesmo padrão -->                              |            |                          |                                          
 
                                               
-    🔹 Tabela de Regras de Negócio (RNs)
+    ## Tabela de Regras de Negócio (RNs)
     | ID    | Descrição                                                                                                                            | Prioridade | Requisitos Relacionados |
     |-------|---------------------------------------------------------------------------------------------------------------------------------------|------------|--------------------------|
     | RN001 | O acesso ao sistema será realizado por usuários externos com perfis específicos (coordenador, bolsista, empreendedor).              | Alta       | RF013                    |
@@ -247,7 +247,7 @@ def extrair_requisitos_func(inputs):
     | RN004 | <!-- Adicione aqui a próxima regra de negócio seguindo o mesmo padrão -->  
 
 
-    🔹 Tabela de Requisitos Não Funcionais (RNFs)
+    ## Tabela de Requisitos Não Funcionais (RNFs)
     | ID     | Descrição                                                                                               | Categoria      | Prioridade |
     |--------|----------------------------------------------------------------------------------------------------------|----------------|------------|
     | RNF001 | O sistema deve ser escalável para atender picos de acesso durante períodos de editais.                  | Escalabilidade | Alta       |
@@ -304,7 +304,7 @@ def refinar_requisitos_func(inputs):
 
     **Objetivo**: Gerar uma versão final dos requisitos em 3 tabelas (RFs, RNs, RNFs), no seguinte formato (exemplo):
     ```
-    🔹 Tabela de Requisitos Funcionais (RFs)
+    ## Tabela de Requisitos Funcionais (RFs)
     | ID    | Descrição                                                    | Prioridade | Requisitos Relacionados |
     |-------|--------------------------------------------------------------|------------|-------------------------|
     | RF001 | O sistema deve permitir o cadastro de usuários.             | Alta       | RF002                   |
@@ -319,7 +319,7 @@ def refinar_requisitos_func(inputs):
     **Formato de Resposta**:  
     - Em Markdown;
     - Três tabelas (RF, RN, RNF);
-    - Depois das tabelas, inclua um bloco "🔍 Dúvidas e validações" se houver.
+    - Depois das tabelas, inclua um bloco " Dúvidas e validações" se houver.
 
     Gere apenas isso. Evite repetições.
     """)
@@ -337,7 +337,7 @@ def refinar_requisitos_func(inputs):
     return {**inputs, "report": resultado_final}
 
 def retorno_final_func(inputs):
-    print("✅ Retornando estado final ao WebUI.")
+    print(" Retornando estado final ao WebUI.")
     return inputs
 
 

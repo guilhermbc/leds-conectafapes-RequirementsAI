@@ -52,7 +52,7 @@ async def call_agent(request: Request):
             print(result)
 
         except Exception as e:
-            print(f"🔴 Erro no invoke: {str(e)}")
+            print(f" Erro no invoke: {str(e)}")
             traceback.print_exc()
             return JSONResponse(content={"output": f"Erro ao gerar resposta: {str(e)}"})
 
@@ -72,7 +72,7 @@ async def call_agent(request: Request):
         return JSONResponse(content={"output": assistant_response})
 
     except Exception as e:
-        print(f"🔴 Erro geral: {str(e)}")
+        print(f" Erro geral: {str(e)}")
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
