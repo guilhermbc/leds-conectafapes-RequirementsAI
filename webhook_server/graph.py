@@ -103,7 +103,8 @@ def copiar_arquivo_webui_para_media(caminho_origem: str, nome_destino: str = Non
 
 def verificar_entrada_func(inputs):
     print("Verificando se o vídeo foi fornecido...")
-
+    video = inputs.get("video_entrevista")
+    print(f"🛠️ Caminho original do vídeo: {video}")
     video = inputs.get("video_entrevista")
 
     if video:
