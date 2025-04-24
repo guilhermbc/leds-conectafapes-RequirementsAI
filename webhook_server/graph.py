@@ -10,14 +10,6 @@ from typing import TypedDict, Optional
 from langsmith import traceable
 import google.generativeai as genai
 import sys
-from langchain.memory import ConversationBufferMemory
-#from langchain_core.messages import ChatMessageHistory
-import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-
-from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.runnables import RunnableConfig
 
 
 load_dotenv()
@@ -33,41 +25,6 @@ model = ChatGoogleGenerativeAI(
 )
 
 parser = StrOutputParser()
-
-# Novo Agente Validador com Memória
-#validador_memory = ChatMessageHistory()
-validador_memory = ConversationBufferMemory(return_messages=True)
-
-validador_prompt = ChatPromptTemplate.from_template("""
-Você é um agente especialista em validação de requisitos.
-
-Seu trabalho é:
-1. Analisar os requisitos abaixo.
-2. Validar clareza, completude e viabilidade.
-3. Gerar feedback e indicar se os requisitos podem ser aprovados ou precisam de ajustes.
-
-Requisitos:
-{requisitos}
-
-Responda com:
-- Avaliação (Clareza, Completude, Viabilidade);
-- Sugestões de Melhoria;
-- Status Final: [Aprovado / Requer Revisão]
-""")
-
-validador_chain = validador_prompt | model | parser
-
-# Função para retornar a memória (simples, sem sessões múltiplas)
-def get_simple_memory(session_id: str):
-    return validador_memory
-
-validador_agent = RunnableWithMessageHistory(
-    validador_chain,
-    get_session_history=get_simple_memory, 
-    input_messages_key="requisitos",
-    history_messages_key="history"
-)
-
 
 # State definition
 class MyState(TypedDict):
@@ -355,7 +312,6 @@ def refine_requirements_func(inputs):
     - In Markdown;
     - Three tables (FR, BR, NFR);
     - After the tables, include a "Questions and validations" block if applicable.
-                                              
 
     Generate only this. Avoid repetitions.
                                               
@@ -374,27 +330,6 @@ def refine_requirements_func(inputs):
         f.write(resultado_final)
 
     return {**inputs, "report": resultado_final}
-
-
-def agente_validador_func(inputs):
-    print("Validating with autonomous agent...")
-    requisitos = inputs.get("report", "")
-
-    if not requisitos:
-        raise ValueError("No requirements found for validation.")
-
-    output = validador_agent.invoke(
-    {"requisitos": requisitos},
-    config={"configurable": {"session_id": "sessao_unica"}}
-    )
-    
-    # Salvar resultado da validação
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"validation_agent_{timestamp}.md"
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(output)
-
-    return {**inputs, "validation_result": output}
 
 # Function that runs the graph and will be traced in LangSmith
 @traceable(name="Run LangGraph with Transcription")
@@ -421,7 +356,6 @@ builder.add_node("extrair_requisitos", RunnableLambda(extract_requirements_func)
 builder.add_node("priorizar_requisitos", RunnableLambda(prioritize_requirements_func))
 builder.add_node("refinar_requisitos", RunnableLambda(refine_requirements_func))
 builder.add_node("retorno_final", RunnableLambda(final_return_func))
-builder.add_node("agente_validador", RunnableLambda(agente_validador_func))
 
 # Define the flow
 builder.set_entry_point("verificar_entrada")
@@ -445,8 +379,7 @@ builder.add_edge("gerar_minimundo", "analisar_documentacao")
 builder.add_edge("analisar_documentacao", "extrair_requisitos")
 builder.add_edge("extrair_requisitos", "priorizar_requisitos")
 builder.add_edge("priorizar_requisitos", "refinar_requisitos")
-builder.add_edge("refinar_requisitos", "agente_validador")
-builder.add_edge("agente_validador", END)
+builder.add_edge("refinar_requisitos", END)
 builder.add_edge("retorno_final", END)
 
 graph = builder.compile()
