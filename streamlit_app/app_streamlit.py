@@ -6,7 +6,7 @@ st.title("📼 Enviar Vídeo para Análise de Requisitos com IA")
 
 UPLOAD_DIR = "../shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
 
-uploaded_file = st.file_uploader("Envie um vídeo (.mp3, .mp4 ou .mkv)", type=["mp3", "mp4", "mkv"])
+uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
 
 if uploaded_file:
     os.makedirs(UPLOAD_DIR, exist_ok=True)  # Garante que o diretório exista
