@@ -3,3 +3,4 @@
 __pycache__/
 *.pyc
 *.pyo
+webhook_server/tests_dev/
