@@ -15,7 +15,7 @@ services:
   webhook_server:
     build: ./webhook_server
     ports:
-      - "8000:8000"
+      - "8001:8001"
     volumes:
       - ./shared/uploads:/app/shared/uploads
     networks:

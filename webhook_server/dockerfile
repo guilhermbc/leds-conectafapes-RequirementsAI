@@ -18,4 +18,4 @@ COPY .env .
 COPY .env.example .
 
 # Comando para iniciar o servidor FastAPI
-CMD ["uvicorn", "webhook_server:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "webhook_server:app", "--host", "0.0.0.0", "--port", "8001", "--reload"]

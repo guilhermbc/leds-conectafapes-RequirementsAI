@@ -5,7 +5,7 @@ WORKDIR /app
 COPY requirements.txt . 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app_streamlit.py .
+COPY app_streamlit_docker.py .
 
 # IMPORTANTE: o diretório 'shared/uploads' NÃO precisa ser copiado,
 # pois o volume será montado em /app/shared/uploads via docker-compose.

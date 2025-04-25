@@ -4,7 +4,7 @@ import os
 
 st.title("📼 Enviar Vídeo para Análise de Requisitos com IA")
 
-UPLOAD_DIR = "../shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
+UPLOAD_DIR = "shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
 
 uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
 
@@ -21,8 +21,8 @@ if uploaded_file:
             "chatInput": file_path
         }
         try:
-            #response = requests.post("http://webhook_server:8001/webhook/webui_pipe_webhook", json=payload) #docker
-            response = requests.post("http://localhost:8001/webhook/webui_pipe_webhook", json=payload) #local
+            response = requests.post("http://webhook_server:8001/webhook/webui_pipe_webhook", json=payload) #docker
+            #response = requests.post("http://localhost:8001/webhook/webui_pipe_webhook", json=payload) #local
 
             if response.status_code == 200:
                 result = response.json().get("output", "")
