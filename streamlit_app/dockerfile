@@ -12,4 +12,4 @@ COPY app_streamlit_docker.py .
 # Mas se quiser criar vazio no build, adicione a linha abaixo:
 # RUN mkdir -p shared/uploads
 
-CMD ["streamlit", "run", "app_streamlit.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app_streamlit_docker.py", "--server.port=8501", "--server.address=0.0.0.0"]
