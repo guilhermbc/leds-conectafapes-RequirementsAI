@@ -107,14 +107,14 @@ docker-compose up --build
 
 python3.12 -m venv venv
 source venv/bin/activate  # ou venv\Scripts\activate no Windows
-pip install -r requirements.txt
+
 ```
 ## Execução direta
 
 Acesse a pasta webhook_server e execute a instrução python3 webhook_server.py
 ```bash
 cd webhook_server
-pip install -r requirements.txt
+pip install -r requirements.txt (and  pip install -U "langgraph-cli[inmem]" para langgraph dev)
 python3 webhook_server.py
 ```
 
