@@ -1,9 +1,7 @@
-from fluxo import graph
-
-def run_full_flow(audio_path: str):
-    input_data = {"video_entrevista": audio_path}
-    final_state = graph.invoke(input_data)
-    print(final_state)
+from graph import graph
+from webhook_server import run_graph_with_trace  # Reutilizando a função decorada
 
 if __name__ == "__main__":
-    run_full_flow("media/entrevista_exemplo.mp3")
+    input_data = {"video_entrevista": "/home/mso/requirementsAI/RequirementsAI/shared/uploads/test_audio.wav"}
+    final_state = run_graph_with_trace(input_data)
+    print(final_state)

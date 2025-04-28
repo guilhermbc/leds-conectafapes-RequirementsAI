@@ -2,6 +2,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 import uvicorn
 import traceback
+from langsmith import traceable
+from graph import graph
 
 app = FastAPI()
 
@@ -23,9 +25,11 @@ def preparar_estado(data: dict) -> dict:
         "video_entrevista": caminho_video
     }
 
-def executar_grafo_e_extrair_estado_final(grafo, estado_inicial):
+# Função decorada com traceable para garantir rastreamento
+@traceable(name="Run RequirementsAI")
+def run_graph_with_trace(input_data: dict):
     final_state = None
-    for step in grafo.stream(estado_inicial):
+    for step in graph.stream(input_data):
         print("🧩 Chunk parcial:", step)
         final_state = step
     return final_state
@@ -44,7 +48,7 @@ async def call_agent(request: Request):
         print(f"🔵 Recebido: {estado['mensagem_usuario']}")
 
         try:
-            result = executar_grafo_e_extrair_estado_final(graph, estado)
+            result = run_graph_with_trace(estado)
             print(f"🟢 Resposta gerada!")
             print("🧾 RESULTADO COMPLETO DO GRAFO:")
             print(result)
