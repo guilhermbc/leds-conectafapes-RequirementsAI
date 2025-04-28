@@ -16,21 +16,38 @@ persona_message_transcricao = SystemMessage(
     )
 )
 
-# --- Agente usando Google Gemini API diretamente (como no seu código) ---
+# Node 0: Transcribe audio with Gemini API
 def transcribe_audio_agent(inputs):
     audio_file_path = inputs["video_entrevista"]
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
     model_gemini = genai.GenerativeModel("gemini-1.5-pro")
+    if not os.path.exists(audio_file_path):
+        raise FileNotFoundError(f"Arquivo de áudio não encontrado: {audio_file_path}")
+    
+    try:
 
-    with open(audio_file_path, 'rb') as f:
-        audio_data = f.read()
+        with open(audio_file_path, 'rb') as f:
+            audio_data = f.read()
 
-    prompt = "Transcreva este áudio com marcações de tempo e identifique os falantes."
+        prompt = """
+        Por favor, forneça uma transcrição completa e precisa deste áudio.
+        Inclua marcações de tempo a cada 30 segundos, se possível.
+        Identifique diferentes falantes se houver múltiplas pessoas falando.
+        """
 
-    response = model_gemini.generate_content([
-        {"mime_type": "audio/mp3", "data": audio_data}, prompt
-    ])
-    print("🎙️ Resultado da transcrição:", response.text)
-    print("📦 Estado retornado:", {**inputs, "transcricao": response.text})
-    return {**inputs, "transcricao": response.text}
+        response = model_gemini.generate_content([
+            {"mime_type": "audio/mp3", "data": audio_data}, prompt
+        ])
 
+        # Salvar a transcrição em um arquivo
+        output_file = f"{os.path.splitext(audio_file_path)[0]}_transcricao.txt"
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(response.text)
+        print(f"Transcrição salva em: {output_file}")
+        print("🎙️ Resultado da transcrição:", response.text)
+        print("📦 Estado retornado:", {**inputs, "transcricao": response.text})
+        return {**inputs, "transcricao": response.text}
+
+    except Exception as e:
+        raise RuntimeError(f"Erro ao transcrever áudio: {str(e)}")
+        sys.exit(1)
