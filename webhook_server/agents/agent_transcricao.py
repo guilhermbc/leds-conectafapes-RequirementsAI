@@ -1,0 +1,36 @@
+from langchain_core.messages import SystemMessage
+from langgraph.prebuilt import create_react_agent
+#from RequirementsAI.webhook_server.app_config import llm_model  # Seu modelo Gemini ou outro
+from app_config import llm_model, parser
+import google.generativeai as genai
+
+
+import os
+
+# Prompt do agente de transcrição
+persona_message_transcricao = SystemMessage(
+    content=(
+        "Você é um especialista em transcrição de entrevistas.\n"
+        "Sua tarefa é ouvir o áudio e gerar uma transcrição fiel, com marcação de tempo a cada 30 segundos.\n"
+        "Identifique falantes diferentes se necessário e forneça o texto em Português."
+    )
+)
+
+# --- Agente usando Google Gemini API diretamente (como no seu código) ---
+def transcribe_audio_agent(inputs):
+    audio_file_path = inputs["video_entrevista"]
+    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+    model_gemini = genai.GenerativeModel("gemini-1.5-pro")
+
+    with open(audio_file_path, 'rb') as f:
+        audio_data = f.read()
+
+    prompt = "Transcreva este áudio com marcações de tempo e identifique os falantes."
+
+    response = model_gemini.generate_content([
+        {"mime_type": "audio/mp3", "data": audio_data}, prompt
+    ])
+    print("🎙️ Resultado da transcrição:", response.text)
+    print("📦 Estado retornado:", {**inputs, "transcricao": response.text})
+    return {**inputs, "transcricao": response.text}
+

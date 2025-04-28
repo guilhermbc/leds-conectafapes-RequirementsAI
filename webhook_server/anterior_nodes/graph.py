@@ -1,32 +1,19 @@
 from langgraph.graph import StateGraph, END
 from state import MyState
-
-# Importa os agentes no lugar dos nodes
-from agents.agent_transcricao import transcribe_audio_agent
-from agents.agent_minimundo import generate_minimundo_node
-from agents.agent_analise import analyze_node
-from agents.agent_extracao import extract_node
-from agents.agent_priorizacao import prioritize_node
-from agents.agent_refinamento import refine_node
-from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
+from nodes import input_check, transcription, minimundo, analyze, extract, prioritize, refine, final
 
 builder = StateGraph(state_schema=MyState)
 
-# Verificação de entrada (não é um agente, é operacional)
+# Adiciona os agentes especialistas
 builder.add_node("verificar_entrada", input_check.check_Input)
-
-# Substitui os nodes antigos pelos agentes
-builder.add_node("transcricao_audio", transcribe_audio_agent)
-builder.add_node("gerar_minimundo", generate_minimundo_node)
-builder.add_node("analisar_documentacao", analyze_node)
-builder.add_node("extrair_requisitos", extract_node)
-builder.add_node("priorizar_requisitos", prioritize_node)
-builder.add_node("refinar_requisitos", refine_node)
-
-# Nó final ainda é operacional
+builder.add_node("transcricao_audio", transcription.transcribe_audio)
+builder.add_node("gerar_minimundo", minimundo.generate_minimundo)
+builder.add_node("analisar_documentacao", analyze.analyze_documentation)
+builder.add_node("extrair_requisitos", extract.extract_requirements)
+builder.add_node("priorizar_requisitos", prioritize.prioritize_requirements)
+builder.add_node("refinar_requisitos", refine.refine_requirements)
 builder.add_node("retorno_final", final.final_return)
 
-# Entrada e condicional
 builder.set_entry_point("verificar_entrada")
 
 def input_route(state: dict) -> str:
@@ -37,7 +24,6 @@ builder.add_conditional_edges("verificar_entrada", input_route, {
     "transcricao_audio": "transcricao_audio"
 })
 
-# Fluxo do grafo com agentes
 builder.add_edge("transcricao_audio", "gerar_minimundo")
 builder.add_edge("gerar_minimundo", "analisar_documentacao")
 builder.add_edge("analisar_documentacao", "extrair_requisitos")

@@ -3,8 +3,6 @@ from fastapi.responses import JSONResponse
 import uvicorn
 import traceback
 
-from graph import graph  # importa seu agente
-
 app = FastAPI()
 
 def preparar_estado(data: dict) -> dict:
@@ -25,7 +23,6 @@ def preparar_estado(data: dict) -> dict:
         "video_entrevista": caminho_video
     }
 
-
 def executar_grafo_e_extrair_estado_final(grafo, estado_inicial):
     final_state = None
     for step in grafo.stream(estado_inicial):
@@ -33,10 +30,11 @@ def executar_grafo_e_extrair_estado_final(grafo, estado_inicial):
         final_state = step
     return final_state
 
-
 @app.post("/webhook/webui_pipe_webhook")
 async def call_agent(request: Request):
     try:
+        from graph import graph  # ⬅️ Importação movida para dentro da função
+
         data = await request.json()
         estado = preparar_estado(data)
 
@@ -56,7 +54,6 @@ async def call_agent(request: Request):
             traceback.print_exc()
             return JSONResponse(content={"output": f"Erro ao gerar resposta: {str(e)}"})
 
-        # Tenta extrair a mensagem de dentro do estado final
         if result and isinstance(result, dict):
             state = next(iter(result.values())) if len(result) == 1 else result
             assistant_response = (
