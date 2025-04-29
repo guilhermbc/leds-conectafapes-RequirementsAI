@@ -79,8 +79,6 @@ Edite o `.env` e informe:
 ### Usando Docker Compose
 
 ```bash
-git clone https://github.com/seu-usuario/RequirementsAI.git
-cd RequirementsAI
 docker-compose up --build
 ```
 - O Streamlit será acessado em http://localhost:8501
