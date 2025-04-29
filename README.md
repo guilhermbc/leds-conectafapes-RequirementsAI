@@ -62,7 +62,7 @@ A solução é composta por dois principais serviços:
 1. **Clone o repositório e acesse a pasta:**
 
 ```bash
-git clone https://github.com/seu-usuario/RequirementsAI.git
+git clone https://github.com/profmoisesomena/RequirementsAI.git
 cd RequirementsAI
 ```
 
