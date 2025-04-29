@@ -37,7 +37,7 @@ def run_graph_with_trace(input_data: dict):
 @app.post("/webhook/webui_pipe_webhook")
 async def call_agent(request: Request):
     try:
-        from graph import graph  # ⬅️ Importação movida para dentro da função
+        from graph import graph  # Importar o grafo aqui para evitar problemas de importação circular
 
         data = await request.json()
         estado = preparar_estado(data)
@@ -49,7 +49,7 @@ async def call_agent(request: Request):
 
         try:
             result = run_graph_with_trace(estado)
-            print(f"🟢 Resposta gerada!")
+            print(f"Resposta gerada!")
             print("🧾 RESULTADO COMPLETO DO GRAFO:")
             print(result)
 
@@ -65,10 +65,10 @@ async def call_agent(request: Request):
                 or state.get("mensagem")
                 or state.get("rascunho_requisitos")
                 or state.get("minimundo")
-                or "Desculpe, não consegui gerar uma resposta."
+                or "Desculpe, não foi possível gerar uma resposta."
             )
         else:
-            assistant_response = "Desculpe, não consegui gerar uma resposta."
+            assistant_response = "Desculpe, não foi possível gerar uma resposta."
 
         return JSONResponse(content={"output": assistant_response})
 
