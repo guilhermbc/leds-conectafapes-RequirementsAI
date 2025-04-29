@@ -76,6 +76,13 @@ Edite o `.env` e informe:
 - `GEMINI_API_KEY` (obrigatório)
 - `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, `LANGSMITH_TRACING` (opcional)
 
+## Criando ambiente virtual
+
+```bash
+python3.12 -m venv venv
+source venv/bin/activate  # ou venv\Scripts\activate no Windows
+```
+
 ### Usando Docker Compose
 
 ```bash
@@ -85,13 +92,8 @@ docker-compose up --build
 - O backend FastAPI funciona internamente (porta 8001), sem exposição direta
 
 
-## Execução Manual
+### Execução Manual
 
-
-```bash
-python3.12 -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate no Windows
-```
 ### Backend (FastAPI):
 
 
