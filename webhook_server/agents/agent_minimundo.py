@@ -3,7 +3,7 @@ from langgraph.prebuilt import create_react_agent
 from langchain.prompts import ChatPromptTemplate
 #from RequirementsAI.webhook_server.app_config import llm_model
 from app_config import llm_model, parser
-
+import datetime
 from langchain_core.output_parsers import StrOutputParser
 
 # Prompt do agente de geração de minimundo
@@ -43,4 +43,13 @@ def generate_minimundo_node(state):
     """
     resultado = agent_minimundo_chain.invoke({"transcricao": state["transcricao"]})
     print("📚 Minimundo gerado:", resultado)
+
+    # Gerar nome de arquivo com timestamp
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"minimundo_{timestamp}.md"
+
+    # Salvar resultado como arquivo Markdown
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(resultado)
+
     return {**state, "minimundo": resultado}
