@@ -160,3 +160,4 @@ Pull requests são bem-vindos! Para problemas ou sugestões, abra uma _issue_.
 ---
 
 # requirements_ai_dev
+# requirements_ai_dev
