@@ -13,37 +13,37 @@ from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
 builder = StateGraph(state_schema=MyState)
 
 # Verificação de entrada (não é um agente, é operacional)
-builder.add_node("verificar_entrada", input_check.check_Input)
+builder.add_node("verify_input", input_check.check_Input)
 
 # Substitui os nodes antigos pelos agentes
-builder.add_node("transcricao_audio", transcribe_audio_agent)
-builder.add_node("gerar_minimundo", generate_minimundo_node)
-builder.add_node("analisar_documentacao", analyze_node)
-builder.add_node("extrair_requisitos", extract_node)
-builder.add_node("priorizar_requisitos", prioritize_node)
-builder.add_node("refinar_requisitos", refine_node)
+builder.add_node("audio_transcription", transcribe_audio_agent)
+builder.add_node("generate_miniworld", generate_minimundo_node)
+builder.add_node("analyze_documentation", analyze_node)
+builder.add_node("extract_requirements", extract_node)
+builder.add_node("prioritize_requirements", prioritize_node)
+builder.add_node("refine_requirements", refine_node)
 
 # Nó final ainda é operacional
-builder.add_node("retorno_final", final.final_return)
+builder.add_node("final_output", final.final_return)
 
 # Entrada e condicional
-builder.set_entry_point("verificar_entrada")
+builder.set_entry_point("verify_input")
 
 def input_route(state: dict) -> str:
-    return "mensagem_falta_video" if "mensagem" in state else "transcricao_audio"
+    return "mensagem_falta_video" if "mensagem" in state else "audio_transcription"
 
-builder.add_conditional_edges("verificar_entrada", input_route, {
-    "mensagem_falta_video": "retorno_final",
-    "transcricao_audio": "transcricao_audio"
+builder.add_conditional_edges("verify_input", input_route, {
+    "mensagem_falta_video": "final_output",
+    "audio_transcription": "audio_transcription"
 })
 
 # Fluxo do grafo com agentes
-builder.add_edge("transcricao_audio", "gerar_minimundo")
-builder.add_edge("gerar_minimundo", "analisar_documentacao")
-builder.add_edge("analisar_documentacao", "extrair_requisitos")
-builder.add_edge("extrair_requisitos", "priorizar_requisitos")
-builder.add_edge("priorizar_requisitos", "refinar_requisitos")
-builder.add_edge("refinar_requisitos", END)
-builder.add_edge("retorno_final", END)
+builder.add_edge("audio_transcription", "generate_miniworld")
+builder.add_edge("generate_miniworld", "analyze_documentation")
+builder.add_edge("analyze_documentation", "extract_requirements")
+builder.add_edge("extract_requirements", "prioritize_requirements")
+builder.add_edge("prioritize_requirements", "refine_requirements")
+builder.add_edge("refine_requirements", END)
+builder.add_edge("final_output", END)
 
 graph = builder.compile()

@@ -1,163 +1,167 @@
-# RequirementsAI – Pipeline Inteligente de Extração de Requisitos
+# Requirement AssIstant – Intelligent Requirements Extraction Pipeline
 
-Este repositório demonstra um pipeline completo de extração de requisitos de software a partir de entrevistas em vídeo, utilizando modelos de linguagem natural (LLMs), LangGraph, agentes especializados e uma interface amigável em Streamlit.
+This repository demonstrates a complete software requirements extraction pipeline from video interviews, utilizing Natural Language Models (LLMs), LangGraph, specialized agents, and a user-friendly Streamlit interface.
 
-A solução é composta por dois principais serviços:
-- **Interface Streamlit**: permite upload de vídeos e exibição dos resultados.
-- **Servidor FastAPI com LangGraph**: orquestra os agentes LLM para transcrição, análise e geração dos requisitos estruturados.
+The solution consists of two main services:
 
----
+  - **Streamlit Interface**: allows video uploads and displays results.
+  - **FastAPI Server with LangGraph**: orchestrates LLM agents for transcription, analysis, and generation of structured requirements.
 
-##  Visão Geral do Pipeline
+-----
 
-1. Upload de um vídeo de entrevista (MKV, MP4, etc.).
-2. Transcrição automatizada do áudio via LLM (Gemini/OpenAI).
-3. Geração de um minimundo a partir da transcrição.
-4. Análise e classificação dos requisitos:
-   - Requisitos Funcionais (RF)
-   - Regras de Negócio (RN)
-   - Requisitos Não Funcionais (RNF)
-5. Agentes refinam, validam e organizam os dados.
-6. Resultado final: Markdown com três tabelas resultantes.
+## Pipeline Overview
 
-## Representação gráfica
+1.  Upload an interview video (MKV, MP4, etc.).
+2.  Automated audio transcription via LLM (Gemini/OpenAI).
+3.  Generation of a miniworld from the transcription.
+4.  Analysis and classification of requirements:
+      - Functional Requirements (FR)
+      - Business Rules (BR)
+      - Non-Functional Requirements (NFR)
+5.  Agents refine, validate, and organize the data.
+6.  Final result: Markdown with three resulting tables.
+
+## Graphical Representation
 
 ![alt text](image.png)
 
 ---
 
-## 📂 Estrutura de Pastas
+## 📂 Folder Structure
 
 ```
 .
-├── streamlit_app/             # Interface do usuário
-│   ├── app_streamlit.py       # App principal
-│   ├── dockerfile             # Dockerfile da interface
-│   └── requirements.txt     # Dependências
+├── streamlit_app/             # User Interface
+│   ├── app_streamlit.py       # Main App
+│   ├── dockerfile             # Interface Dockerfile
+│   └── requirements.txt     # Dependencies
 │
-├── webhook_server/           # Backend com FastAPI + LangGraph
-│   ├── main.py                # Entrypoint do servidor
-│   ├── webhook_server.py     # Inicializa o LangGraph via endpoint
-│   ├── graph.py              # Definição dos nós do grafo
-│   ├── state.py              # Definição do estado compartilhado
-│   ├── agents/               # Agentes especializados por tarefa
-│   └── dockerfile            # Dockerfile do backend
+├── webhook_server/           # Backend with FastAPI + LangGraph
+│   ├── main.py                # Server Entrypoint
+│   ├── webhook_server.py     # Initializes LangGraph via endpoint
+│   ├── graph.py              # Graph node definitions
+│   ├── state.py              # Shared state definition
+│   ├── agents/               # Specialized agents per task
+│   └── dockerfile            # Backend Dockerfile
 │
-├── shared/uploads/           # Uploads de vídeo e transcrições
-├── docker-compose.yml        # Executa Streamlit + FastAPI juntos
+├── shared/uploads/           # Video uploads and transcriptions
+├── docker-compose.yml        # Runs Streamlit + FastAPI together
 └── README.md
 ```
 
----
+-----
 
-## Executando o Projeto
+## Running the Project
 
-### Requisitos (para execução local):
-- Python 3.12+
-- [Poetry](https://python-poetry.org/) ou `pip`
-- API key do Gemini (`GEMINI_API_KEY`) ou OpenAI
+### Requirements (for local execution):
 
-## Configurando o projeto
+  - Python 3.12+
+  - [Poetry](https://python-poetry.org/) or `pip`
+  - Gemini API key (`GEMINI_API_KEY`) or OpenAI
 
-1. **Clone o repositório e acesse a pasta:**
+## Configuring the project
+
+1.  **Clone the repository and access the folder:**
+
+<!-- end list -->
 
 ```bash
 git clone https://github.com/profmoisesomena/RequirementsAI.git
 cd RequirementsAI
 ```
 
-2. **Configure variáveis de ambiente:**
+2.  **Set environment variables:**
+
+<!-- end list -->
 
 ```bash
 cp webhook_server/.env.example webhook_server/.env
 ```
 
-Edite o `.env` e informe:
-- `GEMINI_API_KEY` (obrigatório)
-- `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, `LANGSMITH_TRACING` (opcional)
+Edit the `.env` file and provide:
 
-## Criando ambiente virtual
+  - `GEMINI_API_KEY` (required)
+  - `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, `LANGSMITH_TRACING` (optional)
+
+## Creating virtual environment
 
 ```bash
 python3.12 -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate no Windows
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 ```
 
-### Usando Docker Compose
+### Using Docker Compose
 
 ```bash
 docker-compose up --build
 ```
-- O Streamlit será acessado em http://localhost:8501
-- O backend FastAPI funciona internamente (porta 8001), sem exposição direta
 
+  - Streamlit will be accessible at http://localhost:8501
+  - The FastAPI backend runs internally (port 8001), without direct exposure
 
-### Execução Manual
+### Manual Execution
 
 ### Backend (FastAPI):
 
+Access the webhook\_server folder and run the python3 webhook\_server.py command
 
-Acesse a pasta webhook_server e execute a instrução python3 webhook_server.py
 ```bash
 cd webhook_server
-pip install -r requirements.txt (and  pip install -U "langgraph-cli[inmem]" para langgraph dev)
+pip install -r requirements.txt 
+pip install -U "langgraph-cli[inmem]" # for langgraph dev
 python3 webhook_server.py
 ```
 
 ### Frontend (Streamlit):
-Abra um novo terminal e acesse a pasta pasta streamlit_app e execute a instrução streamlit run app_streamlit.py
+
+Open a new terminal and access the streamlit\_app folder and run the streamlit run app\_streamlit.py command
+
 ```bash
 cd streamlit_app
 pip install -r requirements.txt
-# Ajuste o app_streamlit.py para usar "http://localhost:8001 ou via docker"
+# Adjust app_streamlit.py to use "http://localhost:8001 or via docker"
 streamlit run app_streamlit.py --server.port=8501
 ```
 
-Agora acesse: http://localhost:8501  e você verá o Stremlit executando no seu ambiente local.
+Now access: http://localhost:8501 and you will see Streamlit running in your local environment.
 
-O backend FastAPI funcionará em http://localhost:8001
+The FastAPI backend will run at http://localhost:8001
 
+The response will come in Markdown format with the extracted requirements. The final Markdown is saved as `report_YYYYMMDD_HHMMSS.md`.
 
-A resposta virá em formato Markdown com os requisitos extraídos. O Markdown final é salvo como `report_YYYYMMDD_HHMMSS.md`.
+-----
 
+## Agents and Components
 
----
-
-##  Agentes e Componentes
-
-| Agente                  | Função Principal                                 |
+| Agent                  | Main Function                                    |
 |------------------------|--------------------------------------------------|
-| `agent_transcricao`    | Transcrever áudio/vídeo                          |
-| `agent_minimundo`      | Gerar visão textual de contexto (minimundo)       |
-| `agent_analise`        | Analisar o minimundo e gerar requisitos          |
-| `agent_refinamento`    | Refinar e classificar requisitos (RF, RN, RNF)   |
-| `agent_validacao`      | Validar e estruturar a resposta final em Markdown |
+| `agent_transcricao`    | Transcribe audio/video                           |
+| `agent_minimundo`      | Generate textual context overview (miniworld)    |
+| `agent_analise`        | Analyze the miniworld and generate requirements  |
+| `agent_refinamento`    | Refine and classify requirements (FR, BR, NFR)   |
+| `agent_validacao`      | Validate and structure the final response in Markdown |
 
-Todos os agentes são organizados via LangGraph no arquivo `graph.py`, respeitando transições de estado e permitindo rastreabilidade com `@traceable` do LangSmith.
+All agents are organized via LangGraph in the `graph.py` file, respecting state transitions and allowing traceability with LangSmith's `@traceable`.
 
+-----
 
----
+## Input Files (audio or video)
 
-## Arquivos de Entrada (audio ou vídeo)
+  - `shared/uploads/*.mkv` – Interview videos
+  - `*.wav`, `*.mp3` – Interview audio
 
-- `shared/uploads/*.mkv` – Vídeos de entrevista
-- `*.wav`, `*.mp3` – Áudio da entrvista
+-----
 
----
+## References
 
-## Referências
-- [LangGraph](https://langchain-ai.github.io/langgraph/)
-- [Gemini API](https://ai.google.dev/)
-- [LangSmith Traceable](https://docs.smith.langchain.com/)
-- [Streamlit](https://streamlit.io/)
-- [FastAPI](https://fastapi.tiangolo.com/)
+  - [LangGraph](https://langchain-ai.github.io/langgraph/)
+  - [Gemini API](https://ai.google.dev/)
+  - [LangSmith Traceable](https://docs.smith.langchain.com/)
+  - [Streamlit](https://streamlit.io/)
+  - [FastAPI](https://fastapi.tiangolo.com/)
 
----
+-----
 
-## Contribuição
-Pull requests são bem-vindos! Para problemas ou sugestões, abra uma _issue_.
+## Contribution
 
----
-
-# requirements_ai_dev
-# requirements_ai_dev
+Pull requests are welcome\! For issues or suggestions, please open an *issue*.
