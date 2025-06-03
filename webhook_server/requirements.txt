@@ -215,7 +215,6 @@ unstructured-client==0.32.3
 uritemplate==4.1.1
 urllib3==2.4.0
 uvicorn==0.34.0
-uvloop==0.21.0
 validators==0.34.0
 virtualenv==20.30.0
 watchfiles==1.0.5
