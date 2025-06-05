@@ -16,10 +16,10 @@ persona_message_ident_class = SystemMessage(
     )
 )
 
-analise_prompt = ChatPromptTemplate.from_messages([
+identificacao_prompt = ChatPromptTemplate.from_messages([
     persona_message_ident_class,
     ("human", """
-    You are an expert in class engineering.
+    You are an expert in object-oriented analysis and class modeling.
 
     Task:
     1. Read and analyze the domain narrative below.
@@ -29,10 +29,6 @@ analise_prompt = ChatPromptTemplate.from_messages([
         - Relations (REL): What are the relations of the classes, if there is any?
      
     3. Deliver:
-        - A structured preliminary draft listing FRs, BRs, and NFRs separately.
-        - A list of any identified gaps, ambiguities, or inconsistencies.
-        - Questions for the user to clarify unclear or missing points.
-     
         - A structured preliminary draft listing CLS and, for each CLS, their ATTR and REL.
         - A list of any identified gaps, ambiguities, or inconsistencies.
         - Questions for the user to clarify unclear or missing points.
@@ -74,7 +70,7 @@ analise_prompt = ChatPromptTemplate.from_messages([
      """)
 ])
 
-agent_analise_chain = analise_prompt | llm_model | StrOutputParser()
+agent_identificacao_chain = identificacao_prompt | llm_model | StrOutputParser()
 
 def analyze_node(state):
     """
@@ -84,6 +80,6 @@ def analyze_node(state):
     2. Generate an initial understanding of the classes and their attributes and relations.
     """
     print("🔎 Estado recebido no nó de identificacao:", state)
-    resultado = agent_analise_chain.invoke({"minimundo": state["minimundo"]})
+    resultado = agent_identificacao_chain.invoke({"minimundo": state["minimundo"]})
 
     return {**state, "rascunho_classes": resultado}
