@@ -10,6 +10,13 @@ from agents.agent_priorizacao import prioritize_node
 from agents.agent_refinamento import refine_node
 from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
 
+# Importa os agentes do diagrama de classe
+from agents.classDiagram.agent_extracao_classe import extract_node as extract_CD
+from agents.classDiagram.agent_identificacao_classe import identify_node as identify_CD
+from agents.classDiagram.agent_revisao_classe import revise_node as revise_CD
+from agents.classDiagram.agent_refinamento_classe import refine_node as refine_CD
+# from agents.classDiagram.agent_join import join_node as join_CD
+
 builder = StateGraph(state_schema=MyState)
 
 # Verificação de entrada (não é um agente, é operacional)
@@ -22,6 +29,16 @@ builder.add_node("analyze_documentation", analyze_node)
 builder.add_node("extract_requirements", extract_node)
 builder.add_node("prioritize_requirements", prioritize_node)
 builder.add_node("refine_requirements", refine_node)
+
+# nodes do diagrama de classe
+builder.add_node("indentify_class", identify_CD)
+builder.add_node("extract_class_diagram", extract_CD)
+builder.add_node("revise_class_diagram", revise_CD)
+builder.add_node("refine_class_diagram", refine_CD)
+
+# Join Node (não usa IA)
+# Será usado no paralelismo da parte de requisitos e de classes
+# builder.add_node("join_node", join_CD)
 
 # Nó final ainda é operacional
 builder.add_node("final_output", final.final_return)
@@ -43,7 +60,13 @@ builder.add_edge("generate_miniworld", "analyze_documentation")
 builder.add_edge("analyze_documentation", "extract_requirements")
 builder.add_edge("extract_requirements", "prioritize_requirements")
 builder.add_edge("prioritize_requirements", "refine_requirements")
-builder.add_edge("refine_requirements", END)
+
+builder.add_edge("refine_requirements", "indentify_class")
+builder.add_edge("indentify_class", "extract_class_diagram")
+builder.add_edge("extract_class_diagram", "revise_class_diagram")
+builder.add_edge("revise_class_diagram", "refine_class_diagram")
+builder.add_edge("refine_class_diagram", END)
+
 builder.add_edge("final_output", END)
 
 graph = builder.compile()

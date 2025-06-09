@@ -12,8 +12,6 @@ class MyState(TypedDict):
     requisitos_priorizados: Optional[str]
     report: Optional[str]
 
-class ClassDiagramState(TypedDict):
-    minimundo: Optional[str]
     rascunho_classes: Optional[str]
     diagrama_classes: Optional[str]
     diagrama_classes_revisado: Optional[str]
