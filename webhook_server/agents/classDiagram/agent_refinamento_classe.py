@@ -74,6 +74,6 @@ refinamento_prompt = ChatPromptTemplate.from_messages([
 
 agent_refinamento_chain = refinamento_prompt | llm_model | StrOutputParser()
 
-def extract_node(state):
+def refine_node(state):
     resultado = agent_refinamento_chain.invoke({"diagrama_classes_revisado": state["diagrama_classes_revisado"]})
     return {**state, "diagrama_classes_final": resultado}

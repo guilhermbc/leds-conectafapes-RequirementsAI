@@ -72,7 +72,7 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
 
 agent_identificacao_chain = identificacao_prompt | llm_model | StrOutputParser()
 
-def analyze_node(state):
+def identify_node(state):
     """
     Steps 1 and 2:
     1. Carefully read the domain narrative to identify
