@@ -71,4 +71,4 @@ def refine_node(state):
     with open(filename, "w", encoding="utf-8") as f:
         f.write(resultado)
 
-    return {**state, "report": resultado}
+    return {**state, "requisitos_refinados": resultado}
