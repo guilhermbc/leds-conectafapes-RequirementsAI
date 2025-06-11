@@ -28,7 +28,7 @@ uc_prompt = ChatPromptTemplate.from_messages([
     You are a Use Case Agent, responsible for analyzing a system's requirement table and producing a structured list of use cases based on those requirements.
 
     Below are the prioritized and refined requirements:
-    {requisitos_refinados}
+    {report}
 
     **Objective**: Given a requirement table, generate a Use Case Table in the following format (example):
 
@@ -66,7 +66,9 @@ agent_uc_chain = uc_prompt | llm_model | StrOutputParser()
 # Função refinada para o nó
 def usecases_node(state):
     print("🔍 Estado recebido no nó de casos de uso:", state)
-    resultado = agent_uc_chain.invoke({"requisitos_refinados": state["requisitos_refinados"]})
+    for chave in state.keys():
+        print(f"🔑 Chave: {chave}")
+    resultado = agent_uc_chain.invoke({"report": state["report"]})
 
     # Gerar nome de arquivo com timestamp
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
