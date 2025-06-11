@@ -3,6 +3,7 @@ from langchain.prompts import ChatPromptTemplate
 #from RequirementsAI.webhook_server.app_config import llm_model
 from langchain_core.output_parsers import StrOutputParser
 from app_config import llm_model, parser
+import datetime
 
 persona_message_refinamento = SystemMessage(
     content=("""
@@ -76,4 +77,13 @@ agent_refinamento_chain = refinamento_prompt | llm_model | StrOutputParser()
 
 def refine_node(state):
     resultado = agent_refinamento_chain.invoke({"diagrama_classes_revisado": state["diagrama_classes_revisado"]})
+    
+    # Gerar nome de arquivo com timestamp
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"classDiagram_{timestamp}.md"
+
+    # Salvar resultado como arquivo Markdown
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(resultado)
+
     return {**state, "diagrama_classes_final": resultado}

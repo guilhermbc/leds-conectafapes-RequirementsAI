@@ -72,5 +72,5 @@ revisao_prompt = ChatPromptTemplate.from_messages([
 agent_revisao_chain = revisao_prompt | llm_model | StrOutputParser()
 
 def revise_node(state):
-    resultado = agent_revisao_chain.invoke({"diagrama_classes": state["diagrama_classes"]}, {"report":state["report"]})
+    resultado = agent_revisao_chain.invoke({"diagrama_classes": state["diagrama_classes"], "report":state["report"]})
     return {**state, "diagrama_classes_revisado": resultado}
