@@ -8,7 +8,7 @@ from agents.agent_analise import analyze_node
 from agents.agent_extracao import extract_node
 from agents.agent_priorizacao import prioritize_node
 from agents.agent_refinamento import refine_node
-from agents.agent_casosdeuso import usecases_node
+from webhook_server.agents.use_cases.agent_organizeuc import usecases_node
 from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
 
 builder = StateGraph(state_schema=MyState)
@@ -23,6 +23,7 @@ builder.add_node("analyze_documentation", analyze_node)
 builder.add_node("extract_requirements", extract_node)
 builder.add_node("prioritize_requirements", prioritize_node)
 builder.add_node("refine_requirements", refine_node)
+
 builder.add_node("extract_usecases", usecases_node)
 
 # Nó final ainda é operacional
