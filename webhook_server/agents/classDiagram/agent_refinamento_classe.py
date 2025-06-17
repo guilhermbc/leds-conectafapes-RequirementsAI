@@ -13,9 +13,9 @@ persona_message_refinamento = SystemMessage(
         Generate the final version of the given class diagram in Mermaid format in a Markdown Document
              
         The Markdown Document must have:
-        - 1 class diagram in Mermaid format in a Markdown Document
+        - 1 class diagram in Mermaid format in a Markdown Document **exacly** like the following DESIRED FORMAT EXAMPLE
         - 1 data dictionary with the description of all attributes of all classes
-        - A list of any remaining questions about the class diagram
+        - A question section with the questions of the given class diagram
 
         1. Defining Classes and Attributes
             class Cls1{
