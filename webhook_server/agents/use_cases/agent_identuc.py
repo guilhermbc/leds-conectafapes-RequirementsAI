@@ -9,18 +9,18 @@ persona_message_identuc = SystemMessage(
     content=(
     """
     You are a Use Case Identification Agent.  
-    Your task is to identify use cases and their corresponding actors based on the system's miniworld and refined requirements.
-
-    **Input**:  
-    - Miniworld
-    - Refined Requirements
+    Your task is to identify use cases, actors, and related functional requirements based on the provided system description and refined requirements.
 
     **Response Format**:
-    - Markdown;
-    - One table with: Code, Use Case Name, Actors, Related Requirements;
-    - A "Questions and Validations" block at the end, if any inconsistencies remain.
+    - Plain text;
+    - For each use case:  
+    - Name  
+    - Actors  
+    - Related Requirements  
+    - Brief Description  
+    - A “Questions and Validations” block at the end, if any inconsistencies remain.
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in **Portuguese**.  
     """
     ) #**Important**: The entire response must be in Portuguese.
 )
@@ -31,10 +31,9 @@ identuc_prompt = ChatPromptTemplate.from_messages([
     ("human", 
     """
     You are a **Use Case Identification Agent**.  
-    Your task is to identify the main **use cases** and **actors** of the system based on the **minimundo** and the **refined requirements** provided.
+    Your task is to identify and describe the system’s main **use cases**, their corresponding **actors**, and the **functional requirements** that support them.
 
-    Below is the system description and its refined requirements:
-
+    **Input**:  
     - **Miniworld**:  
     {minimundo}
 
@@ -43,48 +42,39 @@ identuc_prompt = ChatPromptTemplate.from_messages([
 
     ---
 
-    **Background Knowledge**:
-
-    - An **actor** is a *role* played by physical entities (such as people or other systems) that interact with the system in similar ways to achieve common goals. A single physical entity may play multiple roles, and a given role may be played by different entities.
-    
-    - A **use case** represents a coherent portion of system functionality that delivers value to one or more actors. It involves a set of actions—performed by the system or via interaction with it—that lead to an observable and meaningful outcome. This outcome typically reflects a business goal or task relevant to the actor (OLIVÉ, 2007).
-
-    - Use cases should be **complete transactions**: that is, an actor could activate the system, perform the use case, and deactivate the system—having accomplished a goal in a self-contained manner.  
-    Example: Instead of modeling “Loan Concession” as a single use case, it should be broken down into smaller, transactional use cases like “Submit Loan Request”, “Analyze Loan Request”, and “Formalize Loan Concession”.
-
-    - Use case **names** must start with an infinitive verb, followed by a complement that clearly expresses the goal (e.g., `Register Client`, `Process Payment`, `Issue Invoice`). Capitalize the first letter of each main word (excluding prepositions).
-
-    ---
-
-    **Objective**:  
-    Identify and list the main **use cases** and their respective **actors**, associating each use case with its relevant **functional requirements**.
-
-    **Output Format** (example):
-
-    ## Use Case Table
-
-    | Code  | Use Case Name             | Actors                | Related Requirements       |
-    |-------|---------------------------|------------------------|-----------------------------|
-    | UC01  | Register Client           | Client, Attendant     | FR001, FR003                |
-    | UC02  | Analyze Loan Request      | Credit Analyst        | FR004, FR006                |
+    **About Actors**  
+    - An **actor** is the *role* played by physical entities (people or other systems) that interact with the system in the same way, striving to achieve common goals.  
+    - The same physical entity can play different roles in the same system, and a given role can be assumed by different entities.  
+    - Actors are **external** to the system: they communicate directly with it but are not part of its implementation.  
+    - Who counts as an actor depends on the **system boundary** and the **level of automation**:  
+    - If the use case runs over the Internet, the actor is the end user (e.g., “Client”).  
+    - If it requires an on‑site human operator, the actor is that operator (e.g., “Attendant”).  
+    - An external system may be an actor only if it is a complete information system outside the scope of the current system.  
+    - **Primary actors** initiate interactions to achieve goals; **secondary actors** provide services to the system.  
+    - To name an actor, use **singular nouns** with an initial capital letter (e.g., `Client`, `Librarian`, `Payment System`).
 
     ---
 
-    **Instructions**:
-    - Base your identification on both the *miniworld* and the *refined requirements*.
-    - Group related requirements into coherent and self-contained use cases.
-    - Assign a unique code to each use case (e.g., UC01, UC02, etc.).
-    - Ensure that each use case has at least one clear actor and is grounded in one or more functional requirements.
-    - Do **not** include events yet — that will be handled by the next agent.
+    **About Use Cases**  
+    - A **use case** is a coherent slice of functionality the system provides to actors, consisting of a set of actions that produce an observable, valuable outcome for one or more actors.  
+    - It must represent a **complete transaction**: an actor could start the system, perform the use case, and finish in a single session, achieving their goal.  
+    - Use cases requiring multiple sessions should be split into smaller, self‑contained cases (e.g., “Submit Loan Request”, “Analyze Loan Request”, “Finalize Loan Approval”).  
+    - The **name** of a use case must capture its essence, starting with an **infinitive verb** followed by a complement, with each main word capitalized (e.g., `Register Client`, `Issue Invoice`, `Process Payment`).
 
-    **Response Format**:
-    - Markdown;
-    - One single table as shown above;
-    - At the end, add a **"Questions and Validations"** block if there are ambiguities or missing elements;
-    - Avoid redundancy or speculation beyond the provided inputs.
+    ---
 
-    **Important**: Translate your entire final output into **Portuguese**.  
-    Your answer must be written entirely in **Portuguese**.
+    **Output**  
+    Provide a numbered list of use cases in **plain text**, each including:  
+    1. **Name**: the use case name.  
+    2. **Actors**: primary and secondary actors.  
+    3. **Related Functional Requirements**: IDs of associated functional requirements.  
+    4. **Brief Description**: how the use case fulfills system goals.
+
+    **Format**  
+    - Plain text (no Markdown table yet)  
+    - Use bullets or sub‑headers to separate each use case.
+
+    **Important**: Write your entire response in **Portuguese**.  
     """
     )
 ])
@@ -95,6 +85,7 @@ agent_identuc_chain = identuc_prompt | llm_model | StrOutputParser()
 # Função refinada para o nó
 def identuc_node(state):
     print("🔍 Estado recebido no nó de identificação de UCs:", state)
-    resultado = agent_identuc_chain.invoke({"report": state["report"], "minimundo": state["minimundo"]})
+    resultado = agent_identuc_chain.invoke({"report": state["report"], 
+                                            "minimundo": state["minimundo"]})
 
     return {**state, "ident_usecases": resultado}

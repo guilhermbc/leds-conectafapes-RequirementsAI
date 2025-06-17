@@ -1,4 +1,3 @@
-import datetime
 from langchain_core.messages import SystemMessage
 from langchain.prompts import ChatPromptTemplate
 from app_config import llm_model, parser
@@ -8,22 +7,15 @@ from langchain_core.output_parsers import StrOutputParser
 persona_message_validateuc = SystemMessage(
     content=(
     """
-    You are a Use Case Review and Correction Agent.  
-    Your task is to validate and correct a Markdown table of use cases based on the system’s miniworld and refined requirements.
-
-    **Input**:
-    - Miniworld: {minimundo}  
-    - Refined Requirements: {report}  
-    - Initial Use Case Table: {usecase_table}
+    You are a Use Case Validation Agent.  
+    Your task is to review and correct use case descriptions using the refined requirements and the domain description.
 
     **Response Format**:
-    - Markdown;
-    - A corrected table: Code, Use Case Name, Actors, Related Requirements;
-    - A "Validation Report" section listing any changes or justifications;
-    - A "Final Remarks" block at the end, if needed.
+    - Plain text;
+    - For each use case: Name, Actors, Preconditions, Normal Flow of Events, Alternative / Exception Flows, Related Requirements, and Classes;
+    - A "Questions and Validations" block at the end, with doubts, assumptions, or inconsistencies.
 
     **Important**: Your entire response must be written in **Portuguese**.
-
     """
     ) #**Important**: The entire response must be in Portuguese.
 )
@@ -33,40 +25,35 @@ validateuc_prompt = ChatPromptTemplate.from_messages([
     persona_message_validateuc,
     ("human", 
     """
-    You are a **Use Case Review and Correction Agent**.  
-    Your task is to review and correct a Markdown table of use cases, ensuring it accurately reflects the system’s refined requirements and miniworld.
+    You are a **Use Case Validation Agent**.  
+    Your task is to review and validate a list of use cases, ensuring consistency, correctness, and alignment with the refined requirements and the project’s domain description.
 
-    **Input**:
-    - Miniworld:  
-    {minimundo}
-
-    - Refined Requirements Report:  
-    {report}
-
-    - Initial Use Case Table (to be reviewed and corrected):  
-    {ident_usecases}
+    You will receive:  
+    - A list of use cases, each with: Name, Actors, Preconditions, Normal Flow of Events, Alternative / Exception Flows, Related Requirements, and Classes (which may be empty): {ident_events};  
+    - A refined version of the system's requirements: {report};  
+    - A domain description (minimundo) that explains the context of the system: {minimundo}.
 
     ---
 
-    **Objective**:
-    - Carefully analyze the use case table and validate it based on the miniworld and refined requirements.
-    - Identify and fix any of the following issues:
-    - Use cases that are too broad, too vague, or not self-contained;
-    - Missing or incorrect actors;
-    - Improper grouping or omission of functional requirements;
-    - Missing use cases that should be present based on the miniworld;
-    - Naming inconsistencies (use infinitive verbs and capitalize each main word).
+    **Your Objective**:  
+    - Carefully analyze each use case and verify if:  
+    1. The **flow of events** aligns with the system’s goals and logic;  
+    2. The **actors** make sense considering the system boundary and the description of the domain;  
+    3. The **preconditions** are meaningful and necessary;  
+    4. The **related requirements** listed are appropriate and relevant;  
+    5. There are no **missing or redundant cases**;  
+    6. No essential behavior described in the refined requirements or minimundo was left unmodeled.  
+
+    If you find inconsistencies, fix them directly in the use case descriptions. If the information is ambiguous or insufficient, flag it in the "Questions and Validations" section at the end.
 
     ---
 
-    **Response Format**:
-    - Markdown;
-    - First, regenerate a corrected and validated **Use Case Table** with the columns: Code, Use Case Name, Actors, Related Requirements;
-    - Then, include a **"Validation Report"** section listing the corrections made and reasoning behind them;
-    - Finish with a **"Final Remarks"** block if needed.
+    **Output Format**:  
+    - Plain text;  
+    - Return the complete revised list of use cases with all fields (not including Classes, leave it empty);  
+    - Add a final section titled **Questions and Validations** with any doubts, inconsistencies, or assumptions made.
 
     **Important**: Your entire response must be written in **Portuguese**.
-
     """
     )
 ])
@@ -78,14 +65,6 @@ agent_validateuc_chain = validateuc_prompt | llm_model | StrOutputParser()
 def validateuc_node(state):
     resultado = agent_validateuc_chain.invoke({"report": state["report"], 
                                                "minimundo": state["minimundo"],
-                                               "ident_usecases": state["ident_usecases"]})
+                                               "ident_events": state["ident_events"]})
 
-    # Gerar nome de arquivo com timestamp
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"reportuc_{timestamp}.md"
-
-    # Salvar resultado como arquivo Markdown
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(resultado)
-
-    return {**state, "report_usecases": resultado}
+    return {**state, "report_validateuc": resultado}
