@@ -26,8 +26,12 @@ if uploaded_file:
 
             if response.status_code == 200:
                 result = response.json().get("output", "")
+                class_diagram = response.json().get("class_diagram", "")
                 st.markdown("###  Resposta do Agente:")
+                st.markdown("#### Tabelas de Requisitos:")
                 st.markdown(result, unsafe_allow_html=True)
+                st.markdown("#### Diagrama de Classe:")
+                st.markdown(class_diagram, unsafe_allow_html=True)
             else:
                 st.error(f"Erro: {response.status_code}")
         except Exception as e:

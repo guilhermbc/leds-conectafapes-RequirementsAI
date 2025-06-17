@@ -67,10 +67,18 @@ async def call_agent(request: Request):
                 or state.get("minimundo")
                 or "Desculpe, não foi possível gerar uma resposta."
             )
+            class_diagram = (
+                state.get("diagrama_classes_final")
+                or state.get("diagrama_classes_revisado")
+                or state.get("diagrama_classes")
+                or state.get("rascunho_classes")
+                or ""
+            )
         else:
             assistant_response = "Desculpe, não foi possível gerar uma resposta."
+            class_diagram = ""
 
-        return JSONResponse(content={"output": assistant_response})
+        return JSONResponse(content={"output": assistant_response, "class_diagram": class_diagram})
 
     except Exception as e:
         print(f" Erro geral: {str(e)}")
