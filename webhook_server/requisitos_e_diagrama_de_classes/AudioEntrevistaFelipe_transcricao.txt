@@ -1,77 +1,92 @@
-[ 0m0s093ms ] Boa tarde, Filipe.
-[ 0m1s712ms ] Boa tarde, Moisés. Tudo bom com você, cara?
-[ 0m3s562ms ] Tudo bem, meu caro? Tudo certo?
-[ 0m6s172ms ] A gente vai falar então sobre qual módulo do sistema?
-[ 0m10s260ms ] Vamos falar do, ah, vamos falar do portal do coordenador.
-[ 0m14s332ms ] Pode ser? Portal do coordenador.
-[ 0m16s752ms ] É, qual que é o propósito principal do módulo do coordenador que será desenvolvido e quais problemas ele deve resolver?
-[ 0m24s677ms ] Tá, então, deixa, deixa eu voltar aqui, na verdade a gente trocou o nome: Portal FAPs.
-[ 0m30s338ms ] Portal FAPs.
-[ 0m31s728ms ] É, então, o problema que ele precisa resolver é, principalmente, a questão de implementação de bolsa, de cadastro de bolsista, de cadastro de coordenador, é, quando, quando o coordenador ele começa o projeto, a ideia é que ele consiga ver, é, quais os bolsistas estão alocados no seu projeto, quanto que ele tem de recurso, capital, custeio, quantas cotas de bolsa, por quanto tempo ele tem. Se ele quiser, por exemplo, fazer algum tipo de remanejamento, por exemplo, trocar, é, uma bolsa que é maior por duas menores, né, ele também precisa ter esse tipo de, de possibilidade de funcionalidade, né?
-[ 1m15s47ms ] Perfeito, ótimo.
-[ 1m17s497ms ] É,
-[ 1m19s147ms ] quais são os principais processos ou atividades que ele deve apoiar para ser uma solução efetiva?
-[ 1m24s257ms ] Então, a principal coisa é, ele precisa, ele mesmo conseguir fazer esse tipo de, de ajuste.
-[ 1m31s637ms ] Então, por exemplo, seria legal, no sistema, se ele tá ali numa fase de planejamento, né, pensando em trocar uma bolsa por outra e tal, seria bacana se ele conseguisse simular isso, inclusive. Porque aí ele consegue ter uma ideia melhor de, dependendo da configuração que ele faça, como que vai ficar o valor e as cotas das bolsas, se vai sobrar algum tipo de recurso, por exemplo, né? Então é muito comum esse tipo de, de ajuste. Então, seria interessante se ele conseguisse, até antes de fazer, simular essa, essa coisa para ver como é que ficaria.
-[ 2m4s967ms ] Uma previsibilidade, né?
-[ 2m6s107ms ] É, uma previsibilidade.
-[ 2m8s297ms ] É, outra parte importante também é a parte de cadastro de documentos, né? Então, quando vai implementar a bolsa, é, é preciso que o bolsista e o coordenador saibam quais documentos são importantes para aquele edital, né?
-[ 2m23s437ms ] E, e, e uma coisa interessante também seria que a gente não precisasse ficar subindo documentos que não perdem validade.
-[ 2m31s847ms ] Por exemplo, um diploma, né, que já foram validados alguma vez.
-[ 2m36s617ms ] É,
-[ 2m37s457ms ] outros documentos acabam perdendo, né? Por exemplo, comprovante de residência, né?
-[ 2m41s847ms ] É, mas no geral, é, seria interessante que o documento que não tivesse validade, que ele pudesse ser reaproveitado no sistema, né?
-[ 2m50s387ms ] Perfeito.
-[ 2m52s387ms ] Existem regras específicas que devem ser seguidas para a execução das atividades ou processos envolvidos?
-[ 2m57s257ms ] Existem, por exemplo, eh, cada projeto tem um conjunto de bolsas que podem ser alocadas, né? E cada bolsa também tem um conjunto de regras da FAPs de nível de exigência. Então cada uma tem seus requisitos.
-[ 3m13s387ms ] Então, não, não, você não pode alocar qualquer bolsa a qualquer pessoa, né? A pessoa tem que atender os requisitos, né? Eh, tem alguns requisitos, por exemplo, que é certidão negativa de algumas coisas, né? Eh, escolaridade, né? Eh, a idade também, né? Que tem que ser maior de 18 anos também são, se eu não me engano.
-[ 3m37s207ms ] Eh, então existe, existem essas regrinhas, né?
-[ 3m40s27ms ] Eles fazem relativas tanto à formação quanto à experiência, né?
-[ 3m42s67ms ] Exatamente, formação e experiência, isso aí.
-[ 3m45s737ms ] OK. Na sua visão, quais são as entradas, saídas e dados envolvidos nesse, nesse,
-[ 3m51s917ms ] Eu acho que as entradas são as informações dos, dos bolsistas, né? Respeitando, claro, as informações pra alocação da bolsa, né? Então, eh, endereço, conta bancária, eh, identidade, nome, né?
-[ 4m8s627ms ] Eh, pra, pra bolsa em si, né, esses documentos, acho que são relevantes, né?
-[ 4m15s527ms ] Eh, e pro, pro projeto em si, aí tem os dados, dados de alocação da FAPs, né, do edital, por exemplo. Eh, qual a verba do edital, quanto tem que ser alocado em cada coisa, né? Aí são regras do, do, do edital.
-[ 4m31s497ms ] Uhum. Então, além das informações das pessoas, também tem as informações do edital específico e do projeto.
-[ 4m37s927ms ] Isso.
-[ 4m39s927ms ] Quem utilizará o sistema e como esses usuários interagem com o sistema? Quais os principais papéis?
-[ 4m45s387ms ] É, então, os principais papéis, eh, do portal, né, eh, o portal é totalmente voltado para o público externo, né?
-[ 4m53s537ms ] Uhum.
-[ 4m54s537ms ] Então, os, hoje seriam, eh, pesquisadores, né?
-[ 4m59s967ms ] Eh, bolsistas, eu sei que, que a FAPs também tem a parte de extensão, né? Então, tem, por exemplo, centelha, que são empreendedores, né? Pessoas que estão querendo empreender e tal.
-[ 5m12s637ms ] Eh, então assim, basicamente são, são esses os, os papéis, né?
-[ 5m18s677ms ] OK.
-[ 5m20s377ms ] Eh, como esse módulo, na sua visão, se conecta a outros sistemas/módulos envolvidos?
-[ 5m26s507ms ] Eh, então, o, o sistema, ele, algumas informações precisam ser alimentadas pelo, pelo admin, né?
-[ 5m35s17ms ] Então, por exemplo, o cadastro do edital, eh, a submissão do projeto, provavelmente vai ser feita pelo portal também, né, que é o, é o bolsista ou o coordenador que faz a submissão normalmente. Mas isso precisa ser aprovado, né, coisas desse tipo. Passa por avaliação de Hoque, tal.
-[ 5m54s17ms ] Tem todo um trâmite, né?
-[ 5m55s27ms ] Todo um trâmite, que é feito todo por esse admin, né?
-[ 5m58s727ms ] Eh, por exemplo, os tipos das bolsas, né? É tudo feito por esse outro sistema. Então, tem uma base de dados que já é preenchida nesse outro sistema.
-[ 6m9s737ms ] OK. E aí esses dados aparecem nesse, nesse módulo, né?
-[ 6m13s547ms ] Isso.
-[ 6m15s47ms ] OK. Existe alguma restrição importante que deve ser considerada?
-[ 6m20s467ms ] Então, os bolsistas, no geral, eles precisam, eh, morar no estado, né?
-[ 6m27s927ms ] Então, meio que é um pré-requisito para, pelo menos, para receber a bolsa da, da FAPs, teria que morar no estado, né? Outro, outro requisito é que ele precisa de fazer login no, no sistema de login do governo do Estado, que integra lá com o SOU GOV. Então, esse é um requisito.
-[ 6m48s77ms ] OK, perfeito.
-[ 6m50s567ms ] Algum requisito de desempenho esperado para o sistema, na sua visão? Tempo de resposta, volume de dados, número de usuários simultâneos, entre outros?
-[ 6m59s37ms ] Olha, não pensei nisso ainda.
-[ 7m1s937ms ] Não sei te responder.
-[ 7m3s277ms ] OK. Então, a priori, não tem nenhum requisito desse sendo considerado, né?
-[ 7m7s107ms ] Por enquanto não.
-[ 7m8s37ms ] OK.
-[ 7m9s917ms ] É, há documentação ou referência existente que devem ser considerados no desenvolvimento, na sua visão?
-[ 7m16s387ms ] Sim. A ideia é usar o SIGFAPs, né, como como uma visão inicial.
-[ 7m24s147ms ] Eh, existe também um outro sistema que já foi previamente implementado, né?
-[ 7m30s537ms ] Tem, tem muita documentação feita, de análise e tal, que pode ser utilizada. Fora isso é, é resoluções e da FAPs e conversa com o pessoal da FAPs, reuniões, né, entrevistas.
-[ 7m42s637ms ] Uhum. Aí tem as resoluções, mas aí você não tem nenhuma documentação efetiva que seja importante para o mínimo mundo aqui, por exemplo, então. Seriam mais essas documentações que tem que ser levantadas.
-[ 7m52s807ms ] Sim, precisam ser levantadas.
-[ 7m54s557ms ] OK.
-[ 7m55s537ms ] Vocês conhecem ou já utilizaram um sistema similar que pode servir de referência?
-[ 8m1s267ms ] Eh, eu acho que o que a gente tem de referência hoje é o próprio SIGFAPs, né? Eu, pelo menos, não conheço nenhum outro sistema que trabalhe nesse mesmo contexto de edital, bolsa e bolsista, né? Projeto, não, não conheço.
-[ 8m18s577ms ] OK. E a pessoa tem que cadastrar tudo isso, cadastrar bolsa, cadastrar projeto.
-[ 8m22s227ms ] Tem que cadastrar bolsa, projeto, edital, tem que alocar, né? Tudo isso tem que ser feito.
-[ 8m29s137ms ] OK. Obrigado, Filipe. Obrigado pela entrevista.
-[ 8m32s17ms ] De nada, Moisés. Eu que agradeço, cara.
-[ 8m33s777ms ] Ótima tarde, meu querido.
-[ 8m34s837ms ] Pra você também.
-[ 8m38s77ms ] [silence]
+[ 0m0s0ms - 0m1s165ms ] Speaker 1: Boa tarde, Felipe.
+[ 0m1s705ms - 0m3s915ms ] Speaker 2: Boa tarde, Moisés. Tudo bom com você, cara?
+[ 0m4s31ms - 0m5s605ms ] Speaker 1: Tudo bem, meu caro, tudo certo?
+[ 0m6s325ms - 0m9s175ms ] Speaker 1: A gente vai falar então sobre qual módulo do sistema?
+[ 0m10s335ms - 0m13s735ms ] Speaker 2: Vamos falar do, ah, vamos falar do portal do coordenador?
+[ 0m14s355ms - 0m15s785ms ] Speaker 1: Pode ser, portal do coordenador.
+[ 0m16s795ms - 0m24s425ms ] Speaker 1: É, qual que é o propósito principal do módulo do coordenador que será desenvolvido e quais problemas ele deve resolver?
+[ 0m24s766ms - 0m30s356ms ] Speaker 2: Tá, então, deixa eu, deixa eu voltar aqui, na verdade a gente trocou o nome: Portal FAPES.
+[ 0m30s556ms - 0m30s996ms ] Speaker 1: Portal FAPES.
+[ 0m31s936ms - 0m42s376ms ] Speaker 2: Eh, então, o problema que ele precisa resolver é, principalmente a questão de implementação de bolsa, de cadastro de bolsista, de cadastro coordenador.
+[ 0m42s916ms - 1m1s126ms ] Speaker 2: Eh, quando, quando o coordenador ele começa o projeto, a ideia é que ele consiga ver eh quais os bolsistas estão alocados no seu projeto, quanto que ele tem de recurso, capital, custeio, quantas cotas de bolsa, por quanto tempo ele tem.
+[ 1m1s486ms - 1m14s686ms ] Speaker 2: Se ele quiser, por exemplo, fazer algum tipo de remanejamento, por exemplo, trocar eh uma bolsa que é maior por duas menores, né, ele também precisa ter esse tipo de, de possibilidade de funcionalidade, né?
+[ 1m15s326ms - 1m16s386ms ] Speaker 1: Perfeito, ótimo.
+[ 1m17s326ms - 1m23s466ms ] Speaker 1: Eh, quais são os principais processos ou atividades que ele deve apoiar para ser uma solução efetiva?
+[ 1m24s286ms - 1m30s936ms ] Speaker 2: Então, a principal coisa é, ele precisa, ele mesmo conseguir fazer esse tipo de, de ajuste.
+[ 1m31s526ms - 1m42s656ms ] Speaker 2: Então, por exemplo, seria legal no sistema, se ele está ali numa fase de planejamento, né, pensando em trocar uma bolsa por outra e tal, seria bacana se ele conseguisse simular isso, inclusive.
+[ 1m42s656ms - 2m4s546ms ] Speaker 2: Porque aí ele consegue ter uma ideia melhor de, dependendo da configuração que ele faça, como que vai ficar o valor e as cotas das bolsas, se vai sobrar algum tipo de recurso, por exemplo, né?
+[ 2m4s546ms - 2m7s466ms ] Speaker 2: Então é muito comum esse tipo de, de ajuste, então seria interessante se ele conseguisse até antes de fazer, simular essa, essa coisa pra ver como é que ficaria.
+[ 2m7s466ms - 2m7s766ms ] Speaker 1: É, uma previsibilidade.
+[ 2m8s126ms - 2m12s266ms ] Speaker 2: Eh, outra parte importante também é a parte de cadastro de documentos, né?
+[ 2m12s266ms - 2m22s776ms ] Speaker 2: Então, quando vai implementar a bolsa, eh, é preciso que o bolsista e o, o coordenador saibam quais documentos são importantes para aquele edital, né?
+[ 2m23s306ms - 2m31s256ms ] Speaker 2: E, e, e uma coisa interessante também seria que a gente não precisasse ficar subindo documentos que não perdem validade.
+[ 2m31s636ms - 2m41s146ms ] Speaker 2: Por exemplo, um diploma, né, que já foram validados alguma vez, eh, outros documentos acabam perdendo, né, por exemplo, comprovante de residência, né?
+[ 2m41s146ms - 2m50s186ms ] Speaker 2: Eh, mas no geral, eh, seria interessante que o documento que não tivesse validade, que ele pudesse ser reaproveitado no sistema.
+[ 2m50s486ms - 2m50s996ms ] Speaker 1: Perfeito.
+[ 2m52s176ms - 2m56s896ms ] Speaker 1: Existem regras específicas que devem ser seguidas para a execução das atividades ou processos envolvidos?
+[ 2m57s246ms - 3m3s836ms ] Speaker 2: Existem, por exemplo, eh, cada projeto tem um conjunto de bolsas que podem ser alocadas, né?
+[ 3m4s536ms - 3m12s436ms ] Speaker 2: E cada bolsa também tem um conjunto de regras da FAPES de nível de exigência, então cada uma tem seus requisitos.
+[ 3m13s196ms - 3m19s16ms ] Speaker 2: Então, não, não, você não pode alocar qualquer bolsa a qualquer pessoa, né?
+[ 3m19s836ms - 3m30s936ms ] Speaker 2: A pessoa tem que atender os requisitos, né, eh, tem alguns requisitos, por exemplo, que é certidão negativa de algumas coisas, né?
+[ 3m30s936ms - 3m35s746ms ] Speaker 2: Eh, escolaridade, né, eh, a idade também, né, tem que ser maior de 18 anos também são, se não me engano.
+[ 3m37s206ms - 3m39s886ms ] Speaker 2: Eh, então, existe, existem essas regrinhas, né?
+[ 3m39s886ms - 3m42s266ms ] Speaker 1: Elas são relativas tanto à formação quanto à experiência, né?
+[ 3m42s516ms - 3m44s686ms ] Speaker 2: Exatamente, formação e experiência, isso aí.
+[ 3m45s736ms - 3m51s336ms ] Speaker 1: OK. Na sua visão, quais são as entradas, saídas e dados envolvidos?
+[ 3m51s676ms - 3m56s276ms ] Speaker 2: Eu acho que as entradas são as informações dos, dos bolsistas, né?
+[ 3m56s876ms - 4m7s346ms ] Speaker 2: Respeitando, claro, as informações pra alocação da bolsa, né? Então, eh, endereço, conta bancária, identidade, nome, né?
+[ 4m8s626ms - 4m14s376ms ] Speaker 2: Eh, pra, pra bolsa em si, né? Esses documentos, acho que são relevantes, né?
+[ 4m15s476ms - 4m22s766ms ] Speaker 2: Eh, e pro, pro projeto em si, aí tem os dados, dados de alocação da FAPES, né, do edital, por exemplo.
+[ 4m23s486ms - 4m30s386ms ] Speaker 2: Eh, qual a verba do edital, quanto tem que ser alocado em cada coisa, né? Aí são regras do, do, do edital.
+[ 4m31s266ms - 4m31s526ms ] Speaker 1: Uhum.
+[ 4m32s46ms - 4m37s186ms ] Speaker 1: Então, além das informações das pessoas, também tem as informações do edital específico e do projeto.
+[ 4m37s926ms - 4m38s706ms ] Speaker 2: Isso, tem.
+[ 4m40s276ms - 4m45s36ms ] Speaker 1: Quem utilizará o sistema e como esses usuários interagem com o sistema? Os principais papéis?
+[ 4m45s526ms - 4m52s846ms ] Speaker 2: É, então, os principais papéis, eh, do portal, né, eh, o portal é totalmente voltado para o público externo, né?
+[ 4m53s156ms - 4m53s496ms ] Speaker 1: Uhum.
+[ 4m53s866ms - 5m11s946ms ] Speaker 2: Então, os, hoje seriam eh pesquisadores, né? Eh, bolsistas, eu sei que, que a FAPES também tem a parte de extensão, né?
+[ 5m11s946ms - 5m17s16ms ] Speaker 2: Então, tem, por exemplo, Centelha, que são empreendedores, né, pessoas que estão querendo empreender e tal.
+[ 5m17s16ms - 5m17s986ms ] Speaker 2: Eh, então, assim, basicamente são, são esses os, os papéis, né?
+[ 5m18s736ms - 5m19s186ms ] Speaker 1: OK.
+[ 5m19s956ms - 5m25s856ms ] Speaker 1: Eh, como esse módulo, na sua visão, se conecta a outros sistemas/módulos envolvidos?
+[ 5m26s376ms - 5m34s176ms ] Speaker 2: Eh, então, o, o sistema, ele, algumas informações precisam ser alimentadas pelo, pelo admin, né?
+[ 5m35s146ms - 5m37s316ms ] Speaker 2: Então, por exemplo, o cadastro do edital,
+[ 5m38s306ms - 5m51s106ms ] Speaker 2: eh, a submissão do projeto, provavelmente vai ser feita pelo portal também, né, que é o, é o bolsista ou o coordenador que faz a submissão normalmente, mas isso precisa ser aprovado, né, coisas desse tipo, passa por avaliação ad hoc e tal.
+[ 5m51s396ms - 5m54s746ms ] Speaker 1: Tem todo um trâmite, né?
+[ 5m55s36ms - 5m57s716ms ] Speaker 2: Todo um trâmite que é feito todo por esse admin, né?
+[ 5m58s906ms - 6m8s886ms ] Speaker 2: Eh, por exemplo, os tipos das bolsas, né, é tudo feito por esse outro sistema. Então, tem uma base de dados que já é preenchida nesse outro sistema.
+[ 6m9s606ms - 6m9s876ms ] Speaker 1: Ok.
+[ 6m10s386ms - 6m12s876ms ] Speaker 1: E aí, esses dados aparecem nesse, nesse módulo, né?
+[ 6m13s386ms - 6m13s636ms ] Speaker 2: Isso.
+[ 6m15s156ms - 6m15s446ms ] Speaker 1: OK.
+[ 6m15s946ms - 6m19s66ms ] Speaker 1: Existe alguma restrição importante que deve ser considerada?
+[ 6m20s526ms - 6m26s686ms ] Speaker 2: Então, os bolsistas, no geral, eles precisam eh, morar no estado, né?
+[ 6m27s836ms - 6m35s756ms ] Speaker 2: Então, meio que é um pré-requisito para, pelo menos, para receber a bolsa da, da FAPES, teria que morar no estado, né?
+[ 6m36s236ms - 6m43s566ms ] Speaker 2: Outro, outro requisito é que ele precisa de fazer login no, no sistema de login do governo do estado.
+[ 6m44s116ms - 6m46s846ms ] Speaker 2: Que integra lá com o SOU GOV. Então, esse é um requisito.
+[ 6m47s916ms - 6m48s906ms ] Speaker 1: OK, perfeito.
+[ 6m50s489ms - 6m58s9ms ] Speaker 1: Algum requisito de desempenho esperado para o sistema, na sua visão? Tempo de resposta, volume de dados, número de usuários simultâneos, entre outros?
+[ 6m59s209ms - 7m0s799ms ] Speaker 2: Olhando, não pensei nisso ainda.
+[ 7m1s779ms - 7m2s919ms ] Speaker 2: Não sei te responder.
+[ 7m3s429ms - 7m6s529ms ] Speaker 1: OK, então a priori não tem nenhum requisito desse sendo considerado, né?
+[ 7m7s169ms - 7m7s869ms ] Speaker 2: Por enquanto, não.
+[ 7m8s419ms - 7m8s629ms ] Speaker 1: OK.
+[ 7m9s709ms - 7m15s749ms ] Speaker 1: Eh, há documentação ou referência existente que devem ser consideradas no desenvolvimento, na sua visão?
+[ 7m16s319ms - 7m22s349ms ] Speaker 2: Sim, a ideia é usar o SIGFAPES, né, como uma visão inicial.
+[ 7m23s779ms - 7m35s309ms ] Speaker 2: Eh, existe também um outro sistema que já foi previamente implementado, né, tem, tem muita documentação feita de análise e tal, que pode ser utilizada.
+[ 7m35s779ms - 7m41s739ms ] Speaker 2: Fora isso, é, é resoluções e da FAPES e conversa com o pessoal da FAPES, reuniões e entrevistas.
+[ 7m42s269ms - 7m42s659ms ] Speaker 1: Uhum.
+[ 7m43s269ms - 7m52s799ms ] Speaker 1: Aí tem as resoluções, mas aí não tem nenhuma documentação efetiva que seja importante para o mínimo mundo aqui, por exemplo, então, seriam mais essas documentações que tem que ser levantadas.
+[ 7m52s899ms - 7m53s599ms ] Speaker 2: Sim, precisam ser levantadas.
+[ 7m54s259ms - 7m54s509ms ] Speaker 1: OK.
+[ 7m55s299ms - 7m59s369ms ] Speaker 1: Vocês conhecem ou já utilizaram um sistema similar que pode servir de referência?
+[ 8m1s599ms - 8m6s649ms ] Speaker 2: Eh, eu acho que o que a gente tem de referência hoje é o próprio SIGFAPES, né?
+[ 8m6s649ms - 8m17s549ms ] Speaker 2: Eu, pelo menos, não conheço nenhum outro sistema que trabalhe nesse mesmo contexto de edital, bolsa e bolsista, né? Projeto, não, não conheço.
+[ 8m18s319ms - 8m18s649ms ] Speaker 1: OK.
+[ 8m19s149ms - 8m22s799ms ] Speaker 1: E a pessoa tem que cadastrar tudo isso, cadastrar bolsa, cadastrar projeto?
+[ 8m22s799ms - 8m27s689ms ] Speaker 2: Tem que cadastrar bolsa, projeto, edital, tem que alocar, né? Tudo isso tem que ser feito.
+[ 8m29s159ms - 8m31s219ms ] Speaker 1: OK. Obrigado, Felipe. Obrigado pela entrevista.
+[ 8m31s939ms - 8m33s409ms ] Speaker 2: De nada, Moisés. Eu que agradeço, cara.
+[ 8m33s779ms - 8m34s539ms ] Speaker 1: Boa tarde, meu querido.
+[ 8m34s859ms - 8m35s669ms ] Speaker 2: Para você também.
+[ 8m36s279ms - 8m36s589ms ] Speaker 2: (laughs)
