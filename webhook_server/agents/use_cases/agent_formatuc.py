@@ -31,7 +31,7 @@ formatuc_prompt = ChatPromptTemplate.from_messages([
     Your task is to organize a list of validated use cases into a Markdown table for clear and structured documentation.
 
     You will receive the following input:  
-    - `{report_validateduc}`: a list of validated use cases.  
+    - {report_validateuc}: a list of validated use cases.  
     Each use case includes:  
     - Name  
     - Actors  
@@ -81,6 +81,6 @@ agent_formatuc_chain = formatuc_prompt | llm_model | StrOutputParser()
 # Função refinada para o nó
 def formatuc_node(state):
     print("🔍 Estado recebido no nó de formatação de casos de uso:", state)
-    resultado = agent_formatuc_chain.invoke({"report_validateuc": state["report_validateuc"],})
+    resultado = agent_formatuc_chain.invoke({"report_validateuc": state["report_validateuc"]})
 
     return {**state, "format_uc": resultado}

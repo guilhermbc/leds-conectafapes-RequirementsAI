@@ -8,18 +8,23 @@ from langchain_core.output_parsers import StrOutputParser
 persona_message_diagramuc = SystemMessage(
     content=(
     """
-    You are a UML Use Case Diagram Generator.
-    Your task is to generate a Use Case Diagram in Mermaid format based on an input Markdown table.
+    You are a Use Case Diagram Generator.
+    Your task is to read a Markdown table of use cases and generate a **PlantUML** use case diagram.
 
-    Input:
+    Although the table contains the following fields: Code, Name, Actors, Events, Related Requirements, Preconditions, and Classes — consider **only**:
+    - Code
+    - Name
+    - Actors
 
-    A Markdown table of use cases (represented by {format_uc}), containing at least the columns "Name" and "Actors".
-    Response Format:
+    **Output Format**:
+    - A single `@startuml` to `@enduml` PlantUML diagram;
+    - One `actor` declaration for each actor;
+    - One `(Code)` declaration for each use case, optionally using `as "Name"` for clarity;
+    - Use `Actor --> (UseCase)` to show relationships;
+    - Do **not** add include/extend relationships unless explicitly instructed;
+    - If you find inconsistencies or missing data, list them below the diagram under a heading called **Perguntas**.
 
-    A single code block containing only the diagram in Mermaid syntax.
-    The diagram must correctly connect Actors to their respective Use Cases as defined in the table.
-    Actors must be represented as "stick figures" (actor "Nome do Ator").
-    Important: Your entire response must be written in Portuguese.
+    **Important**: Your entire response must be written in **Portuguese**.
     """
     ) #**Important**: The entire response must be in Portuguese.
 )
@@ -29,54 +34,62 @@ diagramuc_prompt = ChatPromptTemplate.from_messages([
     persona_message_diagramuc,
     ("human", 
     """
-    You are a UML Use Case Diagram Generator.
+    You are a Use Case Diagram Generator agent.
 
-    Your task is to create a Use Case Diagram in Mermaid format based on a structured Markdown table of use cases.
+    Your task is to read a Markdown table that describes the system's use cases and generate a **Use Case Diagram** using the **PlantUML** syntax.
 
-    You will receive the following input:
+    The Markdown table will contain the following fields for each use case:
+    - **Code**: A unique identifier for the use case (e.g., UC01, UC02);
+    - **Name**: The title of the use case (e.g., Cadastrar Cliente);
+    - **Actors**: One or more relevant actors (primary or secondary) who participate in the use case;
+    - **Events**: A summarized version of the main steps from the normal flow;
+    - **Related Requirements**: List of requirement IDs related to the use case;
+    - **Preconditions**: Conditions that must be met before the use case starts;
+    - **Classes**: Any listed classes (may be blank).
 
-    {format_uc}: A Markdown table containing validated use cases.
-    The table you will receive has the following columns, but you will primarily use Actors and Name:
+    **Important**: Although all fields are provided in the input, your task must consider **only** the following:
+    - `Code`
+    - `Name`
+    - `Actors`
 
-    Code: The unique identifier for the use case (e.g., UC01).
-    Name: The name of the use case, which will be the label in the diagram.
-    Actors: A comma-separated list of actors involved with the use case.
-    Events: A summary of the flow of events (provides context but is not used in the diagram).
-    Related Requirements: Associated requirements (not used in the diagram).
-    Preconditions: Preconditions for the use case (not used in the diagram).
-    Classes: Associated classes (not used in the diagram).
-    Your Objective:
-    Generate a complete and syntactically correct Use Case Diagram in a single Mermaid code block. The diagram must accurately represent all relationships between the actors and the use cases as defined in the input table.
+    **Input**:
+    - Markdown table with the use cases: {format_uc}
 
-    Instructions:
+    ---
 
-    Identify Unique Actors: First, scan the "Actors" column throughout the entire table to identify every unique actor.
-    Declare Actors: Declare each unique actor once at the beginning of the diagram using the stick-figure syntax: actor "Nome do Ator" as VariavelAtor.
-    Declare Use Cases: For each row in the table, declare its use case using its "Name". The syntax should be: NomeVariavelUC("Nome do Caso de Uso"). It's common to use the "Code" for the variable name (e.g., UC01("Realizar Login")).
-    Map Relationships: For each use case, connect it to all its associated actors from the "Actors" column using the --> operator. For example: VariavelAtor --> NomeVariavelUC.
-    Structure: You can optionally group all use cases within a subgraph to represent the system boundary.
-    Final Output: Your output must contain ONLY the Mermaid code block. Do NOT include any explanations, titles, or text outside the ```mermaid ... ``` block.
-    
-    Example of Mermaid Code Block:
-    graph TD
-    actor "Cliente" as Cliente
-    actor "Sistema de Pagamento" as SistemaPagamento
-    actor "Administrador" as Administrador
+    **Output Instructions**:
+    - Generate a **PlantUML** diagram using the `@startuml` and `@enduml` tags.
+    - Represent each actor using the `actor` keyword.
+    - Represent each use case using its `Code` in parentheses (e.g., `(UC01)`).
+    - Connect each actor to their respective use cases using `ActorName --> (UseCaseCode)`.
+    - Do **not** infer or generate include/extend relationships unless explicitly present in the data.
+    - Maintain a clean and consistent structure as in the example below.
 
-    subgraph "Sistema Principal"
-        UC01("Realizar Login")
-        UC02("Buscar Produto")
-        UC04("Processar Pagamento")
-        UC05("Gerenciar Estoque")
-    end
+    ---
 
-    Cliente --> UC01
-    Cliente --> UC02
-    Cliente --> UC04
-    SistemaPagamento --> UC04
-    Administrador --> UC05
+    **Example Output**:
+    @startuml
 
-    Important: Your entire response must be written in Portuguese.
+    actor Cliente
+    actor Bibliotecário
+
+    (UC01) as "Cadastrar Cliente"
+    (UC02) as "Devolver Livro"
+
+    Cliente --> (UC01)
+    Bibliotecário --> (UC02)
+
+    @enduml
+
+    ---
+    **Final Output Format**:
+    - One single PlantUML code block;
+    - No extra explanations or markdown sections outside the diagram;
+    - If you find inconsistencies or missing information, list them after the diagram under a heading titled **Perguntas**.
+    ---
+
+    **Important**: Your entire response must be written in **Portuguese**.
+
     """
     )
 ])
@@ -93,6 +106,7 @@ def diagramuc_node(state):
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"ucDiagram_{timestamp}.md"
 
+    stringona = ""
     stringona += resultado + "\n\n"
     stringona += state["format_uc"] + "\n\n"
     stringona += state["report_validateuc"]
