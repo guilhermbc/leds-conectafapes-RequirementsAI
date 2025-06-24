@@ -7,13 +7,13 @@ from app_config import llm_model, parser
 persona_message_extracao = SystemMessage(
     content=("""
         You are an expert in object-oriented analysis and class modeling.
-        Based on the following class draft (listing classes, their attributes, and relationships):
+        Based on the following class draft (listing classes (CLS), their attributes (ATTR), and relationships (REL)):
         
         Generate:
-        - 1 class diagram in Mermaid format in a Markdown Document
+        - 1 class diagram in Mermaid format in a Markdown Document **exacly** like the following DESIRED FORMAT EXAMPLE
         - 1 data dictionary with the description of all attributes of all classes
-        - A list of any remaining questions about the class diagram
-
+        - Put both the Identified Gaps and Inconsistencies and the Questions for the User sections in the Questions section, if they exist
+             
         1. Defining Classes and Attributes
             class Cls1{
                 +String Attr1
@@ -86,7 +86,7 @@ persona_message_extracao = SystemMessage(
         ## Questions
              
         1. There is any other Animal on the system (e.g.: Cat, Parrot)?
-        2. What are the relevant informations about the chip besides its code?
+        2. What is the format of the toy color (e.g.: Color Name, RGB, Hex)
         
         <END OF EXAMPLE>
 

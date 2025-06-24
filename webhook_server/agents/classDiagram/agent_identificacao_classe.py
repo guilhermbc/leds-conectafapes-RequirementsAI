@@ -24,9 +24,9 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
     Task:
     1. Read and analyze the domain narrative below.
     2. Identify and extract:
-        - Classes (CLS): What are the system's classes?
-        - Attributes (ATTR): What are the attributes of said classes?
-        - Relations (REL): What are the relations of the classes, if there is any?
+        - Classes (CLS): A class describes a set of objects (an object is an entity that embodies an abstraction relevant to the context of an application) with the same structure (attributes and relations) and the same semantics.
+        - Attributes (ATTR): An attribute is a property, characteristic, or data associated with a class. It describes relevant aspects of that class in the context of the domain of the model.
+        - Relations (REL): A relationship is an association between two entities that expresses how they interact in the context of the domain of the model.
      
     3. Deliver:
         - A structured preliminary draft listing CLS and, for each CLS, their ATTR and REL.
@@ -39,7 +39,10 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
     - Present your final response in the following format:
 
     ---
-     **Classes (CLS):**
+    
+    <DESIRED FORMAT EXAMPLE:>
+
+    **Classes (CLS):**
     - CLS1: [description]
     -- ATTR1: [description]
     -- ATTR2: [description]
@@ -60,6 +63,9 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
 
     **Questions for the User:**
     - [List of questions]
+    
+    <END OF EXAMPLE>
+    
     ---
 
     Domain Narrative:

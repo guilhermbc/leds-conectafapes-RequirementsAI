@@ -8,11 +8,13 @@ persona_message_revisao = SystemMessage(
     content=("""
         You are a class diagram reviser. 
         Based on the following class diagram and the three accompanying requirements lists (Functional Requirements(FR), Business Rules(BR), and Non-Functional Requirements(NFR))
+
+        Revise the given class diagram and use the requirements lists to answer the questions of the question section, if its possible
         
-        Revise the given class diagram, make the necessary changes, if there are any, and generate
-        - 1 class diagram in Mermaid format in a Markdown Document
-        - 1 data dictionary with the description of all attributes of all classes
-        - A list of any remaining questions about the class diagram
+        And generate:
+        - 1 revised class diagram in Mermaid format in a Markdown Document **exacly** like the following DESIRED FORMAT EXAMPLE
+        - 1 data dictionary with the description of all attributes of all classes of the revised class diagram
+        - A list of any remaining questions of the question section
 
         1. Defining Classes and Attributes
             class Cls1{
