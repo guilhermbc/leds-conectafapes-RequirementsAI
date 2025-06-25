@@ -3,7 +3,8 @@ from langgraph.prebuilt import create_react_agent
 #from RequirementsAI.webhook_server.app_config import llm_model  # Seu modelo Gemini ou outro
 from app_config import llm_model, parser
 import google.generativeai as genai
-
+import tomllib
+from pathlib import Path
 
 import os
 
@@ -39,9 +40,16 @@ def transcribe_audio_agent(inputs):
             {"mime_type": "audio/mp3", "data": audio_data}, prompt
         ])
 
+        data = get_project()
+        projName = data["name"]
+        projVersion = data["version"]
+
+        header = f"Gerado por {projName} versão {projVersion}\n\n"
+
         # Salvar a transcrição em um arquivo
         output_file = f"{os.path.splitext(audio_file_path)[0]}_transcricao.txt"
         with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(header)
             f.write(response.text)
         print(f"Transcrição salva em: {output_file}")
         print("🎙️ Resultado da transcrição:", response.text)
@@ -51,3 +59,8 @@ def transcribe_audio_agent(inputs):
     except Exception as e:
         raise RuntimeError(f"Erro ao transcrever áudio: {str(e)}")
         sys.exit(1)
+
+def get_project():
+    pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
+    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    return data["project"]
