@@ -3,6 +3,8 @@ from langchain_core.messages import SystemMessage
 from langchain.prompts import ChatPromptTemplate
 from app_config import llm_model, parser
 from langchain_core.output_parsers import StrOutputParser
+import tomllib
+from pathlib import Path
 
 # System message em inglês com orientações completas
 persona_message_diagramuc = SystemMessage(
@@ -112,9 +114,19 @@ def diagramuc_node(state):
     stringona += state["report_validateuc"]
 
     # Salvar resultado como arquivo Markdown
+    data = get_project()
+    projName = data["name"]
+    projVersion = data["version"]
+
+    footer = f"---\n\nGerado por {projName} versão {projVersion}"
+
     with open(filename, "w", encoding="utf-8") as f:
         f.write(stringona)
+        f.write(footer)
 
     return {**state, "usecases_diagram": resultado}
 
-
+def get_project():
+    pyproject = Path(__file__).resolve().parents[3] / 'pyproject.toml'
+    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    return data["project"]

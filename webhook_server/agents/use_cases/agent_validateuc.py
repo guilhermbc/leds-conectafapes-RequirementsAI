@@ -49,9 +49,38 @@ validateuc_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **Output Format**:  
-    - Plain text;  
-    - Return the complete revised list of use cases with all fields (not including Classes, leave it empty);  
+    - **Markdown** document;  
+    - Return the complete revised list of use cases with all fields (not including Classes, leave it empty);
+    - Format your list as the example below  
     - Add a final section titled **Questions and Validations** with any doubts, inconsistencies, or assumptions made.
+
+    <DESIRED OUTPUT EXAMPLE>
+    ## Use Cases Description
+    - **Name:** User Login  
+    - **Actors:**  
+        - User  
+        - System  
+    - **Preconditions:**  
+        - The user must be registered  
+    - **Normal Flow of Events:**  
+        - User navigates to the login page  
+        - Enters email and password  
+        - Clicks "Login"  
+        - System validates credentials  
+        - User is redirected to the homepage  
+    - **Alternative / Exception Flows:**  
+        - Invalid credentials → System displays an error message  
+        - Missing fields → System prompts for required input  
+    - **Related Requirements:**  
+        - RF01  
+    - **Classes:**    
+
+    ## Questions and Vallidations
+
+    1. What are the different types of users that need access to the system, and do they require different authentication mechanisms (e.g., two-factor authentication, SSO)?
+    2. If a user enters incorrect credentials three times in a row, should the system temporarily lock the account or display a security warning?
+
+    <END OF EXAMPLE>
 
     **Important**: Your entire response must be written in **Portuguese**.
     """

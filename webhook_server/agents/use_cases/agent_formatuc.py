@@ -48,8 +48,9 @@ formatuc_prompt = ChatPromptTemplate.from_messages([
 
     ### Use Case Table (Tabela de Casos de Uso)
 
-    | Code  | Name               | Actors         | Events                                      | Related Requirements | Preconditions                    | Classes             |
-    |-------|--------------------|----------------|---------------------------------------------|-----------------------|-----------------------------------|---------------------|
+    | Code | Name | Actors | Events | Related Requirements | Preconditions | Classes |
+    |------|------|--------|--------|----------------------|---------------|---------|
+    | UC01 | Title of the Use Case | Primary: Actor1, Actor2 <br> Secondary: Actor3 | 1. Summary of Event1 <br> 2. Summary of Event2 | FR01 <br> FR02 | | |
 
     - **Code**: Assign a unique code to each use case (e.g., UC01, UC02...);  
     - **Name**: The title of the use case;  
@@ -64,9 +65,18 @@ formatuc_prompt = ChatPromptTemplate.from_messages([
     **Instructions**:
     - Include **only the normal flow of events** in the "Events" column;  
     - Do **not** include alternative or exception flows in the table;  
-    - Keep summaries clear and concise;  
-    - Output **only** the Markdown table, followed by a section titled **Questions and Validations** (if needed);  
+    - Keep summaries clear and concise;
     - Avoid repetitions or assumptions beyond the provided content.
+
+    ---
+
+    <DESIRED OUTPUT EXAMPLE>
+    ## Use Cases Description
+    | Code | Name | Actors | Events | Related Requirements | Preconditions | Classes |
+    |------|------|--------|--------|----------------------|---------------|---------|
+    | UC01 | User Login | Primary: User <br> Secondary: System | 1. User navigates to the login page <br> 2. Enters email and password <br> 3. Clicks "Login" <br> 4. System validates credentials <br> 5. User is redirected to the homepage | FR01 | The user must be registered | |
+
+    <END OF EXAMPLE>
 
     ---
 

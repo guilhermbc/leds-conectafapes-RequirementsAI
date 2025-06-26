@@ -44,13 +44,13 @@ def transcribe_audio_agent(inputs):
         projName = data["name"]
         projVersion = data["version"]
 
-        header = f"Gerado por {projName} versão {projVersion}\n\n"
+        footer = f"\n---\n\nGerado por {projName} versão {projVersion}"
 
         # Salvar a transcrição em um arquivo
         output_file = f"{os.path.splitext(audio_file_path)[0]}_transcricao.txt"
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(header)
             f.write(response.text)
+            f.write(footer)
         print(f"Transcrição salva em: {output_file}")
         print("🎙️ Resultado da transcrição:", response.text)
         print("📦 Estado retornado:", {**inputs, "transcricao": response.text})
