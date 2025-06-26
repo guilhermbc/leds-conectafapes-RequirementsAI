@@ -11,3 +11,9 @@ class MyState(TypedDict):
     requisitos_tabelas: Optional[str]
     requisitos_priorizados: Optional[str]
     report: Optional[str]
+
+    ident_usecases: Optional[str]
+    ident_events: Optional[str]
+    report_validateuc: Optional[str]
+    format_uc: Optional[str]
+    usecases_diagram: Optional[str]

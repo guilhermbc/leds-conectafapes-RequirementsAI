@@ -31,13 +31,13 @@ The solution consists of two main services:
 
 ```
 .
-├── streamlit_app/             # User Interface
-│   ├── app_streamlit.py       # Main App
-│   ├── dockerfile             # Interface Dockerfile
-│   └── requirements.txt     # Dependencies
+├── streamlit_app/            # User Interface
+│   ├── app_streamlit.py      # Main App
+│   ├── dockerfile            # Interface Dockerfile
+│   └── requirements.txt      # Dependencies
 │
 ├── webhook_server/           # Backend with FastAPI + LangGraph
-│   ├── main.py                # Server Entrypoint
+│   ├── main.py               # Server Entrypoint
 │   ├── webhook_server.py     # Initializes LangGraph via endpoint
 │   ├── graph.py              # Graph node definitions
 │   ├── state.py              # Shared state definition
@@ -118,7 +118,8 @@ Open a new terminal and access the streamlit\_app folder and run the streamlit r
 
 ```bash
 cd streamlit_app
-pip install -r requirements.txt
+# pip install -r requirements.txt
+pip install -r reduced_requirements.txt
 # Adjust app_streamlit.py to use "http://localhost:8001 or via docker"
 streamlit run app_streamlit.py --server.port=8501
 ```

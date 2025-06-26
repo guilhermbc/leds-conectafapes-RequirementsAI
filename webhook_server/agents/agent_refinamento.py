@@ -62,6 +62,7 @@ agent_refinamento_chain = refinamento_prompt | llm_model | StrOutputParser()
 
 # Função refinada para o nó
 def refine_node(state):
+    
     print("🔍 Estado recebido no nó de refinamento:", state)
     resultado = agent_refinamento_chain.invoke({"requisitos_priorizados": state["requisitos_priorizados"]})
 

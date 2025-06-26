@@ -8,6 +8,11 @@ from agents.agent_analise import analyze_node
 from agents.agent_extracao import extract_node
 from agents.agent_priorizacao import prioritize_node
 from agents.agent_refinamento import refine_node
+from agents.use_cases.agent_identuc import identuc_node
+from agents.use_cases.agent_identevent import identevent_node
+from agents.use_cases.agent_validateuc import validateuc_node
+from agents.use_cases.agent_formatuc import formatuc_node
+from agents.use_cases.agent_diagramuc import diagramuc_node
 from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
 
 builder = StateGraph(state_schema=MyState)
@@ -22,6 +27,12 @@ builder.add_node("analyze_documentation", analyze_node)
 builder.add_node("extract_requirements", extract_node)
 builder.add_node("prioritize_requirements", prioritize_node)
 builder.add_node("refine_requirements", refine_node)
+
+builder.add_node("identify_usecases", identuc_node)
+builder.add_node("identify_events", identevent_node)
+builder.add_node("validate_usecases", validateuc_node)
+builder.add_node("format_usecases", formatuc_node)
+builder.add_node("generate_ucdiagram", diagramuc_node)
 
 # Nó final ainda é operacional
 builder.add_node("final_output", final.final_return)
@@ -43,7 +54,13 @@ builder.add_edge("generate_miniworld", "analyze_documentation")
 builder.add_edge("analyze_documentation", "extract_requirements")
 builder.add_edge("extract_requirements", "prioritize_requirements")
 builder.add_edge("prioritize_requirements", "refine_requirements")
-builder.add_edge("refine_requirements", END)
+
+builder.add_edge("refine_requirements", "identify_usecases")
+builder.add_edge("identify_usecases", "identify_events")
+builder.add_edge("identify_events", "validate_usecases")
+builder.add_edge("validate_usecases", "format_usecases")
+builder.add_edge("format_usecases", "generate_ucdiagram")
+builder.add_edge("generate_ucdiagram", END)
 builder.add_edge("final_output", END)
 
 graph = builder.compile()
