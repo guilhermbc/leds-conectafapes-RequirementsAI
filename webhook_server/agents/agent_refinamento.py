@@ -3,6 +3,8 @@ from langchain_core.messages import SystemMessage
 from langchain.prompts import ChatPromptTemplate
 from app_config import llm_model, parser
 from langchain_core.output_parsers import StrOutputParser
+import tomllib
+from pathlib import Path
 
 # System message em inglês com orientações completas
 persona_message_refinamento = SystemMessage(
@@ -67,8 +69,19 @@ def refine_node(state):
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"report_{timestamp}.md"
 
-    # Salvar resultado como arquivo Markdown
+    data = get_project()
+    projName = data["name"]
+    projVersion = data["version"]
+
+    header = f"<!-- Gerado por {projName} versão {projVersion} -->\n\n"
+
     with open(filename, "w", encoding="utf-8") as f:
+        f.write(header)
         f.write(resultado)
 
     return {**state, "report": resultado}
+
+def get_project():
+    pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
+    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    return data["project"]
