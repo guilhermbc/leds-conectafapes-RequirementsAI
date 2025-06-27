@@ -55,11 +55,11 @@ def generate_minimundo_node(state):
     projName = data["name"]
     projVersion = data["version"]
 
-    header = f"<!-- Gerado por {projName} versão {projVersion} -->\n\n"
+    footer = f"\n\n---\nGerado por {projName} versão {projVersion}"
 
     with open(filename, "w", encoding="utf-8") as f:
-        f.write(header)
         f.write(resultado)
+        f.write(footer)
 
     return {**state, "minimundo": resultado}
 
