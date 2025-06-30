@@ -1,4 +1,4 @@
-## v0.2.0 (2025-06-25)
+## v0.2.0 (2025-06-27)
 
 ### Feat
 
@@ -6,4 +6,4 @@
 
 ### Fix
 
-- ajuste no modelo usado
+- texto indicando geracao eh adicionado no final dos artefatos criados
