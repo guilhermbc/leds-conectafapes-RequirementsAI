@@ -167,7 +167,7 @@ def refine_node(state):
     projName = data["name"]
     projVersion = data["version"]
 
-    footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}\n\n---"
+    footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(resultado)
