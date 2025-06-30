@@ -4,6 +4,8 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from app_config import llm_model, parser
 import datetime
+import tomllib
+from pathlib import Path
 
 persona_message_refinamento = SystemMessage(
     content=("""
@@ -15,7 +17,7 @@ persona_message_refinamento = SystemMessage(
         The Markdown Document must have:
         - 1 class diagram in Mermaid format in a Markdown Document **exacly** like the following DESIRED FORMAT EXAMPLE
         - 1 data dictionary with the description of all attributes of all classes
-        - A dependency cycles section that lists any cycles between the classes. List the class paths that form each cycle and, if possible, include the rule related with each cycle
+        - A integrity restrictions section that lists any cycles between the classes. For each integrity restriction, list the involved classes and, if possible, the rule of the integrity restriction.
         - A question section with the questions of the given class diagram
 
         1. Defining Classes and Attributes
@@ -46,6 +48,9 @@ persona_message_refinamento = SystemMessage(
             
         3. Defining Inheritance
             Cls1 --|> Cls2
+        
+        4. Integrity Constraints
+            Integrity constraints are business rules aimed at eliminating ambiguities and making the conceptual model more accurate and faithful to reality. They specify limitations or conditions that must be respected in the relationships between model elements (such as classes and associations), as well as in the attributes of those classes.
 
         <DESIRED FORMAT EXAMPLE:>
 
@@ -98,11 +103,26 @@ persona_message_refinamento = SystemMessage(
         |-----------|-------------|
         | Name | Name of the Owner |
         
-        ## Dependency Cycles
-        *   **Cycle 1: Dog <-> Toy <-> Owner <-> Dog**
-            *   `Dog` -> `Toy` (`Dog` has `Toy`)
-            *   `Owner` -> `Toy` (`Owner` bought `Toy`)
-            *   `Owner` -> `Dog` (`Owner` owns `Dog`)
+        ## Integrity Restrictions
+        - IC1:
+            - Classes: Dog
+            - Rule: Each Dog must have a unique `ChipCode`.
+
+        - IC2:
+            - Classes: Toy, Dog, Owner
+            - Rule: A Toy associated with a Dog must have been bought by the same Owner who owns the Dog.
+
+        - IC3:
+            - Classes: Dog, Owner
+            - Rule: A Dog can only have one Owner at a time.
+
+        - IC4:
+            - Classes: Toy, Owner
+            - Rule: Each Toy must be associated with exactly one Owner.
+
+        - IC6:
+            - Classes: Toy
+            - Rule: A Toy must have both a Color and a Type; these attributes must not be null.
         
         ## Questions
              
@@ -142,7 +162,20 @@ def refine_node(state):
     filename = f"classDiagram_{timestamp}.md"
 
     # Salvar resultado como arquivo Markdown
+
+    data = get_project()
+    projName = data["name"]
+    projVersion = data["version"]
+
+    footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}\n\n---"
+
     with open(filename, "w", encoding="utf-8") as f:
         f.write(resultado)
+        f.write(footer)
 
     return {**state, "diagrama_classes_final": resultado}
+
+def get_project():
+    pyproject = Path(__file__).resolve().parents[3] / 'pyproject.toml'
+    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+    return data["project"]
