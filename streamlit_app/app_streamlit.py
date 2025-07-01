@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import os
+from pathlib import Path
+import tomllib
 
 st.title("📼 Enviar Vídeo para Análise de Requisitos com IA")
 
@@ -24,10 +26,22 @@ if uploaded_file:
             #response = requests.post("http://webhook_server:8001/webhook/webui_pipe_webhook", json=payload) #docker
             response = requests.post("http://localhost:8001/webhook/webui_pipe_webhook", json=payload) #local
 
+            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+            
+            projName = data["project"]["name"]
+            projVersion = data["project"]["version"]
+
+            footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+
             if response.status_code == 200:
                 result = response.json().get("output", "")
+
+                st.download_button('Download Tabelas de Requisitos', result + footer, file_name="requirements.md", on_click='ignore')
+
                 st.markdown("###  Resposta do Agente:")
                 st.markdown(result, unsafe_allow_html=True)
+                st.markdown(footer, unsafe_allow_html=True)
             else:
                 st.error(f"Erro: {response.status_code}")
         except Exception as e:
