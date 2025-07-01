@@ -36,10 +36,13 @@ if uploaded_file:
 
             if response.status_code == 200:
                 result = response.json().get("output", "")
+                minimundo = response.json().get("minimundo", "")
 
                 st.download_button('Download Tabelas de Requisitos', result + footer, file_name="requirements.md", on_click='ignore')
+                st.download_button('Download Minimundo', minimundo + footer, file_name="miniworld.md", on_click='ignore')
 
                 st.markdown("###  Resposta do Agente:")
+                st.markdown(minimundo, unsafe_allow_html=True)
                 st.markdown(result, unsafe_allow_html=True)
                 st.markdown(footer, unsafe_allow_html=True)
             else:
