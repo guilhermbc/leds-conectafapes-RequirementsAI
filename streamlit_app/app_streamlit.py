@@ -36,3 +36,6 @@ if uploaded_file:
                 st.error(f"Erro: {response.status_code}")
         except Exception as e:
             st.error(f"Erro ao enviar requisição: {e}")
+    
+    if os.path.exists(file_path):
+        os.remove(file_path)

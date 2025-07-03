@@ -36,6 +36,8 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
     Instructions:
     - If you identify missing or conflicting information, **explicitly list** the issues and suggest specific questions to ask the user.
     - If the user cannot provide the necessary answers, **propose well-founded assumptions** and document them clearly.
+    - Avoid representing derived values as attributes. Instead, model the original source data from which these values can be computed.
+    - Avoid creating empty classes that have no attributes or associations of their own, even if they inherit them from other classes.
     - Present your final response in the following format:
 
     ---
