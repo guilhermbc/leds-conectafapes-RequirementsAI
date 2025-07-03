@@ -7,4 +7,3 @@
 ### Fix
 
 - texto indicando geracao eh adicionado no final dos artefatos criados
-- ajuste no modelo usado

@@ -40,19 +40,19 @@ def transcribe_audio_agent(inputs):
             {"mime_type": "audio/mp3", "data": audio_data}, prompt
         ])
 
-        data = get_project()
-        projName = data["name"]
-        projVersion = data["version"]
+        # data = get_project()
+        # projName = data["name"]
+        # projVersion = data["version"]
 
-        footer = f"\n\n---\nGerado por {projName} versão {projVersion}"
+        # footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
 
-        # Salvar a transcrição em um arquivo
-        output_file = f"{os.path.splitext(audio_file_path)[0]}_transcricao.txt"
-        with open(output_file, 'w', encoding='utf-8') as f:
-            f.write(response.text)
-            f.write(footer)
+        # # Salvar a transcrição em um arquivo
+        # # output_file = f"{os.path.splitext(audio_file_path)[0]}_transcricao.txt"
+        # # with open(output_file, 'w', encoding='utf-8') as f:
+        # #     f.write(response.text)
+        # #     f.write(footer)
         
-        print(f"Transcrição salva em: {output_file}")
+        # print(f"Transcrição salva em: {output_file}")
         print("🎙️ Resultado da transcrição:", response.text)
         print("📦 Estado retornado:", {**inputs, "transcricao": response.text})
         return {**inputs, "transcricao": response.text}
@@ -61,7 +61,7 @@ def transcribe_audio_agent(inputs):
         raise RuntimeError(f"Erro ao transcrever áudio: {str(e)}")
         sys.exit(1)
 
-def get_project():
-    pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
-    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-    return data["project"]
+# def get_project():
+#     pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
+#     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+#     return data["project"]
