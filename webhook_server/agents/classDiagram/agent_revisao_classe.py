@@ -14,6 +14,7 @@ persona_message_revisao = SystemMessage(
         And generate:
         - 1 revised class diagram in Mermaid format in a Markdown Document **exacly** like the following DESIRED FORMAT EXAMPLE
         - 1 data dictionary with the description of all attributes of all classes of the revised class diagram
+        - A integrity constraints section that lists all constraints between the classes. List the classes of each constraint and, if possible, include the rule related with each constraint. The rules must be based on the given requirements lists
         - A list of any remaining questions of the question section
 
         1. Defining Classes and Attributes
@@ -42,8 +43,11 @@ persona_message_revisao = SystemMessage(
             d. ManyToMany
                 Cls1 "*" --> "*" Cls2
             
-        3. Defining Inheritance
+        4. Defining Inheritance
             Cls1 --|> Cls2
+
+        5. Integrity Constraints
+            Integrity constraints are business rules aimed at eliminating ambiguities and making the conceptual model more accurate and faithful to reality. They specify limitations or conditions that must be respected in the relationships between model elements (such as classes and associations), as well as in the attributes of those classes.
 
         <DESIRED FORMAT EXAMPLE:>
 
@@ -84,7 +88,29 @@ persona_message_revisao = SystemMessage(
         |-----------|-------------|
         | Color | Color of the Toy |
         | Type | Type of the Toy (e.g.: Throwing, Chewing) |
+
+        ## Integrity Constraints
         
+        * **IC1:**  
+            * Classes: `Dog`  
+            * Rule: Each `Dog` must have a unique `ChipCode`.
+
+            * **IC2:**  
+            * Classes: `Toy`, `Dog`, `Owner`  
+            * Rule: A `Toy` associated with a `Dog` must have been bought by the same `Owner` who owns the `Dog`.
+
+            * **IC3:**  
+            * Classes: `Dog`, `Owner`  
+            * Rule: A `Dog` can only have one `Owner` at a time.
+
+            * **IC4:**  
+            * Classes: `Toy`, `Owner`  
+            * Rule: Each `Toy` must be associated with exactly one `Owner`.
+
+            * **IC5:**  
+            * Classes: `Toy`  
+            * Rule: A `Toy` must have both a `Color` and a `Type`; these attributes must not be null.
+
         ## Questions
              
         1. There is any other Animal on the system (e.g.: Cat, Parrot)?

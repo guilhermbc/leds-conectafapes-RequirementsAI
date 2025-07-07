@@ -17,7 +17,7 @@ persona_message_refinamento = SystemMessage(
         The Markdown Document must have:
         - 1 class diagram in Mermaid format in a Markdown Document **exacly** like the following DESIRED FORMAT EXAMPLE
         - 1 data dictionary with the description of all attributes of all classes
-        - A integrity restrictions section that lists any cycles between the classes. For each integrity restriction, list the involved classes and, if possible, the rule of the integrity restriction.
+        - A integrity constraints section that lists all constraints between the classes. Each constraint have the related classes and, whenever possible, the rule of the constraint
         - A question section with the questions of the given class diagram
 
         1. Defining Classes and Attributes
@@ -46,10 +46,10 @@ persona_message_refinamento = SystemMessage(
             d. ManyToMany
                 Cls1 "*" --> "*" Cls2
             
-        3. Defining Inheritance
+        4. Defining Inheritance
             Cls1 --|> Cls2
         
-        4. Integrity Constraints
+        5. Integrity Constraints
             Integrity constraints are business rules aimed at eliminating ambiguities and making the conceptual model more accurate and faithful to reality. They specify limitations or conditions that must be respected in the relationships between model elements (such as classes and associations), as well as in the attributes of those classes.
 
         <DESIRED FORMAT EXAMPLE:>
@@ -103,26 +103,27 @@ persona_message_refinamento = SystemMessage(
         |-----------|-------------|
         | Name | Name of the Owner |
         
-        ## Integrity Restrictions
-        - IC1:
-            - Classes: Dog
-            - Rule: Each Dog must have a unique `ChipCode`.
+        ## Integrity Constraints
+        
+        * **IC1:**  
+            * Classes: `Dog`  
+            * Rule: Each `Dog` must have a unique `ChipCode`.
 
-        - IC2:
-            - Classes: Toy, Dog, Owner
-            - Rule: A Toy associated with a Dog must have been bought by the same Owner who owns the Dog.
+            * **IC2:**  
+            * Classes: `Toy`, `Dog`, `Owner`  
+            * Rule: A `Toy` associated with a `Dog` must have been bought by the same `Owner` who owns the `Dog`.
 
-        - IC3:
-            - Classes: Dog, Owner
-            - Rule: A Dog can only have one Owner at a time.
+            * **IC3:**  
+            * Classes: `Dog`, `Owner`  
+            * Rule: A `Dog` can only have one `Owner` at a time.
 
-        - IC4:
-            - Classes: Toy, Owner
-            - Rule: Each Toy must be associated with exactly one Owner.
+            * **IC4:**  
+            * Classes: `Toy`, `Owner`  
+            * Rule: Each `Toy` must be associated with exactly one `Owner`.
 
-        - IC6:
-            - Classes: Toy
-            - Rule: A Toy must have both a Color and a Type; these attributes must not be null.
+            * **IC5:**  
+            * Classes: `Toy`  
+            * Rule: A `Toy` must have both a `Color` and a `Type`; these attributes must not be null.
         
         ## Questions
              
@@ -149,7 +150,7 @@ persona_message_refinamento = SystemMessage(
 
 refinamento_prompt = ChatPromptTemplate.from_messages([
     persona_message_refinamento,
-    ("human", "class diagram:\n\n{diagrama_classes_revisado}\n\nGenerate **exactly** 1 class diagram ") #Generate **exactly** 3 tables in Markdown format
+    ("human", "class diagram:\n\n{diagrama_classes_revisado}\n\nGenerate **exactly** 1 class diagram ")
 ])
 
 agent_refinamento_chain = refinamento_prompt | llm_model | StrOutputParser()
