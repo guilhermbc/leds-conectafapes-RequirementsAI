@@ -43,7 +43,9 @@ identuc_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **About Actors**  
-    - An **actor** is the *role* played by physical entities (people or other systems) that interact with the system in the same way, striving to achieve common goals.  
+    - An **actor** is the *role* played by physical entities (people or other systems) that interact with the system in the same way, striving to achieve common goals.
+    - Vague or generic roles (e.g., “User”, “System”) are **not** actors;
+    - Avoid considering Login and Authentication as use cases, as it is a common functionality that does not represent a specific goal or outcome for the user.
     - The same physical entity can play different roles in the same system, and a given role can be assumed by different entities.  
     - Actors are **external** to the system: they communicate directly with it but are not part of its implementation.  
     - Who counts as an actor depends on the **system boundary** and the **level of automation**:  
