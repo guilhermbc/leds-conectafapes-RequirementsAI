@@ -67,10 +67,15 @@ async def call_agent(request: Request):
                 or state.get("minimundo")
                 or "Desculpe, não foi possível gerar uma resposta."
             )
+            minimundo = (
+                state.get("minimundo")
+                or "Desculpe, não foi possível gerar uma resposta."
+            )
         else:
             assistant_response = "Desculpe, não foi possível gerar uma resposta."
+            minimundo = ""
 
-        return JSONResponse(content={"output": assistant_response})
+        return JSONResponse(content={"output": assistant_response, "minimundo": minimundo})
 
     except Exception as e:
         print(f" Erro geral: {str(e)}")
