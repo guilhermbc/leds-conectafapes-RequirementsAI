@@ -85,7 +85,7 @@ async def call_agent(request: Request):
 
 def uvicorn_run():
     webhook = os.getenv('WEBHOOK')
-    uvicorn.run("webhook_server:app", host=f"{webhook}", port=8001, reload=True)
+    uvicorn.run("webhook_server:app", host=f"0.0.0.0", port=8001, reload=True)
 
 if __name__ == "__main__":
     uvicorn_run()

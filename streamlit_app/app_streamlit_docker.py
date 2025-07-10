@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import os
+from dotenv import load_dotenv
 from pathlib import Path
 import tomllib
 
@@ -15,7 +16,8 @@ if uploaded_file:
     file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getvalue())
-
+    load_dotenv()
+    webhook = os.getenv('WEBHOOK')
     st.success(f"Arquivo salvo em: {file_path}")
 
     if st.button(" Enviar para análise"):
@@ -23,10 +25,10 @@ if uploaded_file:
             "chatInput": file_path
         }
         try:
-            response = requests.post("http://webhook_server:8001/webhook/webui_pipe_webhook", json=payload) #docker
+            response = requests.post(f"http://{webhook}:8001/webhook/webui_pipe_webhook", json=payload) #docker
             #response = requests.post("http://localhost:8001/webhook/webui_pipe_webhook", json=payload) #local
 
-            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+            pyproject = Path(__file__).resolve().parent / 'pyproject.toml'
             data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
             
             projName = data["project"]["name"]
