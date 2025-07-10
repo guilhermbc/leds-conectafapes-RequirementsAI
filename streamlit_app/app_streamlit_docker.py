@@ -27,9 +27,12 @@ if uploaded_file:
         try:
             response = requests.post(f"http://{webhook}:8001/webhook/webui_pipe_webhook", json=payload) #docker
             #response = requests.post("http://localhost:8001/webhook/webui_pipe_webhook", json=payload) #local
-
-            pyproject = Path(__file__).resolve().parent / 'pyproject.toml'
-            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+            
+            try:
+                pyproject = Path(__file__).resolve().parent / 'pyproject.toml'
+                data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+            except Exception as e:
+                data = { "project" : { "name" : "RequirementsAi", "version" : "0.2.0"}}
             
             projName = data["project"]["name"]
             projVersion = data["project"]["version"]
