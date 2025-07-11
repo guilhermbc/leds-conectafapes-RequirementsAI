@@ -5,6 +5,8 @@ from langchain.prompts import ChatPromptTemplate
 from app_config import llm_model, parser
 import datetime
 from langchain_core.output_parsers import StrOutputParser
+import tomllib
+from pathlib import Path
 
 # Prompt do agente de geração de minimundo
 persona_message_minimundo = SystemMessage(
@@ -45,11 +47,23 @@ def generate_minimundo_node(state):
     print("📚 Minimundo gerado:", resultado)
 
     # Gerar nome de arquivo com timestamp
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"minimundo_{timestamp}.md"
+    # timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    # filename = f"minimundo_{timestamp}.md"
 
     # Salvar resultado como arquivo Markdown
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(resultado)
+    # data = get_project()
+    # projName = data["name"]
+    # projVersion = data["version"]
+
+    # footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+
+    # with open(filename, "w", encoding="utf-8") as f:
+    #     f.write(resultado)
+    #     f.write(footer)
 
     return {**state, "minimundo": resultado}
+
+# def get_project():
+#     pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
+#     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+#     return data["project"]

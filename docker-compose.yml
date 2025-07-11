@@ -3,10 +3,13 @@ services:
 
   streamlit_app:
     build: ./streamlit_app
+    env_file:
+      - ./streamlit_app/.env
     ports:
       - "8501:8501"
     volumes:
       - ./shared/uploads:/app/shared/uploads
+      - ./pyproject.toml:/app/pyproject.toml
     depends_on:
       - webhook_server
     networks:
