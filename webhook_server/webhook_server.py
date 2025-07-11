@@ -4,6 +4,7 @@ import uvicorn
 import traceback
 from langsmith import traceable
 from graph import graph
+import os
 
 app = FastAPI()
 
@@ -67,15 +68,33 @@ async def call_agent(request: Request):
                 or state.get("minimundo")
                 or "Desculpe, não foi possível gerar uma resposta."
             )
+            minimundo = (
+                state.get("minimundo")
+                or "Desculpe, não foi possível gerar uma resposta."
+            )
+            class_diagram = (
+                state.get("diagrama_classes_final")
+                or state.get("diagrama_classes_revisado")
+                or state.get("diagrama_classes")
+                or state.get("rascunho_classes")
+                or ""
+            )
+            
         else:
             assistant_response = "Desculpe, não foi possível gerar uma resposta."
+            minimundo = ""
+            class_diagram = ""
 
-        return JSONResponse(content={"output": assistant_response})
+        return JSONResponse(content={"output": assistant_response, "minimundo": minimundo, "class_diagram": class_diagram})
 
     except Exception as e:
         print(f" Erro geral: {str(e)}")
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+def uvicorn_run():
+    # webhook = os.getenv('WEBHOOK')
+    uvicorn.run("webhook_server:app", host=f"0.0.0.0", port=8001, reload=True)
+
 if __name__ == "__main__":
-    uvicorn.run("webhook_server:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn_run()
