@@ -104,29 +104,9 @@ def diagramuc_node(state):
     print("🔍 Estado recebido no nó de geração de diagrama de casos de uso:", state)
     resultado = agent_diagramuc_chain.invoke({"format_uc": state["format_uc"]})
 
-    # Gerar nome de arquivo com timestamp
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"ucDiagram_{timestamp}.md"
-
     stringona = ""
     stringona += resultado + "\n\n"
     stringona += state["format_uc"] + "\n\n"
     stringona += state["report_validateuc"]
-
-    # Salvar resultado como arquivo Markdown
-    data = get_project()
-    projName = data["name"]
-    projVersion = data["version"]
-
-    footer = f"---\n\nGerado por {projName} versão {projVersion}"
-
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(stringona)
-        f.write(footer)
-
+    
     return {**state, "usecases_diagram": resultado}
-
-def get_project():
-    pyproject = Path(__file__).resolve().parents[3] / 'pyproject.toml'
-    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-    return data["project"]

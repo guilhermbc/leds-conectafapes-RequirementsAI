@@ -18,12 +18,6 @@ class MyState(TypedDict):
     format_uc: Optional[str]
     usecases_diagram: Optional[str]
 
-    ident_usecases: Optional[str]
-    ident_events: Optional[str]
-    report_validateuc: Optional[str]
-    format_uc: Optional[str]
-    usecases_diagram: Optional[str]
-
     rascunho_classes: Optional[str]
     diagrama_classes: Optional[str]
     diagrama_classes_revisado: Optional[str]
