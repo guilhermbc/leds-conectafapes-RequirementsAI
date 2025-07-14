@@ -22,3 +22,7 @@ class MyState(TypedDict):
     diagrama_classes: Optional[str]
     diagrama_classes_revisado: Optional[str]
     diagrama_classes_final: Optional[str]
+
+    cdinuc_description_revised: Optional[str]
+    cdinuc_table_revised: Optional[str]
+    ucincd_revised: Optional[str]

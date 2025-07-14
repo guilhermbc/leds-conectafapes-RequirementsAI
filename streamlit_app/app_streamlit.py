@@ -40,9 +40,9 @@ if uploaded_file:
                 result = response.json().get("output", "")
                 minimundo = response.json().get("minimundo", "")
                 usecases_diagram = response.json().get("usecases_diagram", "")
-                format_uc = response.json().get("format_uc", "")
-                report_validateuc = response.json().get("report_validateuc", "")
-                class_diagram = response.json().get("class_diagram", "")
+                format_uc = response.json().get("cdinuc_table_revised", "")
+                report_validateuc = response.json().get("cdinuc_description_revised", "")
+                class_diagram = response.json().get("ucincd_revised", "")
 
                 st.download_button('Download Tabelas de Requisitos', result + footer, file_name="requirements.md", on_click='ignore')
                 st.download_button('Download Minimundo', minimundo + footer, file_name="miniworld.md", on_click='ignore')

@@ -81,13 +81,15 @@ async def call_agent(request: Request):
                 or state.get("ident_usecases")
             )
             format_uc = (
-                state.get("format_uc")
+                state.get("cdinuc_table_revised")
+                or state.get("format_uc")
                 or state.get("report_validateuc")
                 or state.get("ident_events")
                 or state.get("ident_usecases")
             )
             report_validateuc = (
-                state.get("report_validateuc")
+                state.get("cdinuc_description_revised")
+                or state.get("report_validateuc")
                 or state.get("ident_events")
                 or state.get("ident_usecases")
             )

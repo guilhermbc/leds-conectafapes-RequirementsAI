@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph, END
 from state import MyState
 
-# Importa os agentes no lugar dos nodes
+# Importa os agentes no lugar dos nós
 from agents.agent_transcricao import transcribe_audio_agent
 from agents.agent_minimundo import generate_minimundo_node
 from agents.agent_analise import analyze_node
@@ -23,6 +23,11 @@ from agents.classDiagram.agent_revisao_classe import revise_node as revise_CD
 from agents.classDiagram.agent_refinamento_classe import refine_node as refine_CD
 # from agents.classDiagram.agent_join import join_node as join_CD
 
+# Importa os agentes de revisão
+from agents.revision.agent_revision_cdinuc_description import cdinuc_description_node
+from agents.revision.agent_revision_cdinuc_table import cdinuc_table_node
+from agents.revision.agent_revision_ucincd import ucincd_node
+
 from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
 
 builder = StateGraph(state_schema=MyState)
@@ -30,25 +35,31 @@ builder = StateGraph(state_schema=MyState)
 # Verificação de entrada (não é um agente, é operacional)
 builder.add_node("verify_input", input_check.check_Input)
 
-# Substitui os nodes antigos pelos agentes
+# Substitui os nós antigos pelos agentes
 builder.add_node("audio_transcription", transcribe_audio_agent)
 builder.add_node("generate_miniworld", generate_minimundo_node)
 builder.add_node("analyze_documentation", analyze_node)
 builder.add_node("extract_requirements", extract_node)
 builder.add_node("prioritize_requirements", prioritize_node)
 builder.add_node("refine_requirements", refine_node)
-# Nodes do diagrama de casos de uso
+
+# Nós do diagrama de casos de uso
 builder.add_node("identify_usecases", identuc_node)
 builder.add_node("identify_events", identevent_node)
 builder.add_node("validate_usecases", validateuc_node)
 builder.add_node("format_usecases", formatuc_node)
 builder.add_node("generate_ucdiagram", diagramuc_node)
 
-# Nodes do diagrama de classe
+# Nós do diagrama de classe
 builder.add_node("indentify_class", identify_CD)
 builder.add_node("extract_class_diagram", extract_CD)
 builder.add_node("revise_class_diagram", revise_CD)
 builder.add_node("refine_class_diagram", refine_CD)
+
+# Nós de revisão
+builder.add_node("revise_uc_description_withclasses", cdinuc_description_node)
+builder.add_node("revise_uc_table_withclasses", cdinuc_table_node)
+builder.add_node("revise_classes_withuc", ucincd_node)
 
 # Nó final ainda é operacional
 builder.add_node("final_output", final.final_return)
@@ -82,7 +93,12 @@ builder.add_edge("generate_ucdiagram", "indentify_class")
 builder.add_edge("indentify_class", "extract_class_diagram")
 builder.add_edge("extract_class_diagram", "revise_class_diagram")
 builder.add_edge("revise_class_diagram", "refine_class_diagram")
-builder.add_edge("refine_class_diagram", END)
+builder.add_edge("refine_class_diagram", "revise_uc_description_withclasses")
+
+# Arestas de revisão
+builder.add_edge("revise_uc_description_withclasses", "revise_uc_table_withclasses")
+builder.add_edge("revise_uc_table_withclasses", "revise_classes_withuc")
+builder.add_edge("revise_classes_withuc", END)
 
 builder.add_edge("final_output", END)
 

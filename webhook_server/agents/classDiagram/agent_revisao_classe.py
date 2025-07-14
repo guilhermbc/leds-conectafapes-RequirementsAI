@@ -132,11 +132,17 @@ persona_message_revisao = SystemMessage(
 
 revisao_prompt = ChatPromptTemplate.from_messages([
     persona_message_revisao,
-    ("human", "class diagram:\n\n{diagrama_classes}\n\nrequirements lists\n\n{report}\n\nGenerate **exactly** 1 class diagram ")
+    ("human", "class diagram:\n\n{diagrama_classes}\n\n"
+    "requirements lists:\n\n{report}\n\n"
+    "use cases description:\n\n{report_validateuc}"
+    "Generate **exactly** 1 class diagram ")
 ])
 
 agent_revisao_chain = revisao_prompt | llm_model | StrOutputParser()
 
 def revise_node(state):
-    resultado = agent_revisao_chain.invoke({"diagrama_classes": state["diagrama_classes"], "report":state["report"]})
+    resultado = agent_revisao_chain.invoke({"diagrama_classes": state["diagrama_classes"], 
+                                            "report":state["report"],
+                                            "report_validateuc": state["report_validateuc"]})
+    
     return {**state, "diagrama_classes_revisado": resultado}
