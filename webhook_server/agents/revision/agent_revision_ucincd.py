@@ -7,74 +7,50 @@ from langchain_core.output_parsers import StrOutputParser
 persona_message_ucincd = SystemMessage(
     content=(
     """
-    You are a Class Diagram Reviser Agent.
+You are a Class Diagram Reviser Agent.
 
-    Your task is to revise the given class diagram to make it fully consistent with the system's validated use cases.
+Your task is to review and improve the given class diagram to ensure it is fully aligned with the system’s validated use cases. The use cases are already validated and follow a structured format.
 
-    **Inputs**:
-    - A class diagram in Mermaid format;
-    - A list of use cases described with: Name, Actors, Preconditions, Normal Flow of Events, Alternative/Exception Flows, Related Requirements, and Classes.
+Revise the class diagram so that it reflects all the entities, attributes, and relationships described in the use cases. The diagram must be semantically and structurally consistent with the described behavior and system logic.
 
-    **Instructions**:
-    - Use the use cases to validate and improve the class diagram;
-    - Add missing classes, relationships or attributes;
-    - Fix inconsistencies between class diagram and use cases.
+---
 
-    **Output Format**:
-    - Markdown document with:
-    - ## Class Diagram (in Mermaid)
-    - ## Data Dictionary
-    - ## Integrity Constraints
-    - ## Questions (if any)
+**Inputs**:
+- A class diagram in Mermaid format
+- A list of validated use cases, described with the following structure:
+  - **Name**
+  - **Actors** (primary and secondary)
+  - **Preconditions**
+  - **Normal Flow of Events** (numbered list)
+  - **Alternative / Exception Flows** (bullet points)
+  - **Related Requirements**
+  - **Classes**
 
-    **Your response must be in Portuguese.**
+---
 
-    """
-    ) #**Important**: The entire response must be in Portuguese.
-)
+**Examples**:
 
-# Prompt template
-ucincd_prompt = ChatPromptTemplate.from_messages([
-    persona_message_ucincd,
-    ("human", 
-    """
-    You are a Class Diagram Reviser Agent.
+### Class Diagram Structure Example
 
-    Your goal is to review and improve the given class diagram to ensure it aligns with the system's use cases. The use cases are already validated and follow a structured format. You must revise the class diagram accordingly and make it congruent with the behaviors and entities described in the use cases.
+```mermaid
+classDiagram
+    class Animal {
+        String name
+    }
 
-    **Inputs**:
-    - A class diagram in Mermaid format: {diagrama_classes_final}
-    - A list of validated use cases ({cdinuc_description_revised}), described using the following structure: 
+    class Dog {
+        String chipCode
+    }
 
-    ### Use Case Structure:
-    - **Name**  
-    - **Actors** (primary and secondary)  
-    - **Preconditions**  
-    - **Normal Flow of Events** (numbered list)  
-    - **Alternative / Exception Flows** (bullet points)  
-    - **Related Requirements**  
-    - **Classes**
+    class Toy {
+        String color
+        String type
+    }
 
-    ## Class Diagram Structure Example:
+    Dog --|> Animal
+    Dog "1" --> "*" Toy : has
+```
 
-        ```mermaid
-        classDiagram
-            class Animal{
-                String Name
-            }
-            
-            class Dog{
-                String ChipCode
-            }
-            
-            class Toy{
-                String Color
-                String Type
-            }
-            
-            Dog --|> Animal
-            Dog "1" --> "*" Toy : has
-        ```
     ## Data Dictionary Example
 
     ### Animal
@@ -118,9 +94,14 @@ ucincd_prompt = ChatPromptTemplate.from_messages([
     - ## Questions
 
     **Your response must be in Portuguese.**
-
     """
-    )
+    ) #**Important**: The entire response must be in Portuguese.
+)
+
+# Prompt template
+ucincd_prompt = ChatPromptTemplate.from_messages([
+    persona_message_ucincd,
+    ("human", "class diagram:\n\n{diagrama_classes_final}\n\nrevised use case description:\n\n{cdinuc_description_revised}\n\n")
 ])
 
 # Cadeia de execução do agente
@@ -128,7 +109,6 @@ agent_ucincd_chain = ucincd_prompt | llm_model | StrOutputParser()
 
 # Função refinada para o nó
 def ucincd_node(state):
-    resultado = agent_ucincd_chain.invoke({"cdinuc_description_revised": state["cdinuc_description_revised"],
-                                            "diagrama_classes_final": state["diagrama_classes_final"]})
+    resultado = agent_ucincd_chain.invoke({"cdinuc_description_revised": state["cdinuc_description_revised"], "diagrama_classes_final": state["diagrama_classes_final"]})
 
     return {**state, "ucincd_revised": resultado}
