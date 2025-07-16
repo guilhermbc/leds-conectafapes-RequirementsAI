@@ -10,19 +10,30 @@ st.title("📼 Enviar Vídeo para Análise de Requisitos com IA")
 UPLOAD_DIR = "shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
 
 uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
+uploaded_text = st.file_uploader("Envie um texto com informações adicionais (OPICIONAL) (.txt ou .md)", type=["txt", "md"])
 
 if uploaded_file:
     os.makedirs(UPLOAD_DIR, exist_ok=True)  # Garante que o diretório exista
+    
     file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getvalue())
+    st.success(f"Arquivo salvo em: {file_path}")
+
+    text_path = ""
+    if uploaded_text:
+        text_path = os.path.join(UPLOAD_DIR, uploaded_text.name)
+        with open(text_path, "wb") as f:
+            f.write(uploaded_text.getvalue())
+        st.success(f"Arquivo salvo em: {text_path}")
+
     load_dotenv()
     webhook = os.getenv('WEBHOOK')
-    st.success(f"Arquivo salvo em: {file_path}")
 
     if st.button(" Enviar para análise"):
         payload = {
-            "chatInput": file_path
+            "chatInput": file_path,
+            "textInfo": text_path
         }
         try:
             response = requests.post(f"http://{webhook}:8001/webhook/webui_pipe_webhook", json=payload) #docker
@@ -70,3 +81,5 @@ if uploaded_file:
     
     if os.path.exists(file_path):
         os.remove(file_path)
+    if os.path.exists(text_path):
+        os.remove(text_path)

@@ -21,9 +21,11 @@ minimundo_prompt = ChatPromptTemplate.from_messages([
     ("human", """
     You are a requirements engineering expert.
 
-    Your goal is to create a relevant domain narrative based on the transcription.
+    Your goal is to create a relevant domain narrative based on the transcription and using the addicional information below the transcription.
+    OBS: The addicional information might be empty.
 
     transcription: {transcricao}
+    addicional information: {info}
     The domain narrative based on the transcription should be clear, concise, and reflect the user's needs.
     The domain narrative based on the transcription should contain relevant information for requirements analysis.
     The domain narrative based on the transcription should be structured to facilitate the identification of functional and non-functional requirements.
@@ -43,27 +45,7 @@ def generate_minimundo_node(state):
     Step 0:
     - Transcription of the domain narrative.
     """
-    resultado = agent_minimundo_chain.invoke({"transcricao": state["transcricao"]})
+    resultado = agent_minimundo_chain.invoke({"transcricao": state["transcricao"], "info":state["informacoes_adicionais"]})
     print("📚 Minimundo gerado:", resultado)
 
-    # Gerar nome de arquivo com timestamp
-    # timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    # filename = f"minimundo_{timestamp}.md"
-
-    # Salvar resultado como arquivo Markdown
-    # data = get_project()
-    # projName = data["name"]
-    # projVersion = data["version"]
-
-    # footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
-
-    # with open(filename, "w", encoding="utf-8") as f:
-    #     f.write(resultado)
-    #     f.write(footer)
-
     return {**state, "minimundo": resultado}
-
-# def get_project():
-#     pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
-#     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-#     return data["project"]

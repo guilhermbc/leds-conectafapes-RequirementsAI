@@ -23,4 +23,69 @@ def check_Input_func(inputs):
         }
     return inputs
 
+def check_miniworld_func(inputs):
+    miniworld = inputs.get("minimundo")
+
+    if miniworld:
+        return {**inputs}
+    else:
+        return {
+            **inputs,
+            "mensagem": "Minimundo não identificado",
+            "estado": "erro_minimundo"
+        }
+    
+def check_rq_func(inputs):
+    requirements = inputs.get("report")
+
+    if requirements:
+        return {**inputs}
+    else:
+        return {
+            **inputs,
+            "mensagem": "Tabelas de requisitos não identificadas",
+            "estado": "erro_requirements"
+        }
+
+def check_uc_func(inputs):
+    use_case_table = inputs.get("format_uc")
+    use_case_description = inputs.get("report_validateuc")
+
+    if use_case_table and use_case_description:
+        return {**inputs}
+    elif not use_case_table:
+        return {
+            **inputs,
+            "mensagem": "Tabela dos casos de uso não identificada",
+            "estado": "erro_use_case_table"
+        }
+    elif not use_case_description:
+        return {
+            **inputs,
+            "mensagem": "Descrição dos casos de uso não identificado",
+            "estado": "erro_use_case_description"
+        }
+    else:
+        return {
+            **inputs,
+            "mensagem": "Arquivos dos casos de uso não identificados",
+            "estado": "erro_use_case"
+        }
+
+def check_cd_func(inputs):
+    class_diagram = inputs.get("diagrama_classes_final")
+
+    if class_diagram:
+        return {**inputs}
+    else:
+        return {
+            **inputs,
+            "mensagem": "Diagrama de classe não identificado",
+            "estado": "erro_class_diagram"
+        }
+
 check_Input = RunnableLambda(check_Input_func)
+check_MW = RunnableLambda(check_miniworld_func)
+check_Rq = RunnableLambda(check_rq_func)
+check_UC = RunnableLambda(check_uc_func)
+check_CD = RunnableLambda(check_cd_func)

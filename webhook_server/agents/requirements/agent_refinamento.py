@@ -66,23 +66,4 @@ def refine_node(state):
     print("🔍 Estado recebido no nó de refinamento:", state)
     resultado = agent_refinamento_chain.invoke({"requisitos_priorizados": state["requisitos_priorizados"]})
 
-    # # Gerar nome de arquivo com timestamp
-    # timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    # filename = f"report_{timestamp}.md"
-
-    # data = get_project()
-    # projName = data["name"]
-    # projVersion = data["version"]
-
-    # footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
-
-    # with open(filename, "w", encoding="utf-8") as f:
-    #     f.write(resultado)
-    #     f.write(footer)
-
     return {**state, "report": resultado}
-
-# def get_project():
-#     pyproject = Path(__file__).resolve().parents[2] / 'pyproject.toml'
-#     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-#     return data["project"]

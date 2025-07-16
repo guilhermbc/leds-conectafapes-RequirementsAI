@@ -21,9 +21,14 @@ def preparar_estado(data: dict) -> dict:
     elif "message" in data:
         caminho_video = data["message"]
 
+    info = ""
+    if "textInfo" in data:
+        info = data["textInfo"]
+
     return {
         "mensagem_usuario": caminho_video,
-        "video_entrevista": caminho_video
+        "video_entrevista": caminho_video,
+        "informacoes_adicionais": info
     }
 
 # Função decorada com traceable para garantir rastreamento
