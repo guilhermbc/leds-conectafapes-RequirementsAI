@@ -59,6 +59,7 @@ if uploaded_file:
                 st.markdown(report_validateuc, unsafe_allow_html=True)
                 st.markdown("#### Diagrama de Classe:")
                 st.markdown(class_diagram, unsafe_allow_html=True)
+                st.markdown(footer, unsafe_allow_html=True)
                 minimundo = response.json().get("minimundo", "")
 
             else:

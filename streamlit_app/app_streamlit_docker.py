@@ -62,7 +62,7 @@ if uploaded_file:
                 st.markdown(report_validateuc, unsafe_allow_html=True)
                 st.markdown("#### Diagrama de Classe:")
                 st.markdown(class_diagram, unsafe_allow_html=True)
-                minimundo = response.json().get("minimundo", "")
+                st.markdown(footer, unsafe_allow_html=True)
             else:
                 st.error(f"Erro: {response.status_code}")
         except Exception as e:
