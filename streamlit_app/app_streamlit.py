@@ -8,77 +8,192 @@ import tomllib
 st.title("📼 Enviar Vídeo para Análise de Requisitos com IA")
 
 UPLOAD_DIR = "../shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
+load_dotenv()
+webhook = os.getenv('WEBHOOK')
+URL = f"http://{webhook}:8001/webhook"
 
-uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
-uploaded_text = st.file_uploader("Envie um texto com informações adicionais (OPICIONAL) (.txt ou .md)", type=["txt", "md"])
+opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções", "Minimundo", "Tabela de Requisitos", "Casos de Uso", "Diagrama de Classe"])
+opt = opt.lower().replace(" ", "")
 
-if uploaded_file:
-    os.makedirs(UPLOAD_DIR, exist_ok=True)  # Garante que o diretório exista
+match opt:
+    case "minimundo":
+        uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
+        uploaded_text = st.file_uploader("Envie um texto com informações adicionais (OPICIONAL) (.txt ou .md)", type=["txt", "md"])
 
-    file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
-    with open(file_path, "wb") as f:
-        f.write(uploaded_file.getvalue())
-    st.success(f"Arquivo salvo em: {file_path}")
+        if uploaded_file:
+            os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-    text_path = ""
-    if uploaded_text:
-        text_path = os.path.join(UPLOAD_DIR, uploaded_text.name)
-        with open(text_path, "wb") as f:
-            f.write(uploaded_text.getvalue())
-        st.success(f"Arquivo salvo em: {text_path}")
+            file_path = os.path.join(UPLOAD_DIR, uploaded_file.name)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getvalue())
+            st.success(f"Arquivo salvo em: {file_path}")
 
-    load_dotenv()
-    webhook = os.getenv('WEBHOOK')
+            textInfo = ""
+            if uploaded_text:
+                textInfo = uploaded_text.getvalue().decode("utf-8")
 
-    if st.button(" Enviar para análise"):
-        payload = {
-            "chatInput": file_path,
-            "textInfo": text_path
-        }
-        try:
-            #response = requests.post("http://webhook_server:8001/webhook/webui_pipe_webhook", json=payload) #docker
-            response = requests.post(f"http://{webhook}:8001/webhook/webui_pipe_webhook", json=payload) #local
+            if st.button(" Enviar para análise"):
+                payload = {
+                    "chatInput": file_path,
+                    "textInfo": textInfo
+                }
+                try:
+                    response = requests.post(f"{URL}/miniworld", json=payload) #local
 
-            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-            
-            projName = data["project"]["name"]
-            projVersion = data["project"]["version"]
+                    pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+                    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                
+                    projName = data["project"]["name"]
+                    projVersion = data["project"]["version"]
 
-            footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+                    footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
 
-            if response.status_code == 200:
-                result = response.json().get("output", "")
-                minimundo = response.json().get("minimundo", "")
-                usecases_diagram = response.json().get("usecases_diagram", "")
-                format_uc = response.json().get("format_uc", "")
-                report_validateuc = response.json().get("report_validateuc", "")
-                class_diagram = response.json().get("class_diagram", "")
+                    if response.status_code == 200:
+                        minimundo = response.json().get("minimundo", "")
 
-                st.download_button('Download Tabelas de Requisitos', result + footer, file_name="requirements.md", on_click='ignore')
-                st.download_button('Download Minimundo', minimundo + footer, file_name="miniworld.md", on_click='ignore')
-                st.download_button('Download Diagrama de Casos de Uso', usecases_diagram + footer, file_name="usecasesDiagram.md", on_click='ignore')
-                st.download_button('Download Tabela de Casos de Uso', format_uc + footer, file_name="usecasesTable.md", on_click='ignore')
-                st.download_button('Download Descrição de Casos de Uso', report_validateuc + footer, file_name="usecasesDescription.md", on_click='ignore')
-                st.download_button('Download Diagrama de Classe', class_diagram + footer, file_name="classDiagram.md", on_click='ignore')
+                        st.download_button('Download Minimundo', minimundo + footer, file_name="miniworld.md", on_click='ignore')
 
-                st.markdown("###  Resposta do Agente:")
-                st.markdown("#### Tabelas de Requisitos:")
-                st.markdown(result, unsafe_allow_html=True)
-                st.markdown("#### Diagrama de Casos de Uso:")
-                st.markdown(format_uc, unsafe_allow_html=True)
-                st.markdown(report_validateuc, unsafe_allow_html=True)
-                st.markdown("#### Diagrama de Classe:")
-                st.markdown(class_diagram, unsafe_allow_html=True)
-                st.markdown(footer, unsafe_allow_html=True)
-                minimundo = response.json().get("minimundo", "")
+                        st.markdown("###  Resposta do Agente:")
+                        st.markdown("#### Minimundo:")
+                        st.markdown(minimundo, unsafe_allow_html=True)
+                        st.markdown(footer, unsafe_allow_html=True)
 
-            else:
-                st.error(f"Erro: {response.status_code}")
-        except Exception as e:
-            st.error(f"Erro ao enviar requisição: {e}")
+                    else:
+                        st.error(f"Erro: {response.status_code}")
+                except Exception as e:
+                    st.error(f"Erro ao enviar requisição: {e}")
 
-    if os.path.exists(file_path):
-        os.remove(file_path)
-    if os.path.exists(text_path):
-        os.remove(text_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+    case "tabeladerequisitos":
+        uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
+
+        if uploaded_mw:
+            os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+            minimundo = uploaded_mw.getvalue().decode("utf-8")
+
+            if st.button(" Enviar para análise"):
+                payload = {
+                    "minimundo": minimundo
+                }
+                try:
+                    response = requests.post(f"{URL}/requirements", json=payload) #local
+
+                    pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+                    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                
+                    projName = data["project"]["name"]
+                    projVersion = data["project"]["version"]
+
+                    footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+
+                    if response.status_code == 200:
+                        requisitos = response.json().get("report", "")
+
+                        st.download_button('Download Tabelas de Requisitos', requisitos + footer, file_name="requirements.md", on_click='ignore')
+
+                        st.markdown("###  Resposta do Agente:")
+                        st.markdown("#### Tabelas de Requisitos:")
+                        st.markdown(requisitos, unsafe_allow_html=True)
+                        st.markdown(footer, unsafe_allow_html=True)
+
+                    else:
+                        st.error(f"Erro: {response.status_code}")
+                except Exception as e:
+                    st.error(f"Erro ao enviar requisição: {e}")
+
+    case "casosdeuso":
+        uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
+        uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
+
+        if uploaded_mw and uploaded_rq:
+            minimundo = uploaded_mw.getvalue().decode("utf-8")
+            requisitos = uploaded_rq.getvalue().decode("utf-8")
+
+            if st.button(" Enviar para análise"):
+                    payload = {
+                        "minimundo": minimundo,
+                        "requisitos": requisitos
+                    }
+                    try:
+                        response = requests.post(f"{URL}/use-cases", json=payload) #local
+
+                        pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+                        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                    
+                        projName = data["project"]["name"]
+                        projVersion = data["project"]["version"]
+
+                        footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+
+                        if response.status_code == 200:
+                            digrama = response.json().get("diagrama_uc", "")
+                            tabela = response.json().get("tabela_uc", "")
+                            descricao = response.json().get("descricao_uc", "")
+
+                            st.download_button('Download Diagrama de Caso de Uso', digrama + footer, file_name="uc_diagram.md", on_click='ignore')
+                            st.download_button('Download Tabela de Caso de Uso', tabela + footer, file_name="uc_table.md", on_click='ignore')
+                            st.download_button('Download Descrição de Caso de Uso', descricao + footer, file_name="uc_description.md", on_click='ignore')
+
+                            st.markdown("###  Resposta do Agente:")
+                            st.markdown("#### Diagrama de Caso de Uso:")
+                            st.markdown(digrama, unsafe_allow_html=True)
+                            st.markdown("#### Tabela de Caso de Uso:")
+                            st.markdown(tabela, unsafe_allow_html=True)
+                            st.markdown("#### Descrição de Caso de Uso:")
+                            st.markdown(descricao, unsafe_allow_html=True)
+                            st.markdown(footer, unsafe_allow_html=True)
+
+                        else:
+                            st.error(f"Erro: {response.status_code}")
+                    except Exception as e:
+                        st.error(f"Erro ao enviar requisição: {e}")
+
+    case "diagramadeclasse":
+        uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
+        uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
+        uploaded_uctable = st.file_uploader("Envie o arquivo da tabela de casos de uso (.md)", type=[".md"])
+        uploaded_ucdescr = st.file_uploader("Envie o arquivo da descricao de caso de uso (.md)", type=[".md"])
+
+        if uploaded_mw and uploaded_rq and uploaded_uctable and uploaded_ucdescr:
+            minimundo = uploaded_mw.getvalue().decode("utf-8")
+            requisitos = uploaded_rq.getvalue().decode("utf-8")
+            tabela = uploaded_uctable.getvalue().decode("utf-8")
+            descricao = uploaded_ucdescr.getvalue().decode("utf-8")
+
+            if st.button(" Enviar para análise"):
+                    payload = {
+                        "minimundo": minimundo,
+                        "requisitos": requisitos,
+                        "tabela_caso_uso": tabela,
+                        "descricao_caso_uso": descricao
+                    }
+                    try:
+                        response = requests.post(f"{URL}/class-diagrams", json=payload) #local
+
+                        pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+                        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                    
+                        projName = data["project"]["name"]
+                        projVersion = data["project"]["version"]
+
+                        footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+
+                        if response.status_code == 200:
+                            digrama = response.json().get("diagrama_dc", "")
+
+                            st.download_button('Download Diagrama de Classe', digrama + footer, file_name="class_diagram.md", on_click='ignore')
+
+                            st.markdown("###  Resposta do Agente:")
+                            st.markdown("#### Diagrama de Classe:")
+                            st.markdown(digrama, unsafe_allow_html=True)
+                            st.markdown(footer, unsafe_allow_html=True)
+
+                        else:
+                            st.error(f"Erro: {response.status_code}")
+                    except Exception as e:
+                        st.error(f"Erro ao enviar requisição: {e}")
+    case _:
+        st.markdown("### Escolha uma das opções")
