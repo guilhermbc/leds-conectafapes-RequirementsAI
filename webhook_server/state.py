@@ -25,4 +25,5 @@ class MyState(TypedDict):
 
     cdinuc_description_revised: Optional[str]
     cdinuc_table_revised: Optional[str]
+    cdinuc_diagram_revised: Optional[str]
     ucincd_revised: Optional[str]

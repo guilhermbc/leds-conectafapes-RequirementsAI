@@ -74,20 +74,21 @@ async def call_agent(request: Request):
             )
 
             usecases_diagram = (
-                state.get("usecases_diagram")
+                state.get("cdinuc_diagram_revised")
+                or state.get("usecases_diagram")
                 or state.get("format_uc")
                 or state.get("report_validateuc")
                 or state.get("ident_events")
                 or state.get("ident_usecases")
             )
-            format_uc = (
+            usecases_table = (
                 state.get("cdinuc_table_revised")
                 or state.get("format_uc")
                 or state.get("report_validateuc")
                 or state.get("ident_events")
                 or state.get("ident_usecases")
             )
-            report_validateuc = (
+            usecases_description = (
                 state.get("cdinuc_description_revised")
                 or state.get("report_validateuc")
                 or state.get("ident_events")
@@ -95,26 +96,26 @@ async def call_agent(request: Request):
             )
 
             class_diagram = (
-                state.get("diagrama_classes_final")
+                state.get("ucincd_revised")
+                or state.get("diagrama_classes_final")
                 or state.get("diagrama_classes_revisado")
                 or state.get("diagrama_classes")
                 or state.get("rascunho_classes")
-                or ""
             )
             
         else:
             assistant_response = "Desculpe, não foi possível gerar uma resposta."
             minimundo = ""
             usecases_diagram = ""
-            format_uc = ""
-            report_validateuc = ""
+            usecases_table = ""
+            usecases_description = ""
             class_diagram = ""
 
         return JSONResponse(content={"output": assistant_response, 
                                      "minimundo": minimundo, 
                                      "usecases_diagram": usecases_diagram, 
-                                     "format_uc": format_uc, 
-                                     "report_validateuc": report_validateuc, 
+                                     "usecases_table": usecases_table, 
+                                     "usecases_description": usecases_description, 
                                      "class_diagram": class_diagram})
 
     except Exception as e:

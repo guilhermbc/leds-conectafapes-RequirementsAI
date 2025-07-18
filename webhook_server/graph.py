@@ -24,9 +24,10 @@ from agents.classDiagram.agent_refinamento_classe import refine_node as refine_C
 # from agents.classDiagram.agent_join import join_node as join_CD
 
 # Importa os agentes de revisão
-from agents.revision.agent_revision_cdinuc_description import cdinuc_description_node
-from agents.revision.agent_revision_cdinuc_table import cdinuc_table_node
-from agents.revision.agent_revision_ucincd import ucincd_node
+from agents.revision.agent_cdinuc_description import cdinuc_description_node
+from agents.revision.agent_cdinuc_table import cdinuc_table_node
+from agents.revision.agent_cdinuc_diagram import cdinuc_diagram_node
+from agents.revision.agent_ucincd import ucincd_node
 
 from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
 
@@ -59,6 +60,7 @@ builder.add_node("refine_class_diagram", refine_CD)
 # Nós de revisão
 builder.add_node("revise_uc_description_withclasses", cdinuc_description_node)
 builder.add_node("revise_uc_table_withclasses", cdinuc_table_node)
+builder.add_node("revise_uc_diagram_withclasses", cdinuc_diagram_node)
 builder.add_node("revise_classes_withuc", ucincd_node)
 
 # Nó final ainda é operacional
@@ -97,7 +99,8 @@ builder.add_edge("refine_class_diagram", "revise_uc_description_withclasses")
 
 # Arestas de revisão
 builder.add_edge("revise_uc_description_withclasses", "revise_uc_table_withclasses")
-builder.add_edge("revise_uc_table_withclasses", "revise_classes_withuc")
+builder.add_edge("revise_uc_table_withclasses", "revise_uc_diagram_withclasses")
+builder.add_edge("revise_uc_diagram_withclasses", "revise_classes_withuc")
 builder.add_edge("revise_classes_withuc", END)
 
 builder.add_edge("final_output", END)
