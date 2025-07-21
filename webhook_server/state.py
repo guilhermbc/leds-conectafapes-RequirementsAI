@@ -2,6 +2,7 @@ from typing import TypedDict, Optional
 
 class MyState(TypedDict):
     video_entrevista: Optional[str]
+    informacoes_adicionais: Optional[str]
     mensagem_usuario: Optional[str]
     mensagem: Optional[str]
     estado: Optional[str]
