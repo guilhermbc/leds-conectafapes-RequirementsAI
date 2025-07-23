@@ -81,7 +81,6 @@ def analyze_node(state):
     """
     print("🔎 Estado recebido no nó de análise:", state)
     resultado = agent_analise_chain.invoke({"minimundo": state["minimundo"]})
-    #return {"rascunho_requisitos": resultado}
     return {**state, "rascunho_requisitos": resultado}
 
 
