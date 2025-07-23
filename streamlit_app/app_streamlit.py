@@ -12,7 +12,7 @@ load_dotenv()
 webhook = os.getenv('WEBHOOK')
 URL = f"http://{webhook}:8001/webhook"
 
-opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções", "Minimundo", "Tabela de Requisitos", "Casos de Uso", "Diagrama de Classe"])
+opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções", "Minimundo", "Tabela de Requisitos", "Casos de Uso", "Diagrama de Classe", "Revisao"])
 opt = opt.lower().replace(" ", "")
 
 match opt:

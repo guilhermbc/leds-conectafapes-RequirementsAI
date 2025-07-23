@@ -82,13 +82,15 @@ builderDC.add_node("indentify_class", identify_CD)
 builderDC.add_node("extract_class_diagram", extract_CD)
 builderDC.add_node("revise_class_diagram", revise_CD)
 builderDC.add_node("refine_class_diagram", refine_CD)
+# Final node (operacional)
+builderDC.add_node("final_output", final.final_return)
 
 # Grafo de revisão (prerequisitos: tabelas de requisitos, diagrama de casos de uso e diagrama de classe)
 # Builder
 builderRv = StateGraph(state_schema=MyState)
 # Verificação de entrada (operacional)
 builderRv.add_node("verify_Rq", input_check.check_Rq)
-builderRv.add_node("verify_UC", input_check.check_UC)
+builderRv.add_node("verify_UC", input_check.check_UC_Descr)
 builderRv.add_node("verify_CD", input_check.check_CD)
 # Nodes
 builderRv.add_node("revise_uc_description_withclasses", cdinuc_description_node)
