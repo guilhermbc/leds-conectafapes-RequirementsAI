@@ -74,12 +74,12 @@ identevent_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **Output Structure** (for each use case):  
-    - **Name**  
-    - **Actors** (include both primary and secondary, if applicable)  
-    - **Preconditions**  
-    - **Normal Flow of Events** (numbered list)  
-    - **Alternative / Exception Flows** (bullet points)  
-    - **Related Requirements**  
+    - **Nome** (name of the use case) 
+    - **Atores** (include both primary and secondary, if applicable)  
+    - **Pré-condições** (preconditions that must be met before the use case starts) 
+    - **Fluxo Normal de Eventos** (numbered list)  
+    - **Fluxos Alternativos/de Exceção** (bullet points)  
+    - **Requisitos Relacionados**  
     - **Classes** (leave this field empty for now)
 
     You must **preserve the original use case content** and **add the new sections** in place. Structure the output in plain text — no Markdown tables.
@@ -88,14 +88,14 @@ identevent_prompt = ChatPromptTemplate.from_messages([
 
     **Example**:
 
-    **Name**: Perform Withdrawal  
-    **Actors**:  
+    ### **Perform Withdrawal**  
+    **Atores**:  
     - Client (primary): wants to withdraw money.  
     - Bank system: ensures only authorized withdrawals and verifies the client's balance.  
 
-    **Preconditions**: The ATM must be connected to the bank system.  
+    **Pré-condições**: The ATM must be connected to the bank system.  
 
-    **Normal Flow of Events**:  
+    **Fluxo Normal de Eventos**:  
     1. The client inserts the card into the ATM.  
     2. The system requests the password.  
     3. The client enters the password.  
@@ -106,19 +106,21 @@ identevent_prompt = ChatPromptTemplate.from_messages([
     8. The system deducts the amount from the account and dispenses the cash.  
     9. The system records the transaction and displays a confirmation message.  
 
-    **Alternative / Exception Flows**:  
+    **Fluxos Alternativos/de Exceção**:  
     - **Unacceptable card**: If the card is unreadable or incompatible, an error message is shown.  
     - **Incorrect password**: If the password is incorrect, the client may retry. After three failed attempts, the card is blocked.  
     - **Unauthorized withdrawal**: If the bank system denies the withdrawal, an error message is displayed and the operation is aborted.  
     - **Insufficient cash in ATM**: A message is displayed and the operation is aborted.  
     - **Cancellation**: The client may cancel the operation at any moment before authorization.
 
-    **Related Requirements**: RF01, BR01, NFR01, NFR029  
+    **Requisitos Relacionados**: RF01, BR01, NFR01, NFR029  
     **Classes**: *(leave this field empty)*
 
     ---
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: 
+    - Your entire response must be written in **Portuguese**
+    - Make sure to break lines with double whitespaces before each new section to ensure proper formatting.
     """
     )
 ])

@@ -51,7 +51,7 @@ classDiagram
     Dog "1" --> "*" Toy : has
 ```
 
-    ## Data Dictionary Example
+## Data Dictionary Example
 
     ### Animal
     | Attribute | Description |
