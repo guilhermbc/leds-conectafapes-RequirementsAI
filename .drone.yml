@@ -1,0 +1,112 @@
+kind: pipeline
+type: docker
+name: Build
+
+trigger:
+  event:
+    - push
+  branch:
+    - develop
+
+steps:
+  - name: build
+    image: docker:27.2.0-dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    commands:
+      - docker build -f streamlit_app/dockerfile .
+      - docker build -f webhook_server/dockerfile .
+
+services:
+  - name: dind
+    image: docker:27.1-dind
+    privileged: true
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
+---
+
+kind: pipeline
+type: docker
+name: Publish
+
+trigger:
+  event:
+    - push
+  branch:
+    - develop
+
+depends_on:
+  - Build
+
+steps:
+  - name: publish
+    image: docker:27.2.0-dind
+    privileged: true
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    environment:
+      GITHUB_USERNAME:
+        from_secret: GITHUB_USERNAME
+      GITHUB_TOKEN:
+        from_secret: GHCR_TOKEN
+    commands:
+      - echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
+
+      - docker build -t ghcr.io/leds-conectafapes/leds-conectafapes-RequirementsAI:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA} -f streamlit_app/Dockerfile streamlit_app
+      - docker push ghcr.io/leds-conectafapes/leds-conectafapes-RequirementsAI:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}
+
+      - docker build -t ghcr.io/leds-conectafapes/leds-conectafapes-WebhookServer:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA} -f webhook_server/Dockerfile webhook_server
+      - docker push ghcr.io/leds-conectafapes/leds-conectafapes-WebhookServer:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}
+
+
+services:
+  - name: dind
+    image: docker:27.1-dind
+    privileged: true
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
+---
+
+kind: pipeline
+type: docker
+name: Deploy
+
+trigger:
+  event:
+    - push
+  branch:
+    - develop
+
+depends_on:
+  - Publish
+
+steps:
+  - name: deploy-stage
+    image: alpine/git
+    environment:
+      GITHUB_USERNAME:
+        from_secret: GITHUB_USERNAME
+      GITHUB_TOKEN:
+        from_secret: GHCR_TOKEN
+      DRONE_TAG: ${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}
+    commands:
+      - git clone https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/leds-conectafapes/leds-conectafapes-infra.git
+      - cd leds-conectafapes-infra/services/Requirements-AI
+      - |
+        sed -i "/name: edite-container/{n;s|^\([[:space:]]*\)image:.*|\1image: ghcr.io/leds-conectafapes/leds-conectafapes-RequirementsAI:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}|}" deployment.yaml
+      - git config user.name "drone-ci"
+      - git config user.email "drone@ci.leds"
+      - git add deployment.yaml
+      - git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
+      - git push origin develop
