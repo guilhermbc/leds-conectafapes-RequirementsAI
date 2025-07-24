@@ -16,9 +16,12 @@ steps:
       - name: dockersock
         path: /var/run/docker.sock
     commands:
-      - docker build -f streamlit_app/dockerfile .
-      - docker build -f webhook_server/dockerfile .
-
+      - cd streamlit_app
+      - docker build -f dockerfile .
+      - cd ../webhook_server
+      - docker build -f dockerfile .
+      - cd ..
+      - echo "Build completed successfully"
 services:
   - name: dind
     image: docker:27.1-dind
