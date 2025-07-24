@@ -59,7 +59,7 @@ steps:
     commands:
       - echo $GITHUB_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
 
-      - docker build -t ghcr.io/leds-conectafapes/leds-conectafapes-RequirementsAI:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA} -f streamlit_app/dockerfile streamlit_app
+      - docker build -t ghcr.io/leds-conectafapes/leds-conectafapes-RequirementsAI:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA} -f streamlit_app/dockerfile app_streamlit
       - docker push ghcr.io/leds-conectafapes/leds-conectafapes-RequirementsAI:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}
 
       - docker build -t ghcr.io/leds-conectafapes/leds-conectafapes-WebhookServer:${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA} -f webhook_server/dockerfile webhook_server
