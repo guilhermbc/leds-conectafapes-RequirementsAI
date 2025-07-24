@@ -165,4 +165,4 @@ All agents are organized via LangGraph in the `graph.py` file, respecting state 
 
 ## Contribution
 
-Pull requests are welcome\! For issues or suggestions, please open an *issue*.
+Pull requests are welcome\! For issues or suggestions, please open an *issue*. 
