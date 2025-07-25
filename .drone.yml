@@ -130,11 +130,12 @@ steps:
       - DIGEST_AI=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:develop | cut -d'@' -f2)
       - yq -i ".spec.template.spec.containers[1].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/services/Requirements-AI/streamlit/deployment.yaml
 
+      - cd leds-conectafapes-infra
       - echo "Deployment images updated successfully"
       - git config user.name "drone-ci"
       - git config user.email "drone@ci.leds"
-      - git add leds-conectafapes-infra/services/Requirements-AI/webhook/deployment.yaml
-      - git add leds-conectafapes-infra/services/Requirements-AI/streamlit/deployment.yaml
+      - git add services/Requirements-AI/webhook/deployment.yaml
+      - git add services/Requirements-AI/streamlit/deployment.yaml
       - git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
       - git push
 when:
