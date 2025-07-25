@@ -100,7 +100,7 @@ depends_on:
 
 steps:
   - name: deploy-stage
-    image: alpine/git
+    image: docker:27.2.0-cli
     privileged: true
     environment:
       GITHUB_USERNAME:
