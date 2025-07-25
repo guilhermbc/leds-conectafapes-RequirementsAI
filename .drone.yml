@@ -123,18 +123,17 @@ steps:
       - docker pull ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook:develop
       - docker pull ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:develop
       - git clone https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/leds-conectafapes/leds-conectafapes-infra.git
-      - cd leds-conectafapes-infra/services/Requirements-AI/webhook
+
       - DIGEST_WEBHOOK=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook:develop | cut -d'@' -f2)
-      - yq -i '.spec.template.spec.containers[0].image = "ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@'"$DIGEST_WEBHOOK"'' deployment.yaml
-      - cd ..
-      - cd leds-conectafapes-infra/services/Requirements-AI/streamlit
+      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@$DIGEST_WEBHOOK\"" leds-conectafapes-infra/services/Requirements-AI/webhook/deployment.yaml
+
       - DIGEST_AI=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:develop | cut -d'@' -f2)
-      - yq -i '.spec.template.spec.containers[1].image = "ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@'"$DIGEST_AI"'' deployment.yaml
-      - cd ..
+      - yq -i ".spec.template.spec.containers[1].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/services/Requirements-AI/streamlit/deployment.yaml
+
       - echo "Deployment images updated successfully"
       - git config user.name "drone-ci"
       - git config user.email "drone@ci.leds"
-      - git add deployment.yaml
+      - git add leds-conectafapes-infra/services/Requirements-AI/**/deployment.yaml
       - git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
       - git push
 when:
