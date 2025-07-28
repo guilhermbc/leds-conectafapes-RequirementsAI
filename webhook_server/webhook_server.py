@@ -318,7 +318,7 @@ async def call_agent_miniworld(request: Request):
         else:
             diagrama = "Desculpe, não foi possível gerar uma resposta."
         
-        return JSONResponse(content={"diagrama_dc": diagrama})
+        return JSONResponse(content={"diagrama_cd": diagrama})
 
     except Exception as e:
         print(f" Erro geral: {str(e)}")
@@ -370,9 +370,9 @@ async def call_agent_miniworld(request: Request):
             )
         else:
             descricao_uc = "Desculpe, não foi possível gerar uma resposta."
-            tabela_uc = "Desculpe, não foi possível gerar uma resposta."
-            diagrama_uc = "Desculpe, não foi possível gerar uma resposta."
-            diagrama_classes = "Desculpe, não foi possível gerar uma resposta."
+            tabela_uc = "Teste de erro."
+            diagrama_uc = "Teste de erro 2"
+            diagrama_classes = "Teste de erro 3"
         
         return JSONResponse(content={
             "descricao_uc": descricao_uc,
