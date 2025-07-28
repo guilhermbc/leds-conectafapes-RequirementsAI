@@ -90,7 +90,7 @@ builderDC.add_node("final_output", final.final_return)
 builderRv = StateGraph(state_schema=MyState)
 # Verificação de entrada (operacional)
 builderRv.add_node("verify_Rq", input_check.check_Rq)
-builderRv.add_node("verify_UC", input_check.check_UC)
+builderRv.add_node("verify_UC", input_check.check_UC_Descr)
 builderRv.add_node("verify_CD", input_check.check_CD)
 # Nodes
 builderRv.add_node("revise_uc_description_withclasses", cdinuc_description_node)
