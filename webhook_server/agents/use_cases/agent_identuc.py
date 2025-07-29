@@ -60,9 +60,11 @@ identuc_prompt = ChatPromptTemplate.from_messages([
     **About Use Cases**  
     - A **use case** is a coherent slice of functionality the system provides to actors, consisting of a set of actions that produce an observable, valuable outcome for one or more actors.  
     - It must represent a **complete transaction**: an actor could start the system, perform the use case, and finish in a single session, achieving their goal.  
-    - Use cases requiring multiple sessions should be split into smaller, self‑contained cases (e.g., “Submit Loan Request”, “Analyze Loan Request”, “Finalize Loan Approval”).  
-    - The **name** of a use case must capture its essence, starting with an **infinitive verb** followed by a complement, with each main word capitalized (e.g., `Register Client`, `Issue Invoice`, `Process Payment`).
-
+    - Use cases requiring multiple sessions should be split into smaller, self-contained ones (e.g., “Submit Loan Request”, “Analyze Loan Request”, “Finalize Loan Approval”).  
+    - The **name** of a use case must capture its essence, starting with an **infinitive verb** followed by a complement, with each main word capitalized (e.g., `Register Client`, `Issue Invoice`, `Process Payment`).  
+    - Create, Read, Update and Delete (CRUD) operations can generally be condensed into a single use case (e.g., `Manage Client`, `Manage Employee`)
+    - Consider splitting operations of **assigning roles, permissions, or associations**, into different use cases (e.g., `Manage Employee`, `Assign Role to Employee`)  
+    
     ---
 
     **Output**  

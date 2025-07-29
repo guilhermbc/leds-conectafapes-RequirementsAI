@@ -71,6 +71,30 @@ def check_uc_func(inputs):
             "mensagem": "Arquivos dos casos de uso não identificados",
             "estado": "erro_use_case"
         }
+    
+def check_uc_desc_func(inputs):
+    use_case_description = inputs.get("report_validateuc")
+
+    if use_case_description:
+        return {**inputs}
+    else:
+        return {
+            **inputs,
+            "mensagem": "Descrição dos casos de uso não identificado",
+            "estado": "erro_use_case_description"
+        }
+
+def check_uc_tabl_func(inputs):
+    use_case_table = inputs.get("format_uc")
+
+    if use_case_table:
+        return {**inputs}
+    else:
+        return {
+            **inputs,
+            "mensagem": "Tabela dos casos de uso não identificada",
+            "estado": "erro_use_case_table"
+        }
 
 def check_cd_func(inputs):
     class_diagram = inputs.get("diagrama_classes_final")
@@ -88,4 +112,6 @@ check_Input = RunnableLambda(check_Input_func)
 check_MW = RunnableLambda(check_miniworld_func)
 check_Rq = RunnableLambda(check_rq_func)
 check_UC = RunnableLambda(check_uc_func)
+check_UC_Descr = RunnableLambda(check_uc_desc_func)
+check_UC_Table = RunnableLambda(check_uc_tabl_func)
 check_CD = RunnableLambda(check_cd_func)
