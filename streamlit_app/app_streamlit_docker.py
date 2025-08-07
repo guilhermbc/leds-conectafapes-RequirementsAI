@@ -18,7 +18,8 @@ opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções",
                                                      "Casos de Uso", 
                                                      "Diagrama de Classe",
                                                      "Casos de Uso e Diagrama de Classe (com validação mútua)",
-                                                     "Tudo!"])
+                                                     "Tudo!",
+                                                     "Protótipo de Interface"])
 opt = opt.lower().replace(" ", "")
 
 match opt:
@@ -446,5 +447,52 @@ match opt:
 
             if os.path.exists(file_path):
                 os.remove(file_path)
+    case "protótipodeinterface":
+        uploaded_ucdescr = st.file_uploader("Envie o arquivo da descrição de caso de uso (.md)", type=[".md"])
+        uploaded_ctable = st.file_uploader("Envie o arquivo do diagrama de classes (.md)", type=[".md"])
+
+        if uploaded_ucdescr and uploaded_ctable:
+            descricao_uc = uploaded_ucdescr.getvalue().decode("utf-8")
+            diagrama_classes = uploaded_ctable.getvalue().decode("utf-8")
+
+            if st.button(" Enviar para análise"):
+                payload = {
+                    "descricao_caso_uso": descricao_uc,
+                    "diagrama_classes": diagrama_classes
+                }
+                try:
+                    response = requests.post(f"{URL}/interface-prototype", json=payload) #local
+
+                    try:
+                        pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                    except Exception as e:
+                        try:
+                            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+                            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                        except Exception as e:
+                            data = {
+                                "project":{
+                                    "name": "RequirementsAi",
+                                    "version":"0.4.0"
+                                }
+                            }
+    
+                    projName = data["project"]["name"]
+                    projVersion = data["project"]["version"]
+
+                    footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+
+                    if response.status_code == 200:
+                        prototipo_interface = response.json().get("prototipo_interface", "")
+
+                        st.download_button('Download Protótipo de Interface ', prototipo_interface + footer, file_name="interface_prototype.md", on_click='ignore')
+                        
+                        st.markdown("#### Protótipo de Interface:")
+                        st.markdown(prototipo_interface, unsafe_allow_html=True)
+                    else:
+                        st.error(f"Erro: {response.status_code}")
+                except Exception as e:
+                    st.error(f"Erro ao enviar requisição: {e}")
     case _:
         st.markdown("### Escolha uma das opções")

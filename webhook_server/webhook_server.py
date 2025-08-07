@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 import uvicorn
 import traceback
 from langsmith import traceable
-from graph import graphMW, graphRq, graphUC, graphDC, graphRv
+from graph import graphMW, graphRq, graphUC, graphDC, graphRv, graphIP
 import os
 
 app = FastAPI()
@@ -109,6 +109,20 @@ def preparar_estado_revisao(data: dict) -> dict:
         "diagrama_classes_final": diagrama_classes
     }
 
+def preparar_estado_prototipo_interface(data: dict) -> dict:
+    descricao_uc = ""
+    diagrama_classes = ""
+    if "descricao_caso_uso" in data:
+        descricao_uc = data["descricao_caso_uso"]
+    if "diagrama_classes" in data:
+        diagrama_classes = data["diagrama_classes"]
+
+    return {
+        "mensagem_usuario": descricao_uc,
+        "cdinuc_description_revised": descricao_uc,
+        "ucincd_revised": diagrama_classes
+    }
+
 # Função decorada com traceable para garantir rastreamento
 @traceable(name="Run RequirementsAI")
 def run_graphMW_with_trace(input_data: dict):
@@ -142,6 +156,13 @@ def run_graphDC_with_trace(input_data: dict):
 def run_graphRv_with_trace(input_data: dict):
     final_state = None
     for step in graphRv.stream(input_data):
+        print("🧩 Chunk parcial:", step)
+        final_state = step
+    return final_state
+
+def run_graphIP_with_trace(input_data: dict):
+    final_state = None
+    for step in graphIP.stream(input_data):
         print("🧩 Chunk parcial:", step)
         final_state = step
     return final_state
@@ -379,6 +400,48 @@ async def call_agent_miniworld(request: Request):
             "tabela_uc": tabela_uc,
             "diagrama_uc": diagrama_uc,
             "diagrama_classes": diagrama_classes
+            })
+
+    except Exception as e:
+        print(f" Erro geral: {str(e)}")
+        traceback.print_exc()
+        return JSONResponse(status_code=500, content={"error": str(e)})
+    
+@app.post("/webhook/interface-prototype")
+async def call_agent_miniworld(request: Request):
+    try:
+        from graph import graphIP
+
+        data = await request.json()
+        estado = preparar_estado_prototipo_interface(data)
+
+        if not estado["mensagem_usuario"] or estado["mensagem_usuario"] == "":
+            return JSONResponse(status_code=400, content={"error": "Nenhuma mensagem reconhecida."})
+
+        print(f"🔵 Recebido: {estado['mensagem_usuario']}")
+
+        try:
+            result = run_graphIP_with_trace(estado)
+            print(f"Resposta gerada!")
+            print("🧾 RESULTADO COMPLETO DO GRAFO:")
+            print(result)
+
+        except Exception as e:
+            print(f" Erro no invoke: {str(e)}")
+            traceback.print_exc()
+            return JSONResponse(content={"output": f"Erro ao gerar resposta: {str(e)}"})
+        
+        if result and isinstance(result, dict):
+            state = next(iter(result.values())) if len(result) == 1 else result
+            prototipo_interface = (
+                state.get("interface_prototype")
+                or "Desculpe, não foi possível gerar uma resposta."
+            )
+        else:
+            prototipo_interface = "Desculpe, não foi possível gerar uma resposta."
+        
+        return JSONResponse(content={
+            "prototipo_interface": prototipo_interface,
             })
 
     except Exception as e:
