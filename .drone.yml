@@ -137,7 +137,13 @@ steps:
       - git config user.email "drone@ci.leds"
       - git add services/Requirements-AI/webhook/deployment.yaml
       - git add services/Requirements-AI/streamlit/deployment.yaml
-      - git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
+      - |
+        if ! git diff --cached --quiet; then
+          git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
+        else
+          echo "Nenhuma alteração para commitar"
+        fi
+
       - git push
 when:
      branch:
@@ -198,7 +204,12 @@ steps:
       - git config user.email "drone@ci.leds"
       - git add services/Requirements-AI/webhook/deployment.yaml
       - git add services/Requirements-AI/streamlit/deployment.yaml
-      - git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
+      - |
+        if ! git diff --cached --quiet; then
+          git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
+        else
+          echo "Nenhuma alteração para commitar"
+        fi
       - git push
 when:
      branch:
