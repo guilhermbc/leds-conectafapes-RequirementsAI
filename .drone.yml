@@ -7,6 +7,7 @@ trigger:
     - push
   branch:
     - develop
+    - test
 
 steps:
   - name: build
@@ -43,6 +44,7 @@ trigger:
     - push
   branch:
     - develop
+    - test
 
 depends_on:
   - Build
@@ -71,7 +73,6 @@ steps:
       - echo "Publish completed successfully"
 
       
-
 
 services:
   - name: dind
@@ -142,4 +143,64 @@ when:
      branch:
        include:
          - develop
-            
+
+
+---
+kind: pipeline
+type: docker
+name: Deploy-Test
+
+trigger:
+  event:
+    - push
+  branch:
+    - test
+
+depends_on:
+  - Publish-Test
+
+volumes:
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
+
+steps:
+  - name: deploy-stage
+    image: docker:20.10.24-dind
+    privileged: true
+    environment:
+      GITHUB_USERNAME:
+        from_secret: GITHUB_USERNAME
+      GITHUB_TOKEN:
+        from_secret: GHCR_TOKEN
+      DRONE_TAG: ${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}
+    volumes:
+      - name: dockersock
+        path: /var/run/docker.sock
+    commands:
+      - apk add --no-cache git wget curl
+      - wget https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64 -O /usr/local/bin/yq
+      - chmod +x /usr/local/bin/yq
+      - echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_USERNAME" --password-stdin
+      - docker pull ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook:test
+      - docker pull ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:test
+      - git clone https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/leds-conectafapes/leds-conectafapes-infra.git
+
+      - DIGEST_WEBHOOK=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook:test | cut -d'@' -f2)
+      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@$DIGEST_WEBHOOK\"" leds-conectafapes-infra/services/Requirements-AI/webhook/deployment.yaml
+
+      - DIGEST_AI=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:test | cut -d'@' -f2)
+      - yq -i ".spec.template.spec.containers[1].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/services/Requirements-AI/streamlit/deployment.yaml
+
+      - cd leds-conectafapes-infra
+      - echo "Deployment images updated successfully"
+      - git config user.name "drone-ci"
+      - git config user.email "drone@ci.leds"
+      - git add services/Requirements-AI/webhook/deployment.yaml
+      - git add services/Requirements-AI/streamlit/deployment.yaml
+      - git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
+      - git push
+when:
+     branch:
+       include:
+         - test
