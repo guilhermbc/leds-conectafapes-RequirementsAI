@@ -157,7 +157,7 @@ trigger:
     - test
 
 depends_on:
-  - Publish-Test
+  - Publish
 
 volumes:
   - name: dockersock
