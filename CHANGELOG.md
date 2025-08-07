@@ -1,3 +1,9 @@
+## v0.5.0 (2025-08-07)
+
+### Feat
+
+- **streamlit/webhook**: adição da versão inicial de protótipo de interface
+
 ## v0.4.0 (2025-07-28)
 
 ### Refactor
