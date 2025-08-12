@@ -486,10 +486,10 @@ match opt:
                     if response.status_code == 200:
                         prototipo_interface = response.json().get("prototipo_interface", "")
 
-                        st.download_button('Download Protótipo de Interface ', prototipo_interface + footer, file_name="interface_prototype.md", on_click='ignore')
+                        st.download_button('Download Protótipo de Interface ', prototipo_interface, file_name="interface_prototype.html", on_click='ignore')
                         
-                        st.markdown("#### Protótipo de Interface:")
-                        st.markdown(prototipo_interface, unsafe_allow_html=True)
+                        st.markdown("#### Protótipo de interface pronto!:")
+
                     else:
                         st.error(f"Erro: {response.status_code}")
                 except Exception as e:
