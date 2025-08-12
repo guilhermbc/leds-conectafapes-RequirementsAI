@@ -1,6 +1,6 @@
 [project]
 name = "RequirementsAI"
-version = "0.5.0"
+version = "0.5.1"
 description = """
 Software requirements extraction pipeline from video interviews, utilizing
 Natural Language Models (LLMs), LangGraph, specialized agents, and a

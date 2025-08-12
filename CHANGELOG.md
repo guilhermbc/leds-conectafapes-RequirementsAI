@@ -1,3 +1,9 @@
+## v0.5.1 (2025-08-12)
+
+### Refactor
+
+- **webhook**: geração de um único html com todas as páginas
+
 ## v0.5.0 (2025-08-07)
 
 ### Feat
