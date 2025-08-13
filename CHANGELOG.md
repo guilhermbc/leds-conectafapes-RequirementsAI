@@ -1,3 +1,9 @@
+## v0.6.0 (2025-08-13)
+
+### Feat
+
+- **interfacePrototype**: geração de descrição de uso dos protótipos de interface
+
 ## v0.5.1 (2025-08-12)
 
 ### Refactor
