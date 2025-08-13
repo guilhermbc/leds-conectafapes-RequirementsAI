@@ -448,15 +448,18 @@ match opt:
             if os.path.exists(file_path):
                 os.remove(file_path)
     case "protótipodeinterface":
+        uploaded_rq = st.file_uploader("Envie o arquivo dos requisitos (.md)", type=[".md"])
         uploaded_ucdescr = st.file_uploader("Envie o arquivo da descrição de caso de uso (.md)", type=[".md"])
         uploaded_ctable = st.file_uploader("Envie o arquivo do diagrama de classes (.md)", type=[".md"])
 
         if uploaded_ucdescr and uploaded_ctable:
+            requisitos = uploaded_rq.getvalue().decode("utf-8")
             descricao_uc = uploaded_ucdescr.getvalue().decode("utf-8")
             diagrama_classes = uploaded_ctable.getvalue().decode("utf-8")
 
             if st.button(" Enviar para análise"):
                 payload = {
+                    "requisitos": requisitos,
                     "descricao_caso_uso": descricao_uc,
                     "diagrama_classes": diagrama_classes
                 }
@@ -474,7 +477,7 @@ match opt:
                             data = {
                                 "project":{
                                     "name": "RequirementsAi",
-                                    "version":"0.4.0"
+                                    "version":"0.5.2"
                                 }
                             }
     
@@ -485,10 +488,13 @@ match opt:
 
                     if response.status_code == 200:
                         prototipo_interface = response.json().get("prototipo_interface", "")
+                        descricao_interface = response.json().get("descricao_interface", "")
+
+                        st.markdown("#### Protótipo de interface pronto!")
 
                         st.download_button('Download Protótipo de Interface ', prototipo_interface, file_name="interface_prototype.html", on_click='ignore')
-                        
-                        st.markdown("#### Protótipo de interface pronto!:")
+                        st.download_button('Download Descrição de Uso de Interface ', descricao_interface, file_name="interface_use_description.md", on_click='ignore')
+
 
                     else:
                         st.error(f"Erro: {response.status_code}")

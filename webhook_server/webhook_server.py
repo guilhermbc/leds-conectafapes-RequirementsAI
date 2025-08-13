@@ -110,8 +110,11 @@ def preparar_estado_revisao(data: dict) -> dict:
     }
 
 def preparar_estado_prototipo_interface(data: dict) -> dict:
+    requisitos= ""
     descricao_uc = ""
     diagrama_classes = ""
+    if "requisitos" in data:
+        requisitos = data["requisitos"]
     if "descricao_caso_uso" in data:
         descricao_uc = data["descricao_caso_uso"]
     if "diagrama_classes" in data:
@@ -119,6 +122,7 @@ def preparar_estado_prototipo_interface(data: dict) -> dict:
 
     return {
         "mensagem_usuario": descricao_uc,
+        "report": requisitos,
         "cdinuc_description_revised": descricao_uc,
         "ucincd_revised": diagrama_classes
     }
@@ -437,11 +441,17 @@ async def call_agent_miniworld(request: Request):
                 state.get("interface_prototype")
                 or "Desculpe, não foi possível gerar uma resposta."
             )
+            descricao_interface = (
+                state.get("interface_description")
+                or "Desculpe, não foi possível gerar uma resposta."
+            )
         else:
             prototipo_interface = "Desculpe, não foi possível gerar uma resposta."
+            descricao_interface = "Desculpe, não foi possível gerar uma resposta."
         
         return JSONResponse(content={
             "prototipo_interface": prototipo_interface,
+            "descricao_interface": descricao_interface
             })
 
     except Exception as e:

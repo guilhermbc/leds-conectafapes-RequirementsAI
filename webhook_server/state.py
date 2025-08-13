@@ -30,3 +30,4 @@ class MyState(TypedDict):
     ucincd_revised: Optional[str]
 
     interface_prototype: Optional[str]
+    interface_description: Optional[str]
