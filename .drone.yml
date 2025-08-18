@@ -135,8 +135,8 @@ steps:
       - echo "Deployment images updated successfully"
       - git config user.name "drone-ci"
       - git config user.email "drone@ci.leds"
-      - git add services/Requirements-AI/webhook/deployment.yaml
-      - git add services/Requirements-AI/streamlit/deployment.yaml
+      - git add agentes/stage/Requirements-AI/webhook/deployment.yaml
+      - git add agentes/stage/Requirements-AI/streamlit/deployment.yaml
       - |
         if ! git diff --cached --quiet; then
           git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
@@ -202,8 +202,8 @@ steps:
       - echo "Deployment images updated successfully"
       - git config user.name "drone-ci"
       - git config user.email "drone@ci.leds"
-      - git add services/Requirements-AI/webhook/deployment.yaml
-      - git add services/Requirements-AI/streamlit/deployment.yaml
+      - git add agentes/testing/Requirements-AI/webhook/deployment.yaml
+      - git add agentes/testing/Requirements-AI/streamlit/deployment.yaml
       - |
         if ! git diff --cached --quiet; then
           git commit -m "[DEPLOY] Atualizando imagens para ${DRONE_TAG}"
