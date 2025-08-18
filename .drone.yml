@@ -126,10 +126,10 @@ steps:
       - git clone https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/leds-conectafapes/leds-conectafapes-infra.git
 
       - DIGEST_WEBHOOK=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook:develop | cut -d'@' -f2)
-      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@$DIGEST_WEBHOOK\"" leds-conectafapes-infra/services/Requirements-AI/webhook/deployment.yaml
+      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@$DIGEST_WEBHOOK\"" leds-conectafapes-infra/agentes/stage/Requirements-AI/webhook/deployment.yaml
 
       - DIGEST_AI=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:develop | cut -d'@' -f2)
-      - yq -i ".spec.template.spec.containers[1].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/services/Requirements-AI/streamlit/deployment.yaml
+      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/agentes/testing/Requirements-AI/streamlit/deployment.yaml
 
       - cd leds-conectafapes-infra
       - echo "Deployment images updated successfully"
@@ -179,7 +179,7 @@ steps:
         from_secret: GITHUB_USERNAME
       GITHUB_TOKEN:
         from_secret: GHCR_TOKEN
-      DRONE_TAG: ${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}
+      DRONE_TAG: ${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}leds-conectafapes-infra/services/Requirements-AI/webhook/deployment.yaml
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
@@ -193,10 +193,10 @@ steps:
       - git clone https://$GITHUB_USERNAME:$GITHUB_TOKEN@github.com/leds-conectafapes/leds-conectafapes-infra.git
 
       - DIGEST_WEBHOOK=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook:test | cut -d'@' -f2)
-      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@$DIGEST_WEBHOOK\"" leds-conectafapes-infra/services/Requirements-AI/webhook/deployment.yaml
+      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@$DIGEST_WEBHOOK\"" leds-conectafapes-infra/agentes/testing/Requirements-AI/webhook/deployment.yaml
 
       - DIGEST_AI=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:test | cut -d'@' -f2)
-      - yq -i ".spec.template.spec.containers[1].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/services/Requirements-AI/streamlit/deployment.yaml
+      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/agentes/testing/Requirements-AI/streamlit/deployment.yaml
 
       - cd leds-conectafapes-infra
       - echo "Deployment images updated successfully"
