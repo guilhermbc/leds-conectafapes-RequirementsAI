@@ -179,7 +179,7 @@ steps:
         from_secret: GITHUB_USERNAME
       GITHUB_TOKEN:
         from_secret: GHCR_TOKEN
-      DRONE_TAG: ${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}leds-conectafapes-infra/services/Requirements-AI/webhook/deployment.yaml
+      DRONE_TAG: ${DRONE_COMMIT_BRANCH}-${DRONE_COMMIT_SHA}
     volumes:
       - name: dockersock
         path: /var/run/docker.sock
