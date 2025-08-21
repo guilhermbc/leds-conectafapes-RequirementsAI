@@ -110,11 +110,8 @@ def preparar_estado_revisao(data: dict) -> dict:
     }
 
 def preparar_estado_prototipo_interface(data: dict) -> dict:
-    requisitos= ""
     descricao_uc = ""
     diagrama_classes = ""
-    if "requisitos" in data:
-        requisitos = data["requisitos"]
     if "descricao_caso_uso" in data:
         descricao_uc = data["descricao_caso_uso"]
     if "diagrama_classes" in data:
@@ -122,7 +119,6 @@ def preparar_estado_prototipo_interface(data: dict) -> dict:
 
     return {
         "mensagem_usuario": descricao_uc,
-        "report": requisitos,
         "cdinuc_description_revised": descricao_uc,
         "ucincd_revised": diagrama_classes
     }
