@@ -1,3 +1,14 @@
+## v0.7.0 (2025-08-26)
+
+### Feat
+
+- **agent_interface_description**: adição de relação de telas com casos de uso
+
+### Fix
+
+- **webhook_server/streamlit**: correção da geração dos artefatos
+- **streamlit/webhook_server**: adição da geração de protótipo de interface na opção de gerar tudo
+
 ## v0.6.0 (2025-08-13)
 
 ### Feat
