@@ -237,12 +237,7 @@ builderRv.add_edge("final_output", END)
 
 
 # Protótipo de interface
-builderIP.set_entry_point("verify_Rq")
-
-builderIP.add_conditional_edges("verify_Rq", rq_route, {
-    "mensagem_falta_requisitos": "final_output",
-    "success": "verify_UC"
-})
+builderIP.set_entry_point("verify_UC")
 
 builderIP.add_conditional_edges("verify_UC", uc_route, {
     "mensagem_falta_caso_uso": "final_output",

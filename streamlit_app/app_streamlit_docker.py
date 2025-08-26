@@ -7,7 +7,7 @@ import tomllib
 
 st.title("📼 Enviar Vídeo para Análise de Requisitos com IA")
 
-UPLOAD_DIR = "../shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
+UPLOAD_DIR = "shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
 load_dotenv()
 webhook = os.getenv('WEBHOOK')
 URL = f"http://{webhook}:8001/webhook"
@@ -49,19 +49,15 @@ match opt:
                     response = requests.post(f"{URL}/miniworld", json=payload) #local
 
                     try:
-                        pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                        pyproject = Path('/app/pyproject.toml')
                         data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
                     except Exception as e:
-                        try:
-                            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                        except Exception as e:
-                            data = {
-                                "project":{
-                                    "name": "RequirementsAi",
-                                    "version":"0.3.0"
-                                }
+                        data = {
+                            "project":{
+                                "name": "RequirementsAi",
+                                "version":"0.5.2"
                             }
+                        }
                 
                     projName = data["project"]["name"]
                     projVersion = data["project"]["version"]
@@ -102,19 +98,15 @@ match opt:
                     response = requests.post(f"{URL}/requirements", json=payload) #local
 
                     try:
-                        pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                        pyproject = Path('/app/pyproject.toml')
                         data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
                     except Exception as e:
-                        try:
-                            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                        except Exception as e:
-                            data = {
-                                "project":{
-                                    "name": "RequirementsAi",
-                                    "version":"0.3.0"
-                                }
+                        data = {
+                            "project":{
+                                "name": "RequirementsAi",
+                                "version":"0.5.2"
                             }
+                        }
                 
                     projName = data["project"]["name"]
                     projVersion = data["project"]["version"]
@@ -153,19 +145,15 @@ match opt:
                         response = requests.post(f"{URL}/use-cases", json=payload) #local
 
                         try:
-                            pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                            pyproject = Path('/app/pyproject.toml')
                             data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
                         except Exception as e:
-                            try:
-                                pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                                data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                            except Exception as e:
-                                data = {
-                                    "project":{
-                                        "name": "RequirementsAi",
-                                        "version":"0.3.0"
-                                    }
+                            data = {
+                                "project":{
+                                    "name": "RequirementsAi",
+                                    "version":"0.5.2"
                                 }
+                            }
                     
                         projName = data["project"]["name"]
                         projVersion = data["project"]["version"]
@@ -218,19 +206,15 @@ match opt:
                         response = requests.post(f"{URL}/class-diagram", json=payload) #local
 
                         try:
-                            pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                            pyproject = Path('/app/pyproject.toml')
                             data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
                         except Exception as e:
-                            try:
-                                pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                                data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                            except Exception as e:
-                                data = {
-                                    "project":{
-                                        "name": "RequirementsAi",
-                                        "version":"0.3.0"
-                                    }
+                            data = {
+                                "project":{
+                                    "name": "RequirementsAi",
+                                    "version":"0.5.2"
                                 }
+                            }
                     
                         projName = data["project"]["name"]
                         projVersion = data["project"]["version"]
@@ -271,19 +255,15 @@ match opt:
                     response = requests.post(f"{URL}/revision", json=payload) #local
 
                     try:
-                        pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                        pyproject = Path('/app/pyproject.toml')
                         data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
                     except Exception as e:
-                        try:
-                            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                        except Exception as e:
-                            data = {
-                                "project":{
-                                    "name": "RequirementsAi",
-                                    "version":"0.3.0"
-                                }
+                        data = {
+                            "project":{
+                                "name": "RequirementsAi",
+                                "version":"0.5.2"
                             }
+                        }
     
                     projName = data["project"]["name"]
                     projVersion = data["project"]["version"]
@@ -311,7 +291,7 @@ match opt:
                         st.error(f"Erro: {response.status_code}")
                 except Exception as e:
                     st.error(f"Erro ao enviar requisição: {e}")
-    case "protótipodeinterface":
+    case "protótipodeinterfaceedescriçãodeuso":
         uploaded_ucdescr = st.file_uploader("Envie o arquivo da descrição de caso de uso (.md)", type=[".md"])
         uploaded_ctable = st.file_uploader("Envie o arquivo do diagrama de classes (.md)", type=[".md"])
 
@@ -328,19 +308,15 @@ match opt:
                     response = requests.post(f"{URL}/interface-prototype", json=payload) #local
 
                     try:
-                        pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                        pyproject = Path('/app/pyproject.toml')
                         data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
                     except Exception as e:
-                        try:
-                            pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                            data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                        except Exception as e:
-                            data = {
-                                "project":{
-                                    "name": "RequirementsAi",
-                                    "version":"0.5.2"
-                                }
+                        data = {
+                            "project":{
+                                "name": "RequirementsAi",
+                                "version":"0.5.2"
                             }
+                        }
     
                     projName = data["project"]["name"]
                     projVersion = data["project"]["version"]
@@ -356,6 +332,8 @@ match opt:
                         st.download_button('Download Protótipo de Interface ', prototipo_interface, file_name="interface_prototype.html", on_click='ignore')
                         st.download_button('Download Descrição de Uso de Interface ', descricao_interface, file_name="interface_use_description.md", on_click='ignore')
 
+                        st.markdown("#### Descrição de Uso de Interface:")
+                        st.markdown(descricao_interface + footer, unsafe_allow_html=True)
 
                     else:
                         st.error(f"Erro: {response.status_code}")
@@ -448,19 +426,15 @@ match opt:
                                                                 descricao_interface = response_ip.json().get("descricao_interface", "")
 
                                                                 try:
-                                                                    pyproject = Path(__file__).resolve().parents / 'pyproject.toml'
+                                                                    pyproject = Path('/app/pyproject.toml')
                                                                     data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
                                                                 except Exception as e:
-                                                                    try:
-                                                                        pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                                                                        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                                                                    except Exception as e:
-                                                                        data = {
-                                                                            "project":{
-                                                                                "name": "RequirementsAi",
-                                                                                "version":"0.5.2"
-                                                                            }
+                                                                    data = {
+                                                                        "project":{
+                                                                            "name": "RequirementsAi",
+                                                                            "version":"0.5.2"
                                                                         }
+                                                                    }
                                                             
                                                                 projName = data["project"]["name"]
                                                                 projVersion = data["project"]["version"]

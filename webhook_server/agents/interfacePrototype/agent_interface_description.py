@@ -55,7 +55,6 @@ persona_message_interface = SystemMessage(
 interface_prompt = ChatPromptTemplate.from_messages([
     persona_message_interface,
     ("human", "use cases description:\n\n{cdinuc_description_revised}\n\n"
-    "requirements and business rules:\n\n{report}\n\n"
     "interface prototype:\n\n{interface_prototype}\n\n")
 ])
 
@@ -63,7 +62,6 @@ agent_interface_chain = interface_prompt | llm_model | StrOutputParser()
 
 def interface_description_node(state):
     resultado = agent_interface_chain.invoke({"cdinuc_description_revised": state["cdinuc_description_revised"], 
-                                            "report": state["report"],
                                             "interface_prototype": state["interface_prototype"]})
 
     return {**state, "interface_description": resultado}
