@@ -66,8 +66,8 @@ def preparar_estado_requisitos(data: dict) -> dict:
     return {
         "mensagem_usuario": minimundo,
         "minimundo": minimundo,
-        "info_requirements": info_requisitos,
-        "previous_requirements": requisitos_anteriores
+        "old_requirements": info_requisitos,
+        "requirements_information": requisitos_anteriores
     }
 
 def preparar_estado_caso_uso(data: dict) -> dict:
@@ -87,9 +87,10 @@ def preparar_estado_caso_uso(data: dict) -> dict:
 
     return {
         "mensagem_usuario": requisitos,
+        "report": requisitos,
         "minimundo": minimundo,
-        "previous_usecases": casosdeuso_anteriores,
-        "info_usecases": info_casosdeuso,
+        "old_uc": casosdeuso_anteriores,
+        "uc_information": info_casosdeuso,
     }
 
 def preparar_estado_diagrama_classe(data: dict) -> dict:

@@ -129,7 +129,7 @@ def identevent_node(state):
     resultado = agent_identevent_chain.invoke({"report": state["report"], 
                                                "minimundo": state["minimundo"],
                                                "ident_usecases": state["ident_usecases"],
-                                               "info_usecases": state["info_usecases"],
-                                               "previous_usecases": state["previous_usecases"]})
+                                               "info_usecases": state["uc_information"],
+                                               "previous_usecases": state["old_uc"]})
 
     return {**state, "ident_events": resultado}
