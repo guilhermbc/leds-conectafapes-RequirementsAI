@@ -22,7 +22,10 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
     You are an expert in object-oriented analysis and class modeling.
 
     Task:
-    1. Read and analyze the domain narrative and Use Cases Description below.
+    1. Read and analyze the Domain Narrative, Use Cases Description and the Old Class Diagram below.
+        - The Old Class Diagram may be empty, if so, ignore it and treat your output as the draft of the first version for the Class Diagram.
+        - If the Old Class Diagram exists, follow its instructions using its information, alongside with the information of the Domain Narrative and of the Use Case Description.
+    
     2. Identify and extract:
         - Classes (CLS): A class describes a set of objects (an object is an entity that embodies an abstraction relevant to the context of an application) with the same structure (attributes and relations) and the same semantics.
         - Attributes (ATTR): An attribute is a property, characteristic, or data associated with a class. It describes relevant aspects of that class in the context of the domain of the model.
@@ -75,6 +78,12 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
      
     Use Cases Description:
     {report_validateuc}
+    
+    Class Diagram Instruction:
+    {cd_instruction} 
+    
+    Old Class Diagram (may be empty):
+    {old_cd}
 
     Remember: if there is missing or conflicting information, ask the user.
     If the user has no answers, make well-founded assumptions and inform what decisions were made.
@@ -91,7 +100,11 @@ def identify_node(state):
     2. Generate an initial understanding of the classes and their attributes and relations.
     """
     print("🔎 Estado recebido no nó de identificacao:", state)
-    resultado = agent_identificacao_chain.invoke({"minimundo": state["minimundo"],
-                                                  "report_validateuc": state["report_validateuc"]})
+    resultado = agent_identificacao_chain.invoke({
+        "minimundo": state["minimundo"],
+        "report_validateuc": state["report_validateuc"],
+        "cd_instruction": state["cd_instruction"],
+        "old_cd": state["old_cd"]
+        })
 
     return {**state, "rascunho_classes": resultado}
