@@ -33,16 +33,22 @@ def preparar_estado(data: dict) -> dict:
 
 def preparar_estado_minimundo(data: dict) -> dict:
     caminho_video = ""
-    info = ""
+    old_mw = ""
+    mw_instruction = ""
+
     if "chatInput" in data:
         caminho_video = data["chatInput"]
-    if "textInfo" in data:
-        info = data["textInfo"]
+
+    if "old_mw" in data:
+        old_mw = data["old_mw"]
+        if "mw_instruction" in data:
+            mw_instruction = data["mw_instruction"]
 
     return {
         "mensagem_usuario": caminho_video,
         "video_entrevista": caminho_video,
-        "informacoes_adicionais": info
+        "old_mw": old_mw,
+        "mw_instruction": mw_instruction
     }
 
 def preparar_estado_requisitos(data: dict) -> dict:
@@ -91,6 +97,9 @@ def preparar_estado_diagrama_classe(data: dict) -> dict:
     requisitos = ""
     tabela_uc = ""
     descricao_uc = ""
+    old_cd = ""
+    cd_instruction = ""
+
     if "minimundo" in data:
         minimundo = data["minimundo"]
     if "requisitos" in data:
@@ -100,12 +109,19 @@ def preparar_estado_diagrama_classe(data: dict) -> dict:
     if "descricao_caso_uso" in data:
         descricao_uc = data["descricao_caso_uso"]
 
+    if "old_cd" in data:
+        old_cd = data["old_cd"]
+        if "cd_instruction" in data:
+            cd_instruction = data["cd_instruction"]
+
     return {
         "mensagem_usuario": tabela_uc,
         "minimundo": minimundo,
         "report": requisitos,
         "format_uc": tabela_uc,
-        "report_validateuc": descricao_uc
+        "report_validateuc": descricao_uc,
+        "old_cd": old_cd,
+        "cd_instruction": cd_instruction
     }
 
 def preparar_estado_revisao(data: dict) -> dict:

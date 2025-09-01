@@ -26,7 +26,8 @@ opt = opt.lower().replace(" ", "")
 match opt:
     case "minimundo":
         uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
-        uploaded_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_mw = st.file_uploader("Envie o minimundo anterior (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_mw_instruction = st.text_area("Escreva as instruções de contexto para o minimundo passado (OPCIONAL)")
 
         if uploaded_file:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -36,14 +37,18 @@ match opt:
                 f.write(uploaded_file.getvalue())
             st.success(f"Arquivo salvo em: {file_path}")
 
-            textInfo = ""
-            if uploaded_text:
-                textInfo = uploaded_text.getvalue().decode("utf-8")
+            mwText = ""
+            mwInstruction = ""
+            if uploaded_mw:
+                mwText = uploaded_mw.getvalue().decode("utf-8")
+            if uploaded_mw_instruction:
+                mwInstruction = uploaded_mw_instruction
 
             if st.button(" Enviar para análise"):
                 payload = {
                     "chatInput": file_path,
-                    "textInfo": textInfo
+                    "old_mw": mwText,
+                    "mw_instruction": mwInstruction 
                 }
                 try:
                     response = requests.post(f"{URL}/miniworld", json=payload) #local
@@ -227,7 +232,7 @@ match opt:
                         "descricao_caso_uso": descricao
                     }
                     try:
-                        response = requests.post(f"{URL}/class-diagram", json=payload) #local
+                        response = requests.post(f"{URL}/class-diagrams", json=payload) #local
 
                         try:
                             pyproject = Path('/app/pyproject.toml')
@@ -246,7 +251,7 @@ match opt:
                         footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
 
                         if response.status_code == 200:
-                            digrama = response.json().get("diagrama_dc", "")
+                            digrama = response.json().get("diagrama_cd", "")
 
                             st.download_button('Download Diagrama de Classe', digrama + footer, file_name="class_diagram.md", on_click='ignore')
 

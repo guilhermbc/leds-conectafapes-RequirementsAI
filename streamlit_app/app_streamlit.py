@@ -12,20 +12,21 @@ load_dotenv()
 webhook = os.getenv('WEBHOOK')
 URL = f"http://{webhook}:8001/webhook"
 
-opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções", 
-                                                     "Minimundo", 
-                                                     "Tabela de Requisitos", 
-                                                     "Casos de Uso", 
-                                                     "Diagrama de Classe",
-                                                     "Casos de Uso e Diagrama de Classe (com validação mútua)",
-                                                     "Protótipo de Interface e Descrição de Uso",
-                                                     "Tudo!"])
+opt = st.selectbox(" Escolha o que deseja criar: ", [
+    "Escolha uma das opções", 
+    "Minimundo", 
+    "Tabela de Requisitos", 
+    "Casos de Uso", 
+    "Diagrama de Classe",
+    "Casos de Uso e Diagrama de Classe (com validação mútua)",
+    "Tudo!"])
 opt = opt.lower().replace(" ", "")
 
 match opt:
     case "minimundo":
         uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
-        uploaded_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_mw = st.file_uploader("Envie o minimundo anterior (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_mw_instruction = st.text_area("Escreva as instruções de contexto para o minimundo passado (OPCIONAL)")
 
         if uploaded_file:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -35,14 +36,18 @@ match opt:
                 f.write(uploaded_file.getvalue())
             st.success(f"Arquivo salvo em: {file_path}")
 
-            textInfo = ""
-            if uploaded_text:
-                textInfo = uploaded_text.getvalue().decode("utf-8")
+            mwText = ""
+            mwInstruction = ""
+            if uploaded_mw:
+                mwText = uploaded_mw.getvalue().decode("utf-8")
+            if uploaded_mw_instruction:
+                mwInstruction = uploaded_mw_instruction
 
             if st.button(" Enviar para análise"):
                 payload = {
                     "chatInput": file_path,
-                    "textInfo": textInfo
+                    "old_mw": mwText,
+                    "mw_instruction": mwInstruction 
                 }
                 try:
                     response = requests.post(f"{URL}/miniworld", json=payload) #local
@@ -187,6 +192,8 @@ match opt:
         uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
         uploaded_uctable = st.file_uploader("Envie o arquivo da tabela de casos de uso (.md)", type=[".md"])
         uploaded_ucdescr = st.file_uploader("Envie o arquivo da descricao de caso de uso (.md)", type=[".md"])
+        uploaded_cd = st.file_uploader("Envie o diagrama de classes anterior (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_cd_instruction = st.text_area("Escreva as instruções de contexto para o diagrama de classes passado (OPCIONAL)")
 
         if uploaded_mw and uploaded_rq and uploaded_uctable and uploaded_ucdescr:
             minimundo = uploaded_mw.getvalue().decode("utf-8")
@@ -194,12 +201,21 @@ match opt:
             tabela = uploaded_uctable.getvalue().decode("utf-8")
             descricao = uploaded_ucdescr.getvalue().decode("utf-8")
 
+            cdText = ""
+            cdInstruction = ""
+            if uploaded_cd:
+                cdText = uploaded_cd.getvalue().decode("utf-8")
+            if uploaded_cd_instruction:
+                mwInstruction = uploaded_cd_instruction
+
             if st.button(" Enviar para análise"):
                     payload = {
                         "minimundo": minimundo,
                         "requisitos": requisitos,
                         "tabela_caso_uso": tabela,
-                        "descricao_caso_uso": descricao
+                        "descricao_caso_uso": descricao,
+                        "old_cd": cdText,
+                        "cd_instruction": cdInstruction,
                     }
                     try:
                         response = requests.post(f"{URL}/class-diagrams", json=payload) #local
