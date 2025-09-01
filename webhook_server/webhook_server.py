@@ -47,26 +47,43 @@ def preparar_estado_minimundo(data: dict) -> dict:
 
 def preparar_estado_requisitos(data: dict) -> dict:
     minimundo = ""
+    requisitos_anteriores = ""
+    info_requisitos = ""
+
     if "minimundo" in data:
         minimundo = data["minimundo"]
+    if "requisitos_anteriores" in data:
+        requisitos_anteriores = data["requisitos_anteriores"]
+    if "info_requisitos" in data:
+        info_requisitos = data["info_requisitos"]
     
     return {
         "mensagem_usuario": minimundo,
-        "minimundo": minimundo
+        "minimundo": minimundo,
+        "info_requirements": info_requisitos,
+        "previous_requirements": requisitos_anteriores
     }
 
 def preparar_estado_caso_uso(data: dict) -> dict:
     minimundo = ""
     requisitos = ""
+    casosdeuso_anteriores = ""
+    info_casosdeuso = ""
+
     if "minimundo" in data:
         minimundo = data["minimundo"]
     if "requisitos" in data:
         requisitos = data["requisitos"]
+    if "casosdeuso_anteriores" in data:
+        casosdeuso_anteriores = data["casosdeuso_anteriores"]
+    if "info_casosdeuso" in data:
+        info_casosdeuso = data["info_casosdeuso"]
 
     return {
         "mensagem_usuario": requisitos,
         "minimundo": minimundo,
-        "report": requisitos
+        "previous_usecases": casosdeuso_anteriores,
+        "info_usecases": info_casosdeuso,
     }
 
 def preparar_estado_diagrama_classe(data: dict) -> dict:

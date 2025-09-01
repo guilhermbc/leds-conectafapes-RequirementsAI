@@ -7,19 +7,7 @@ from langchain_core.output_parsers import StrOutputParser
 # Definição da persona via mensagem de sistema
 persona_message_analise = SystemMessage(
     content=(
-        "You are a highly experienced Requirements Engineering Specialist. "
-        "Your tasks involve: carefully analyzing domain narratives, "
-        "extracting functional and non-functional requirements, identifying business rules, "
-        "and detecting missing information or inconsistencies. "
-        "Your output must be clear, structured, and actionable."
-    )
-)
-
-# Novo Prompt otimizado
-analise_prompt = ChatPromptTemplate.from_messages([
-    persona_message_analise,
-    ("human", """
-    You are an expert in requirements engineering.
+    """You are an expert in requirements engineering.
 
     Task:
     1. Read and analyze the domain narrative below.
@@ -61,12 +49,28 @@ analise_prompt = ChatPromptTemplate.from_messages([
     - [List of questions]
     ---
 
-    Domain Narrative:
-    {minimundo}
-
     Remember: if there is missing or conflicting information, ask the user.
     If the user has no answers, make well-founded assumptions and inform what decisions were made.
-     """)
+    Your response should be in Portuguese.
+
+    Additional Instructions
+
+    You may also receive the following optional information:
+    - A previous version of the requirements.
+    - A text containing additional information or instructions on how you should use the provided previous version of the document 
+    (e.g., use it as a basis, take its content into account, apply adjustments, etc.).
+
+    """
+    )
+)
+
+analise_prompt = ChatPromptTemplate.from_messages([
+    persona_message_analise,
+    ("human", """
+    Domain Narrative: {minimundo}
+    Additional Information: {info_requirements}
+    Previous Requirements Version: {previous_requirements}
+    """)
 ])
 
 agent_analise_chain = analise_prompt | llm_model | StrOutputParser()
@@ -80,7 +84,9 @@ def analyze_node(state):
     2. Generate an initial understanding of the functionalities and related attributes.
     """
     print("🔎 Estado recebido no nó de análise:", state)
-    resultado = agent_analise_chain.invoke({"minimundo": state["minimundo"]})
+    resultado = agent_analise_chain.invoke({"minimundo": state["minimundo"],
+                                            "info_requirements": state.get("info_requirements", ""),
+                                            "previous_requirements": state.get("previous_requirements", "")})
     return {**state, "rascunho_requisitos": resultado}
 
 

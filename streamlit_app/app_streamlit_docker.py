@@ -84,15 +84,27 @@ match opt:
 
     case "tabeladerequisitos":
         uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
+        uploaded_previous_requirements = st.file_uploader("Envie uma versão anterior dos requisitos (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_requirements_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
 
         if uploaded_mw:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
 
             minimundo = uploaded_mw.getvalue().decode("utf-8")
+            requisitos_anteriores = ""
+            info_requisitos = ""
+
+            #Verfica se os arquivos opcionais foram enviados
+            if uploaded_previous_requirements:
+                requisitos_anteriores = uploaded_previous_requirements.getvalue().decode("utf-8")
+            if uploaded_requirements_text:
+                info_requisitos = uploaded_requirements_text.getvalue().decode("utf-8")
 
             if st.button(" Enviar para análise"):
                 payload = {
-                    "minimundo": minimundo
+                    "minimundo": minimundo,
+                    "requisitos_anteriores": requisitos_anteriores,
+                    "info_requisitos": info_requisitos
                 }
                 try:
                     response = requests.post(f"{URL}/requirements", json=payload) #local
@@ -131,15 +143,27 @@ match opt:
     case "casosdeuso":
         uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
         uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
+        uploaded_previous_usecases = st.file_uploader("Envie uma versão anterior da descrição dos casos de uso (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_usecases_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
 
         if uploaded_mw and uploaded_rq:
             minimundo = uploaded_mw.getvalue().decode("utf-8")
             requisitos = uploaded_rq.getvalue().decode("utf-8")
 
+            casosdeuso_anteriores = ""
+            info_casosdeuso = ""
+
+            if uploaded_previous_usecases:
+                casosdeuso_anteriores = uploaded_previous_usecases.getvalue().decode("utf-8")
+            if uploaded_usecases_text: 
+                info_casosdeuso = uploaded_usecases_text.getvalue().decode("utf-8")
+
             if st.button(" Enviar para análise"):
                     payload = {
                         "minimundo": minimundo,
-                        "requisitos": requisitos
+                        "requisitos": requisitos,
+                        "casosdeuso_anteriores": casosdeuso_anteriores,
+                        "info_casosdeuso": info_casosdeuso
                     }
                     try:
                         response = requests.post(f"{URL}/use-cases", json=payload) #local
