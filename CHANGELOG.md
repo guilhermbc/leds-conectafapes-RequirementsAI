@@ -1,3 +1,20 @@
+## v0.8.0 (2025-09-01)
+
+### Feat
+
+- **agent_minimundo/agent_identificacao_classe**: opcao de envio de um documento anterior
+- opção de adicionar versões anteriores de requisitos e casos de uso
+
+### Fix
+
+- **agent_identuc**: agent_identuc também recebe os arquivos opcionais como entrada
+- **state.py**: padronizacao de nomes dos documentos anteriores passados para a ia
+- **app_streamlit_docker.py**: correcoes menores no frontend
+
+### Refactor
+
+- **.github**: branch develop compartinha do mesmo historico de commits da branch main
+
 ## v0.7.0 (2025-08-26)
 
 ### Feat
