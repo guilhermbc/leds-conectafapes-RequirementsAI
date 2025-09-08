@@ -60,7 +60,7 @@ match opt:
                         data = {
                             "project":{
                                 "name": "RequirementsAi",
-                                "version":"0.5.2"
+                                "version":"0.8.2"
                             }
                         }
                 
@@ -121,7 +121,7 @@ match opt:
                         data = {
                             "project":{
                                 "name": "RequirementsAi",
-                                "version":"0.5.2"
+                                "version":"0.8.2"
                             }
                         }
                 
@@ -180,7 +180,7 @@ match opt:
                             data = {
                                 "project":{
                                     "name": "RequirementsAi",
-                                    "version":"0.5.2"
+                                    "version":"0.8.2"
                                 }
                             }
                     
@@ -252,7 +252,7 @@ match opt:
                             data = {
                                 "project":{
                                     "name": "RequirementsAi",
-                                    "version":"0.5.2"
+                                    "version":"0.8.2"
                                 }
                             }
                     
@@ -301,7 +301,7 @@ match opt:
                         data = {
                             "project":{
                                 "name": "RequirementsAi",
-                                "version":"0.5.2"
+                                "version":"0.8.2"
                             }
                         }
     
@@ -354,7 +354,7 @@ match opt:
                         data = {
                             "project":{
                                 "name": "RequirementsAi",
-                                "version":"0.5.2"
+                                "version":"0.8.2"
                             }
                         }
     
@@ -472,7 +472,7 @@ match opt:
                                                                     data = {
                                                                         "project":{
                                                                             "name": "RequirementsAi",
-                                                                            "version":"0.5.2"
+                                                                            "version":"0.8.2"
                                                                         }
                                                                     }
                                                             
