@@ -1,3 +1,9 @@
+## v0.8.1 (2025-09-08)
+
+### Fix
+
+- **streamlit**: readição do protótipo de interface nas opções
+
 ## v0.8.0 (2025-09-01)
 
 ### Feat
