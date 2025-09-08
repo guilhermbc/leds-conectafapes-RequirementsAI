@@ -26,7 +26,7 @@ opt = opt.lower().replace(" ", "")
 match opt:
     case "minimundo":
         uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
-        uploaded_mw = st.file_uploader("Envie o minimundo anterior (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_mw = st.file_uploader("Envie uma versão anterior do minimundo (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
         uploaded_mw_instruction = st.text_area("Escreva as instruções de contexto para o minimundo passado (OPCIONAL)")
 
         if uploaded_file:
@@ -90,7 +90,7 @@ match opt:
     case "tabeladerequisitos":
         uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
         uploaded_previous_requirements = st.file_uploader("Envie uma versão anterior dos requisitos (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
-        uploaded_requirements_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_requirements_text = st.text_area("Escreva as instruções de contexto para os requisitos passados (OPCIONAL)")
 
         if uploaded_mw:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -103,7 +103,7 @@ match opt:
             if uploaded_previous_requirements:
                 requisitos_anteriores = uploaded_previous_requirements.getvalue().decode("utf-8")
             if uploaded_requirements_text:
-                info_requisitos = uploaded_requirements_text.getvalue().decode("utf-8")
+                info_requisitos = uploaded_requirements_text
 
             if st.button(" Enviar para análise"):
                 payload = {
@@ -149,7 +149,7 @@ match opt:
         uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
         uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
         uploaded_previous_usecases = st.file_uploader("Envie uma versão anterior da descrição dos casos de uso (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
-        uploaded_usecases_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_usecases_text = st.text_area("Escreva as instruções de contexto para os casos de uso passados (OPCIONAL)")
 
         if uploaded_mw and uploaded_rq:
             minimundo = uploaded_mw.getvalue().decode("utf-8")
@@ -161,7 +161,7 @@ match opt:
             if uploaded_previous_usecases:
                 casosdeuso_anteriores = uploaded_previous_usecases.getvalue().decode("utf-8")
             if uploaded_usecases_text: 
-                info_casosdeuso = uploaded_usecases_text.getvalue().decode("utf-8")
+                info_casosdeuso = uploaded_usecases_text
 
             if st.button(" Enviar para análise"):
                     payload = {
@@ -217,7 +217,7 @@ match opt:
         uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
         uploaded_uctable = st.file_uploader("Envie o arquivo da tabela de casos de uso (.md)", type=[".md"])
         uploaded_ucdescr = st.file_uploader("Envie o arquivo da descricao de caso de uso (.md)", type=[".md"])
-        uploaded_cd = st.file_uploader("Envie o diagrama de classes anterior (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_cd = st.file_uploader("Envie uma versão anterior do diagrama de classes (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
         uploaded_cd_instruction = st.text_area("Escreva as instruções de contexto para o diagrama de classes passado (OPCIONAL)")
 
         if uploaded_mw and uploaded_rq and uploaded_uctable and uploaded_ucdescr:
