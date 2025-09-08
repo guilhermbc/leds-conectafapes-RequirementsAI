@@ -1,3 +1,9 @@
+## v0.8.2 (2025-09-08)
+
+### Fix
+
+- **app_streamlit_docker**: correção da busca alternativa por versão
+
 ## v0.8.1 (2025-09-08)
 
 ### Fix
