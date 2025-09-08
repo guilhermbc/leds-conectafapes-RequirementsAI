@@ -1,3 +1,49 @@
+## v0.8.0 (2025-09-01)
+
+### Feat
+
+- **agent_minimundo/agent_identificacao_classe**: opcao de envio de um documento anterior
+- opção de adicionar versões anteriores de requisitos e casos de uso
+
+### Fix
+
+- **agent_identuc**: agent_identuc também recebe os arquivos opcionais como entrada
+- **state.py**: padronizacao de nomes dos documentos anteriores passados para a ia
+- **app_streamlit_docker.py**: correcoes menores no frontend
+
+### Refactor
+
+- **.github**: branch develop compartinha do mesmo historico de commits da branch main
+
+## v0.7.0 (2025-08-26)
+
+### Feat
+
+- **agent_interface_description**: adição de relação de telas com casos de uso
+
+### Fix
+
+- **webhook_server/streamlit**: correção da geração dos artefatos
+- **streamlit/webhook_server**: adição da geração de protótipo de interface na opção de gerar tudo
+
+## v0.6.0 (2025-08-13)
+
+### Feat
+
+- **interfacePrototype**: geração de descrição de uso dos protótipos de interface
+
+## v0.5.1 (2025-08-12)
+
+### Refactor
+
+- **webhook**: geração de um único html com todas as páginas
+
+## v0.5.0 (2025-08-07)
+
+### Feat
+
+- **streamlit/webhook**: adição da versão inicial de protótipo de interface
+
 ## v0.4.0 (2025-07-28)
 
 ### Refactor

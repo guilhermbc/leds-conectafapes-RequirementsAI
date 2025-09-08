@@ -8,24 +8,6 @@ from langchain_core.output_parsers import StrOutputParser
 persona_message_identevent = SystemMessage(
     content=(
     """
-    You are a Use Case Events Agent.  
-    Your task is to enrich each use case by identifying its normal flow of events and possible exceptions.
-
-    **Response Format**:
-    - Plain text;
-    - For each use case: Name, Actors, Preconditions, Normal Flow of Events (numbered list), Alternative / Exception Flows (bulleted list), Related Requirements, and Classes (leave empty);
-    - A "Questions and Validations" block at the end, if needed.
-
-    **Important**: Your entire response must be written in **Portuguese**.
-    """
-    ) #**Important**: The entire response must be in Portuguese.
-)
-
-# Prompt template
-identevent_prompt = ChatPromptTemplate.from_messages([
-    persona_message_identevent,
-    ("human", 
-    """
     You are a **Use Case Events Agent**.  
     Your task is to analyze a list of use cases and enrich each one by describing its main **events**, including the **normal flow of events** and possible **exception or alternative flows**.
 
@@ -40,16 +22,6 @@ identevent_prompt = ChatPromptTemplate.from_messages([
     2. Any **Alternative or Exception Flows** that may occur;  
     3. Any relevant **Preconditions** that must be satisfied before the use case starts;  
     4. A **Classes** field, which must remain empty for now.
-
-    **Input**:  
-    - **Miniworld**:  
-    {minimundo}
-
-    - **Refined Requirements Report**:  
-    {report}
-
-    - **Structured Use Cases**:
-    {ident_usecases}
 
     ---
 
@@ -118,9 +90,32 @@ identevent_prompt = ChatPromptTemplate.from_messages([
 
     ---
 
+    Additional Instructions
+
+    You may also receive the following optional information:
+    - A previous version of the use cases and events.
+    - A text containing additional information or instructions on how you should use the provided previous version of the document 
+    (e.g., use it as a basis, take its content into account, apply adjustments, etc.).
+
+    ---
+    
     **Important**: 
     - Your entire response must be written in **Portuguese**
     - Make sure to break lines with double whitespaces before each new section to ensure proper formatting.
+    """
+    ) 
+)
+
+# Prompt template
+identevent_prompt = ChatPromptTemplate.from_messages([
+    persona_message_identevent,
+    ("human", 
+    """
+    Miniworld: {minimundo}
+    Refined Requirements Report: {report}
+    Structured Use Cases: {ident_usecases}
+    Additional Information: {info_usecases}
+    Previous Use Cases Version: {previous_usecases}
     """
     )
 ])
@@ -133,6 +128,8 @@ def identevent_node(state):
     print("🔍 Estado recebido no nó de identificação de eventos:", state)
     resultado = agent_identevent_chain.invoke({"report": state["report"], 
                                                "minimundo": state["minimundo"],
-                                               "ident_usecases": state["ident_usecases"]})
+                                               "ident_usecases": state["ident_usecases"],
+                                               "info_usecases": state["uc_information"],
+                                               "previous_usecases": state["old_uc"]})
 
     return {**state, "ident_events": resultado}

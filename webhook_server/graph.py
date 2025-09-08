@@ -21,11 +21,16 @@ from agents.classDiagram.agent_extracao_classe import extract_node as extract_CD
 from agents.classDiagram.agent_identificacao_classe import identify_node as identify_CD
 from agents.classDiagram.agent_revisao_classe import revise_node as revise_CD
 from agents.classDiagram.agent_refinamento_classe import refine_node as refine_CD
+
 # Importa os agentes de revisão
 from agents.revision.agent_cdinuc_description import cdinuc_description_node
 from agents.revision.agent_cdinuc_table import cdinuc_table_node
 from agents.revision.agent_cdinuc_diagram import cdinuc_diagram_node
 from agents.revision.agent_ucincd import ucincd_node
+
+# Importa os agentes de protótipo de interface
+from agents.interfacePrototype.agent_interface import interface_node
+from agents.interfacePrototype.agent_interface_description import interface_description_node
 
 from nodes import input_check, final  # Apenas esses são operacionais, sem LLM
 
@@ -99,6 +104,19 @@ builderRv.add_node("revise_uc_diagram_withclasses", cdinuc_diagram_node)
 builderRv.add_node("revise_classes_withuc", ucincd_node)
 # Final node (operacional)
 builderRv.add_node("final_output", final.final_return)
+
+# Grafo de protótipo de interface (prerequisitos: descrição de casos de uso e diagrama de classes revisados)
+# Builder
+builderIP = StateGraph(state_schema=MyState)
+# Verificação de entrada (operacional)
+builderIP.add_node("verify_Rq", input_check.check_Rq)
+builderIP.add_node("verify_UC", input_check.check_UC_Descr_Rev)
+builderIP.add_node("verify_CD", input_check.check_CD_Rev)
+# Nodes
+builderIP.add_node("generate_interface_prototype", interface_node)
+builderIP.add_node("generate_interface_description", interface_description_node)
+# Final node (operacional)
+builderIP.add_node("final_output", final.final_return)
 
 # Funções de verificação de rotas
 def input_route(state: dict) -> str:
@@ -217,9 +235,27 @@ builderRv.add_edge("revise_uc_diagram_withclasses", "revise_classes_withuc")
 builderRv.add_edge("revise_classes_withuc", END)
 builderRv.add_edge("final_output", END)
 
+
+# Protótipo de interface
+builderIP.set_entry_point("verify_UC")
+
+builderIP.add_conditional_edges("verify_UC", uc_route, {
+    "mensagem_falta_caso_uso": "final_output",
+    "success": "verify_CD"
+})
+builderIP.add_conditional_edges("verify_CD", cd_route, {
+    "mensagem_falta_diagrama_classe": "final_output",
+    "success": "generate_interface_prototype"
+})
+# Fluxo do grafo
+builderIP.add_edge("generate_interface_prototype", "generate_interface_description")
+builderIP.add_edge("generate_interface_description", END)
+builderIP.add_edge("final_output", END)
+
 # Compilação dos grafos
 graphMW = builderMW.compile()
 graphRq = builderRq.compile()
 graphUC = builderUC.compile()
 graphDC = builderDC.compile()
 graphRv = builderRv.compile()
+graphIP = builderIP.compile()

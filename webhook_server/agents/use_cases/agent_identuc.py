@@ -8,39 +8,8 @@ from langchain_core.output_parsers import StrOutputParser
 persona_message_identuc = SystemMessage(
     content=(
     """
-    You are a Use Case Identification Agent.  
-    Your task is to identify use cases, actors, and related functional requirements based on the provided system description and refined requirements.
-
-    **Response Format**:
-    - Plain text;
-    - For each use case:  
-    - Name  
-    - Actors  
-    - Related Requirements  
-    - Brief Description  
-    - A “Questions and Validations” block at the end, if any inconsistencies remain.
-
-    **Important**: Your entire response must be written in **Portuguese**.  
-    """
-    ) #**Important**: The entire response must be in Portuguese.
-)
-
-# Prompt template
-identuc_prompt = ChatPromptTemplate.from_messages([
-    persona_message_identuc,
-    ("human", 
-    """
     You are a **Use Case Identification Agent**.  
     Your task is to identify and describe the system’s main **use cases**, their corresponding **actors**, and the **functional requirements** that support them.
-
-    **Input**:  
-    - **Miniworld**:  
-    {minimundo}
-
-    - **Refined Requirements Report**:  
-    {report}
-
-    ---
 
     **About Actors**  
     - An **actor** is the *role* played by physical entities (people or other systems) that interact with the system in the same way, striving to achieve common goals.
@@ -78,8 +47,28 @@ identuc_prompt = ChatPromptTemplate.from_messages([
     - Plain text (no Markdown table yet)  
     - Use bullets or sub‑headers to separate each use case.
 
+    Additional Instructions
+
+    You may also receive the following optional information:
+    - A previous version of the use cases and events (only consider the information: name, actors, related requirements, and brief description; ignore the flow of events).
+    - A text containing additional information or instructions on how you should use the provided previous version of the document 
+    (e.g., use it as a basis, take its content into account, apply adjustments, etc.).
+
+    ---
+
     **Important**: Write your entire response in **Portuguese**.  
     """
+    )
+)
+
+# Prompt template
+identuc_prompt = ChatPromptTemplate.from_messages([
+    persona_message_identuc,
+    ("human", 
+    "Miniworld: {minimundo}\n"
+    "Refined Requirements Report: {report}\n"
+    "Additional Information: {info_usecases}\n"
+    "Previous Use Cases Version: {previous_usecases}\n"
     )
 ])
 
@@ -90,6 +79,8 @@ agent_identuc_chain = identuc_prompt | llm_model | StrOutputParser()
 def identuc_node(state):
     print("🔍 Estado recebido no nó de identificação de UCs:", state)
     resultado = agent_identuc_chain.invoke({"report": state["report"], 
-                                            "minimundo": state["minimundo"]})
+                                            "minimundo": state["minimundo"],
+                                            "info_usecases": state["uc_information"],
+                                            "previous_usecases": state["old_uc"]})
 
     return {**state, "ident_usecases": resultado}

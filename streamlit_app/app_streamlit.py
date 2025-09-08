@@ -12,19 +12,21 @@ load_dotenv()
 webhook = os.getenv('WEBHOOK')
 URL = f"http://{webhook}:8001/webhook"
 
-opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções", 
-                                                     "Minimundo", 
-                                                     "Tabela de Requisitos", 
-                                                     "Casos de Uso", 
-                                                     "Diagrama de Classe",
-                                                     "Casos de Uso e Diagrama de Classe (com validação mútua)",
-                                                     "Tudo!"])
+opt = st.selectbox(" Escolha o que deseja criar: ", [
+    "Escolha uma das opções", 
+    "Minimundo", 
+    "Tabela de Requisitos", 
+    "Casos de Uso", 
+    "Diagrama de Classe",
+    "Casos de Uso e Diagrama de Classe (com validação mútua)",
+    "Tudo!"])
 opt = opt.lower().replace(" ", "")
 
 match opt:
     case "minimundo":
         uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
-        uploaded_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_mw = st.file_uploader("Envie o minimundo anterior (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_mw_instruction = st.text_area("Escreva as instruções de contexto para o minimundo passado (OPCIONAL)")
 
         if uploaded_file:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -34,14 +36,18 @@ match opt:
                 f.write(uploaded_file.getvalue())
             st.success(f"Arquivo salvo em: {file_path}")
 
-            textInfo = ""
-            if uploaded_text:
-                textInfo = uploaded_text.getvalue().decode("utf-8")
+            mwText = ""
+            mwInstruction = ""
+            if uploaded_mw:
+                mwText = uploaded_mw.getvalue().decode("utf-8")
+            if uploaded_mw_instruction:
+                mwInstruction = uploaded_mw_instruction
 
             if st.button(" Enviar para análise"):
                 payload = {
                     "chatInput": file_path,
-                    "textInfo": textInfo
+                    "old_mw": mwText,
+                    "mw_instruction": mwInstruction 
                 }
                 try:
                     response = requests.post(f"{URL}/miniworld", json=payload) #local
@@ -74,15 +80,27 @@ match opt:
 
     case "tabeladerequisitos":
         uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
-
+        uploaded_previous_requirements = st.file_uploader("Envie uma versão anterior dos requisitos (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_requirements_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        
         if uploaded_mw:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
 
             minimundo = uploaded_mw.getvalue().decode("utf-8")
+            requisitos_anteriores = ""
+            info_requisitos = ""
+
+            #Verfica se os arquivos opcionais foram enviados
+            if uploaded_previous_requirements:
+                requisitos_anteriores = uploaded_previous_requirements.getvalue().decode("utf-8")
+            if uploaded_requirements_text:
+                info_requisitos = uploaded_requirements_text.getvalue().decode("utf-8")
 
             if st.button(" Enviar para análise"):
                 payload = {
-                    "minimundo": minimundo
+                    "minimundo": minimundo,
+                    "requisitos_anteriores": requisitos_anteriores,
+                    "info_requisitos": info_requisitos
                 }
                 try:
                     response = requests.post(f"{URL}/requirements", json=payload) #local
@@ -113,15 +131,27 @@ match opt:
     case "casosdeuso":
         uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
         uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
-
+        uploaded_previous_usecases = st.file_uploader("Envie uma versão anterior da descrição dos casos de uso (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_usecases_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        
         if uploaded_mw and uploaded_rq:
             minimundo = uploaded_mw.getvalue().decode("utf-8")
             requisitos = uploaded_rq.getvalue().decode("utf-8")
+            
+            casosdeuso_anteriores = ""
+            info_casosdeuso = ""
 
+            if uploaded_previous_usecases:
+                casosdeuso_anteriores = uploaded_previous_usecases.getvalue().decode("utf-8")
+            if uploaded_usecases_text: 
+                info_casosdeuso = uploaded_usecases_text.getvalue().decode("utf-8")
+            
             if st.button(" Enviar para análise"):
                     payload = {
                         "minimundo": minimundo,
-                        "requisitos": requisitos
+                        "requisitos": requisitos,
+                        "casosdeuso_anteriores": casosdeuso_anteriores,
+                        "info_casosdeuso": info_casosdeuso
                     }
                     try:
                         response = requests.post(f"{URL}/use-cases", json=payload) #local
@@ -162,6 +192,8 @@ match opt:
         uploaded_rq = st.file_uploader("Envie o arquivo das tabelas de requisitos (.md)", type=[".md"])
         uploaded_uctable = st.file_uploader("Envie o arquivo da tabela de casos de uso (.md)", type=[".md"])
         uploaded_ucdescr = st.file_uploader("Envie o arquivo da descricao de caso de uso (.md)", type=[".md"])
+        uploaded_cd = st.file_uploader("Envie o diagrama de classes anterior (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        uploaded_cd_instruction = st.text_area("Escreva as instruções de contexto para o diagrama de classes passado (OPCIONAL)")
 
         if uploaded_mw and uploaded_rq and uploaded_uctable and uploaded_ucdescr:
             minimundo = uploaded_mw.getvalue().decode("utf-8")
@@ -169,12 +201,21 @@ match opt:
             tabela = uploaded_uctable.getvalue().decode("utf-8")
             descricao = uploaded_ucdescr.getvalue().decode("utf-8")
 
+            cdText = ""
+            cdInstruction = ""
+            if uploaded_cd:
+                cdText = uploaded_cd.getvalue().decode("utf-8")
+            if uploaded_cd_instruction:
+                mwInstruction = uploaded_cd_instruction
+
             if st.button(" Enviar para análise"):
                     payload = {
                         "minimundo": minimundo,
                         "requisitos": requisitos,
                         "tabela_caso_uso": tabela,
-                        "descricao_caso_uso": descricao
+                        "descricao_caso_uso": descricao,
+                        "old_cd": cdText,
+                        "cd_instruction": cdInstruction,
                     }
                     try:
                         response = requests.post(f"{URL}/class-diagrams", json=payload) #local
@@ -261,6 +302,46 @@ match opt:
                         st.error(f"Erro: {response.status_code}")
                 except Exception as e:
                     st.error(f"Erro ao enviar requisição: {e}")
+    case "protótipodeinterfaceedescriçãodeuso":
+        uploaded_ucdescr = st.file_uploader("Envie o arquivo da descrição de caso de uso (.md)", type=[".md"])
+        uploaded_ctable = st.file_uploader("Envie o arquivo do diagrama de classes (.md)", type=[".md"])
+
+        if uploaded_ucdescr and uploaded_ctable:
+            descricao_uc = uploaded_ucdescr.getvalue().decode("utf-8")
+            diagrama_classes = uploaded_ctable.getvalue().decode("utf-8")
+
+            if st.button(" Enviar para análise"):
+                payload = {
+                    "descricao_caso_uso": descricao_uc,
+                    "diagrama_classes": diagrama_classes
+                }
+                try:
+                    response = requests.post(f"{URL}/interface-prototype", json=payload) #local
+
+                    pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+                    data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                    
+                    projName = data["project"]["name"]
+                    projVersion = data["project"]["version"]
+
+                    footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+
+                    if response.status_code == 200:
+                        prototipo_interface = response.json().get("prototipo_interface", "")
+                        descricao_interface = response.json().get("descricao_interface", "")
+
+                        st.markdown("#### Protótipo de interface pronto!")
+
+                        st.download_button('Download Protótipo de Interface ', prototipo_interface, file_name="interface_prototype.html", on_click='ignore')
+                        st.download_button('Download Descrição de Uso de Interface ', descricao_interface, file_name="interface_use_description.md", on_click='ignore')
+
+                        st.markdown("#### Descrição de Uso de Interface:")
+                        st.markdown(descricao_interface + footer, unsafe_allow_html=True)
+
+                    else:
+                        st.error(f"Erro: {response.status_code}")
+                except Exception as e:
+                    st.error(f"Erro ao enviar requisição: {e}")
     case "tudo!":
         uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
         uploaded_text = st.file_uploader("Envie um texto com informações adicionais (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
@@ -335,36 +416,55 @@ match opt:
                                                         diagrama_uc = response_rv.json().get("diagrama_uc", "")
                                                         diagrama_classes = response_rv.json().get("diagrama_classes", "")
 
-                                                        pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
-                                                        data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
-                                                        
-                                                        projName = data["project"]["name"]
-                                                        projVersion = data["project"]["version"]
+                                                        payload = {
+                                                            "descricao_caso_uso": descricao_uc,
+                                                            "diagrama_classes": diagrama_classes
+                                                        }
 
-                                                        footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
+                                                        try:
+                                                            response_ip = requests.post(f"{URL}/interface-prototype", json=payload) #local
 
-                                                        st.download_button('Download Minimundo', minimundo + footer, file_name="miniworld.md", on_click='ignore', key='download_mw')
-                                                        st.download_button('Download Tabelas de Requisitos', requisitos + footer, file_name="requirements.md", on_click='ignore', key='download_rq')
-                                                        st.download_button('Download Diagrama de Caso de Uso', diagrama_uc + footer, file_name="uc_diagram.md", on_click='ignore', key='download_uc_diagram')
-                                                        st.download_button('Download Tabela de Caso de Uso', tabela_uc + footer, file_name="uc_table.md", on_click='ignore', key='download_uc_table')
-                                                        st.download_button('Download Descrição de Caso de Uso', descricao_uc + footer, file_name="uc_description.md", on_click='ignore', key='download_uc_description')
-                                                        st.download_button('Download Diagrama de Classe', diagrama_classes + footer, file_name="class_diagram.md", on_click='ignore', key='download_class_diagram')
+                                                            if response_ip.status_code == 200:
+                                                                prototipo_interface = response_ip.json().get("prototipo_interface", "")
+                                                                descricao_interface = response_ip.json().get("descricao_interface", "")
+                                                            
+                                                                pyproject = Path(__file__).resolve().parents[1] / 'pyproject.toml'
+                                                                data = tomllib.loads(pyproject.read_text(encoding="utf-8"))
+                                                                                                    
+                                                                projName = data["project"]["name"]
+                                                                projVersion = data["project"]["version"]
 
-                                                        st.markdown("###  Resposta do Agente:")
-                                                        st.markdown("#### Minimundo:")
-                                                        st.markdown(minimundo, unsafe_allow_html=True)
-                                                        st.markdown("#### Tabelas de Requisitos:")
-                                                        st.markdown(requisitos, unsafe_allow_html=True)
-                                                        st.markdown("#### Diagrama de Caso de Uso:")
-                                                        st.markdown(diagrama_uc, unsafe_allow_html=True)
-                                                        st.markdown("#### Tabela de Caso de Uso:")
-                                                        st.markdown(tabela_uc, unsafe_allow_html=True)
-                                                        st.markdown("#### Descrição de Caso de Uso:")
-                                                        st.markdown(descricao_uc, unsafe_allow_html=True)
-                                                        st.markdown("#### Diagrama de Classe:")
-                                                        st.markdown(diagrama_classes, unsafe_allow_html=True)
-                                                        st.markdown(footer, unsafe_allow_html=True)
+                                                                footer = f"\n\n---\n\nGerado por {projName} versão {projVersion}"
 
+                                                                st.download_button('Download Minimundo', minimundo + footer, file_name="miniworld.md", on_click='ignore', key='download_mw')
+                                                                st.download_button('Download Tabelas de Requisitos', requisitos + footer, file_name="requirements.md", on_click='ignore', key='download_rq')
+                                                                st.download_button('Download Diagrama de Caso de Uso', diagrama_uc + footer, file_name="uc_diagram.md", on_click='ignore', key='download_uc_diagram')
+                                                                st.download_button('Download Tabela de Caso de Uso', tabela_uc + footer, file_name="uc_table.md", on_click='ignore', key='download_uc_table')
+                                                                st.download_button('Download Descrição de Caso de Uso', descricao_uc + footer, file_name="uc_description.md", on_click='ignore', key='download_uc_description')
+                                                                st.download_button('Download Diagrama de Classe', diagrama_classes + footer, file_name="class_diagram.md", on_click='ignore', key='download_class_diagram')
+                                                                st.download_button('Download Protótipo de Interface ', prototipo_interface, file_name="interface_prototype.html", on_click='ignore', key='download_interface_prototype')
+                                                                st.download_button('Download Descrição de Uso de Interface ', descricao_interface, file_name="interface_use_description.md", on_click='ignore', key='download_interface_description')
+
+                                                                st.markdown("###  Resposta do Agente:")
+                                                                st.markdown("#### Minimundo:")
+                                                                st.markdown(minimundo, unsafe_allow_html=True)
+                                                                st.markdown("#### Tabelas de Requisitos:")
+                                                                st.markdown(requisitos, unsafe_allow_html=True)
+                                                                st.markdown("#### Diagrama de Caso de Uso:")
+                                                                st.markdown(diagrama_uc, unsafe_allow_html=True)
+                                                                st.markdown("#### Tabela de Caso de Uso:")
+                                                                st.markdown(tabela_uc, unsafe_allow_html=True)
+                                                                st.markdown("#### Descrição de Caso de Uso:")
+                                                                st.markdown(descricao_uc, unsafe_allow_html=True)
+                                                                st.markdown("#### Diagrama de Classe:")
+                                                                st.markdown(diagrama_classes, unsafe_allow_html=True)
+                                                                st.markdown("#### Descrição de Uso de Protótipo de Interface:")
+                                                                st.markdown(descricao_interface, unsafe_allow_html=True)
+                                                                st.markdown(footer, unsafe_allow_html=True)
+
+                                                        except Exception as e:
+                                                            st.error(f"Erro ao enviar requisição para protótipo de interface: {e}")
+                                            
                                                 except Exception as e:
                                                     st.error(f"Erro ao enviar requisição para revisão: {e}")
 
@@ -386,5 +486,6 @@ match opt:
 
             if os.path.exists(file_path):
                 os.remove(file_path)
+    
     case _:
         st.markdown("### Escolha uma das opções")
