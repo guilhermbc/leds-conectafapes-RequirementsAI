@@ -12,22 +12,24 @@ load_dotenv()
 webhook = os.getenv('WEBHOOK')
 URL = f"http://{webhook}:8001/webhook"
 
-opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções", 
-                                                     "Minimundo", 
-                                                     "Tabela de Requisitos", 
-                                                     "Casos de Uso", 
-                                                     "Diagrama de Classe",
-                                                     "Casos de Uso e Diagrama de Classe (com validação mútua)",
-                                                     "Protótipo de Interface e Descrição de Uso",
-                                                     "Tudo!",
-                                                     ])
+opt = st.selectbox(" Escolha o que deseja criar: ", [
+    "Escolha uma das opções",
+    "Minimundo",
+    "Tabela de Requisitos",
+    "Casos de Uso",
+    "Diagrama de Classe",
+    "Casos de Uso e Diagrama de Classe (com validação mútua)",
+    "Protótipo de Interface e Descrição de Uso",
+    "Tudo!",
+])
+
 opt = opt.lower().replace(" ", "")
 
 match opt:
     case "minimundo":
         uploaded_file = st.file_uploader("Envie um vídeo (.mp3, wav, .mp4 ou .mkv)", type=["mp3", "mp4", "wav", "mkv"])
-        uploaded_mw = st.file_uploader("Envie uma versão anterior do minimundo (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
-        uploaded_mw_instruction = st.text_area("Escreva as instruções de contexto para o minimundo passado (OPCIONAL)")
+        # uploaded_mw = st.file_uploader("Envie uma versão anterior do minimundo (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
+        # uploaded_mw_instruction = st.text_area("Escreva as instruções de contexto para o minimundo passado (OPCIONAL)")
 
         if uploaded_file:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -39,19 +41,19 @@ match opt:
 
             mwText = ""
             mwInstruction = ""
-            if uploaded_mw:
-                mwText = uploaded_mw.getvalue().decode("utf-8")
-            if uploaded_mw_instruction:
-                mwInstruction = uploaded_mw_instruction
+            # if uploaded_mw:
+            #     mwText = uploaded_mw.getvalue().decode("utf-8")
+            # if uploaded_mw_instruction:
+            #     mwInstruction = uploaded_mw_instruction
 
             if st.button(" Enviar para análise"):
                 payload = {
                     "chatInput": file_path,
-                    "old_mw": mwText,
-                    "mw_instruction": mwInstruction 
+                    # "old_mw": mwText,
+                    # "mw_instruction": mwInstruction 
                 }
                 try:
-                    response = requests.post(f"{URL}/miniworld", json=payload) #local
+                    response = requests.post(f"{URL}/miniworld", json=payload)
 
                     try:
                         pyproject = Path('/app/pyproject.toml')
@@ -90,7 +92,6 @@ match opt:
     case "tabeladerequisitos":
         uploaded_mw = st.file_uploader("Envie o arquivo do minimundo (.md)", type=[".md"])
         uploaded_previous_requirements = st.file_uploader("Envie uma versão anterior dos requisitos (OPCIONAL) (.txt ou .md)", type=["txt", "md"])
-        uploaded_requirements_text = st.text_area("Escreva as instruções de contexto para os requisitos passados (OPCIONAL)")
 
         if uploaded_mw:
             os.makedirs(UPLOAD_DIR, exist_ok=True)
@@ -102,14 +103,14 @@ match opt:
             #Verfica se os arquivos opcionais foram enviados
             if uploaded_previous_requirements:
                 requisitos_anteriores = uploaded_previous_requirements.getvalue().decode("utf-8")
-            if uploaded_requirements_text:
-                info_requisitos = uploaded_requirements_text
+            # if uploaded_requirements_text:
+                # info_requisitos = uploaded_requirements_text
 
             if st.button(" Enviar para análise"):
                 payload = {
                     "minimundo": minimundo,
                     "requisitos_anteriores": requisitos_anteriores,
-                    "info_requisitos": info_requisitos
+                    # "info_requisitos": info_requisitos
                 }
                 try:
                     response = requests.post(f"{URL}/requirements", json=payload) #local
