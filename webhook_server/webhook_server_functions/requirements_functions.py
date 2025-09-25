@@ -21,8 +21,8 @@ def preparar_estado_requisitos(data: dict) -> dict:
     return {
         "mensagem_usuario": minimundo,
         "minimundo": minimundo,
-        "old_requirements": info_requisitos,
-        "requirements_information": requisitos_anteriores
+        "old_requirements": requisitos_anteriores,
+        "requirements_information": info_requisitos
     }
 
 @traceable(name="Run Requirements Table")
