@@ -8,8 +8,8 @@ class MyState(TypedDict):
     transcricao: Optional[str]
     minimundo: Optional[str]
 
-    # old_mw: Optional[str]
-    # mw_instruction: Optional[str]
+    old_mw: Optional[str]
+    mw_instruction: Optional[str]
 
     rascunho_requisitos: Optional[str]
     requisitos_tabelas: Optional[str]

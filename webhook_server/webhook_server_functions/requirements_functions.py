@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graph import graphRq
+from graphs.requirement_graph import graphRq
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback
@@ -36,7 +36,7 @@ def run_graphRq_with_trace(input_data: dict):
 @router.post("/webhook/requirements")
 async def call_agent_miniworld(request: Request):
     try:
-        from graph import graphRq
+        from graphs.requirement_graph import graphRq
 
         data = await request.json()
         estado = preparar_estado_requisitos(data)

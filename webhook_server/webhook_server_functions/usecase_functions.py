@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graph import graphUC
+from graphs.use_case_graph import graphUC
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback
@@ -40,7 +40,7 @@ def run_graphUC_with_trace(input_data: dict):
 @router.post("/webhook/use-cases")
 async def call_agent_miniworld(request: Request):
     try:
-        from graph import graphUC
+        from graphs.use_case_graph import graphUC
 
         data = await request.json()
         estado = preparar_estado_caso_uso(data)

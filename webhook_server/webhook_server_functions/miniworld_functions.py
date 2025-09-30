@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graph import graphMW
+from graphs.miniworld_graph import graphMW
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback
@@ -39,7 +39,7 @@ def run_graphMW_with_trace(input_data: dict):
 @router.post("/webhook/miniworld")
 async def call_agent_miniworld(request: Request):
     try:
-        from graph import graphMW 
+        from graphs.miniworld_graph import graphMW 
 
         data = await request.json()
         estado = preparar_estado_minimundo(data)

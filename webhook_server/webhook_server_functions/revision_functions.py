@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graph import graphRv
+from graphs.revision_graph import graphRv
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback
@@ -35,7 +35,7 @@ def run_graphRv_with_trace(input_data: dict):
 @router.post("/webhook/revision")
 async def call_agent_miniworld(request: Request):
     try:
-        from graph import graphRv
+        from graphs.revision_graph import graphRv
 
         data = await request.json()
         estado = preparar_estado_revisao(data)

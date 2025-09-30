@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graph import graphDC
+from graphs.class_diagram_graph import graphDC
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback
@@ -49,7 +49,7 @@ def run_graphDC_with_trace(input_data: dict):
 @router.post("/webhook/class-diagrams")
 async def call_agent_miniworld(request: Request):
     try:
-        from graph import graphDC
+        from graphs.class_diagram_graph import graphDC
 
         data = await request.json()
         estado = preparar_estado_diagrama_classe(data)

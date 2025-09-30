@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graph import graphIP
+from graphs.interface_graph import graphIP
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback
@@ -31,7 +31,7 @@ def run_graphIP_with_trace(input_data: dict):
 @router.post("/webhook/interface-prototype")
 async def call_agent_miniworld(request: Request):
     try:
-        from graph import graphIP
+        from graphs.interface_graph import graphIP
 
         data = await request.json()
         estado = preparar_estado_prototipo_interface(data)
