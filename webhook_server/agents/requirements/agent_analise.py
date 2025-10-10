@@ -53,13 +53,14 @@ persona_message_analise = SystemMessage(
     If the user has no answers, make well-founded assumptions and inform what decisions were made.
     Your response should be in Portuguese.
 
-    Additional Instructions
+    Important:
+    You may also receive a previous requirements version.
+    If you do, use it as the baseline for creating the new version, following these rules:
+    - Do not remove or alter the requirements of the previous version;
+    - Only add new requirements if the new requirements do not contradict any requirements of the previous version;
+    - If a new requirement contradict a previous requirement **explicitly list** the contradiction and the new requirement in the **Identified Gaps and Inconsistencies** section;
 
-    You may also receive the following optional information:
-    - A previous version of the requirements.
-    - A text containing additional information or instructions on how you should use the provided previous version of the document 
-    (e.g., use it as a basis, take its content into account, apply adjustments, etc.).
-
+    If no previous version is provided, treat the current version you are creating as the first version.
     """
     )
 )
@@ -68,7 +69,6 @@ analise_prompt = ChatPromptTemplate.from_messages([
     persona_message_analise,
     ("human", """
     Domain Narrative: {minimundo}
-    Additional Information: {info_requirements}
     Previous Requirements Version: {previous_requirements}
     """)
 ])
@@ -84,9 +84,11 @@ def analyze_node(state):
     2. Generate an initial understanding of the functionalities and related attributes.
     """
     print("🔎 Estado recebido no nó de análise:", state)
-    resultado = agent_analise_chain.invoke({"minimundo": state["minimundo"],
-                                            "info_requirements": state.get("requirements_instruction", ""),
-                                            "previous_requirements": state.get("old_requirements", "")})
+    resultado = agent_analise_chain.invoke({
+        "minimundo": state["minimundo"],
+        "info_requirements": state.get("requirements_instruction", ""),
+        "previous_requirements": state.get("old_requirements", "")})
+    
     return {**state, "rascunho_requisitos": resultado}
 
 
