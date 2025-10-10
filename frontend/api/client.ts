@@ -13,9 +13,20 @@ export const api = new Api({
 });
 
 // calls
+// Miniworld
 // api.webhook.callAgentMiniworldWebhookMiniworldPost()
+
+// Requirements
 // api.webhook.callAgentMiniworldWebhookRequirementsPost()
+
+// Use Case
 // api.webhook.callAgentMiniworldWebhookUseCasesPost()
+
+// Class Diagram
 // api.webhook.callAgentMiniworldWebhookClassDiagramsPost()
+
+// Revision
 // api.webhook.callAgentMiniworldWebhookRevisionPost()
+
+// Interface Prototype
 // api.webhook.callAgentMiniworldWebhookInterfacePrototypePost()
