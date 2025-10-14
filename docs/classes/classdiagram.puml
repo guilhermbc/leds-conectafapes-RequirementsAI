@@ -1,0 +1,37 @@
+@startuml Classes
+    enum DOCS {
+         Minimundo
+        Requisitos
+        CasoUso
+        DiagramaClasse
+        PrototipoInterface
+    }
+    class Projeto {
+    string: nome
+    string: descricao
+
+    Modulo: projeto
+    }
+
+
+    Projeto "1" -- "0..*" Modulo : projeto >
+
+    class Modulo {
+    string: nome
+    string: descricao
+
+    Documento: modulo
+    }
+
+
+    Modulo "1" -- "0..*" Documento : modulo >
+
+    class Documento {
+    string: versao
+    string: arquivo
+
+    }
+
+    Documento "1" -- "1" DOCS : documento>
+
+@enduml
