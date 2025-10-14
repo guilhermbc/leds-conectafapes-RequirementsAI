@@ -5,6 +5,5 @@ __pycache__/
 *.pyo
 webhook_server/tests_dev/
 node_modules
-*.json
 *.js
 lefthook*

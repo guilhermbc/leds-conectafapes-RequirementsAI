@@ -1,3 +1,5 @@
+import { api } from '../api/client'
+
 "use client"
 
 import type React from "react"
@@ -268,189 +270,68 @@ export default function RequirementsWorkflow({
     }
   }
 
-  const simulateArtifactGeneration = (stepId: ProjectArtifact["type"], prompt?: string) => {
-    setTimeout(() => {
-      let content: string | any
+const simulateArtifactGeneration = async (stepId: ProjectArtifact["type"], prompt?: string) => {
+  let content: string | any
+
+  try {
+    switch (stepId) {
+      case "minimundo": {
+        const response = await api.webhook.callAgentMiniworldWebhookMiniworldPost({});
+        content = response
+        setNewlyGeneratedMinimundoData(content)
+        setCurrentArtifactContent(content)
+        break
+      }
+      case "diagram": {
+        const response = await api.webhook.callAgentMiniworldWebhookClassDiagramsPost({});
+        content = response
+        setNewlyGeneratedDiagramData(content)
+        setCurrentArtifactContent(content)
+        break
+      }
+      case "use-cases": {
+        const response = await api.webhook.callAgentMiniworldWebhookUseCasesPost({});
+        content = response
+        setNewlyGeneratedUseCasesData(content)
+        setCurrentArtifactContent(content)
+        break
+      }
+      case "requirements": {
+        const response = await api.webhook.callAgentMiniworldWebhookRequirementsPost({});
+        content = response
+        setNewlyGeneratedFinalDocument(content)
+        setCurrentArtifactContent(content)
+        break
+      }
+    }
+
+    updateStepStatus(stepId, "completed")
+    addAnalyzeHandler(stepId, () => {
+      setCurrentArtifactContent(content)
+      setCurrentArtifactType(stepId)
       switch (stepId) {
         case "minimundo":
-          content = `O sistema proposto é uma plataforma de gerenciamento de projetos que permite aos usuários criar, organizar e acompanhar o progresso de suas tarefas e projetos. 
-          ${prompt ? `\n\n(Regenerado com prompt: "${prompt}")` : ""}
-          O sistema deve permitir que usuários se cadastrem e façam login de forma segura. Cada usuário pode criar múltiplos projetos, onde cada projeto pode conter várias tarefas organizadas em diferentes status (pendente, em andamento, concluído).
-          
-          As tarefas devem ter informações como título, descrição, data de vencimento, prioridade e responsável. O sistema deve enviar notificações automáticas para lembrar os usuários sobre prazos próximos.
-          
-          Além disso, o sistema deve gerar relatórios de produtividade e permitir a colaboração entre membros da equipe através de comentários e anexos nas tarefas.`
-          setNewlyGeneratedMinimundoData(content)
-          setCurrentArtifactContent(content) // Update content for modal
+          setShowMinimundoModal(true)
           break
         case "diagram":
-          content = {
-            classes: [
-              {
-                name: "User",
-                attributes: ["id: String", "name: String", "email: String", "password: String"],
-                methods: ["login()", "logout()", "updateProfile()"],
-              },
-              {
-                name: "Project",
-                attributes: ["id: String", "title: String", "description: String", "createdAt: DateTime"],
-                methods: ["create()", "update()", "delete()", "addTask()"],
-              },
-              {
-                name: "Task",
-                attributes: [
-                  "id: String",
-                  "title: String",
-                  "description: String",
-                  "status: String",
-                  "priority: String",
-                  "dueDate: DateTime",
-                ],
-                methods: ["create()", "update()", "changeStatus()", "assignTo()"],
-              },
-              {
-                name: "Notification",
-                attributes: ["id: String", "message: String", "userId: String", "createdAt: DateTime"],
-                methods: ["send()", "markAsRead()"],
-              },
-            ],
-          }
-          if (prompt) {
-            // Simple modification based on prompt for demo
-            if (prompt.toLowerCase().includes("pagamento")) {
-              content.classes.push({
-                name: "Payment",
-                attributes: ["id: String", "amount: Float", "status: String"],
-                methods: ["process()"],
-              })
-            }
-            if (prompt.toLowerCase().includes("remover notificação")) {
-              content.classes = content.classes.filter((cls: any) => cls.name !== "Notification")
-            }
-          }
-          setNewlyGeneratedDiagramData(content)
-          setCurrentArtifactContent(content) // Update content for modal
+          setShowDiagramModal(true)
           break
         case "use-cases":
-          content = `## Casos de Uso do Sistema de Gerenciamento de Projetos
-          ${prompt ? `\n\n(Regenerado com prompt: "${prompt}")` : ""}
-          ### CU001: Realizar Login
-          **Ator Principal:** Usuário
-          **Objetivo:** Permitir que o usuário acesse sua conta no sistema.
-          **Pré-condições:** O usuário deve ter uma conta cadastrada.
-          **Fluxo Principal:**
-          1. O usuário acessa a página de login.
-          2. O sistema exibe o formulário de login.
-          3. O usuário insere seu email e senha.
-          4. O sistema valida as credenciais.
-          5. O sistema redireciona o usuário para o dashboard.
-          **Pós-condições:** Usuário logado no sistema.
-          
-          ### CU002: Criar Projeto
-          **Ator Principal:** Usuário
-          **Objetivo:** Permitir que o usuário crie um novo projeto.
-          **Pré-condições:** Usuário logado.
-          **Fluxo Principal:**
-          1. O usuário acessa a área de projetos.
-          2. O usuário clica em "Novo Projeto".
-          3. O sistema exibe o formulário de criação.
-          4. O usuário preenche os dados do projeto.
-          5. O sistema salva o projeto e exibe confirmação.
-          **Pós-condições:** Novo projeto criado.
-          
-          ### CU003: Gerenciar Tarefas
-          **Ator Principal:** Usuário
-          **Objetivo:** Permitir que o usuário crie e gerencie tarefas.
-          **Pré-condições:** Usuário logado e projeto selecionado.
-          **Fluxo Principal:**
-          1. O usuário seleciona um projeto.
-          2. O usuário cria uma nova tarefa.
-          3. O sistema permite editar status, prioridade e responsável.
-          4. O sistema salva as alterações.
-          **Pós-condições:** Tarefa criada/atualizada.`
-          setNewlyGeneratedUseCasesData(content)
-          setCurrentArtifactContent(content) // Update content for modal
+          setShowUseCasesModal(true)
           break
         case "requirements":
-          content = `# Documento de Requisitos - Sistema de Gerenciamento de Projetos
-          ${prompt ? `\n\n(Regenerado com prompt: "${prompt}")` : ""}
-          ## 1. Introdução
-          ${newlyGeneratedMinimundoData}
-          
-          ## 2. Casos de Uso
-          ${newlyGeneratedUseCasesData}
-          
-          ## 3. Requisitos Funcionais
-          
-          ### RF001 - Autenticação de Usuários
-          O sistema deve permitir que usuários se cadastrem e façam login de forma segura.
-          **Prioridade:** Alta
-          
-          ### RF002 - Gerenciamento de Projetos
-          O sistema deve permitir criar, editar e excluir projetos.
-          **Prioridade:** Alta
-          
-          ### RF003 - Gerenciamento de Tarefas
-          O sistema deve permitir criar, editar e excluir tarefas dentro dos projetos.
-          **Prioridade:** Alta
-          
-          ### RF004 - Sistema de Notificações
-          O sistema deve enviar notificações automáticas sobre prazos e atualizações.
-          **Prioridade:** Média
-          
-          ## 4. Requisitos Não Funcionais
-          
-          ### RNF001 - Segurança
-          O sistema deve criptografar senhas e usar HTTPS.
-          **Prioridade:** Alta
-          
-          ### RNF002 - Performance
-          O sistema deve responder em menos de 2 segundos.
-          **Prioridade:** Alta
-          
-          ### RNF003 - Usabilidade
-          O sistema deve ter interface intuitiva e responsiva.
-          **Prioridade:** Média
-          
-          ## 5. Regras de Negócio
-          
-          ### RN001 - Hierarquia de Projetos
-          Um usuário pode ter múltiplos projetos, mas cada tarefa pertence a apenas um projeto.
-          
-          ### RN002 - Status de Tarefas
-          As tarefas devem seguir o fluxo: Pendente → Em Andamento → Concluída.
-          
-          ### RN003 - Notificações
-          Notificações devem ser enviadas 24h antes do vencimento de uma tarefa.`
-          setNewlyGeneratedFinalDocument(content)
-          setCurrentArtifactContent(content) // Update content for modal
+          setShowRequirementsModal(true)
           break
       }
-      updateStepStatus(stepId, "completed")
-      addAnalyzeHandler(stepId, () => {
-        setCurrentArtifactContent(content)
-        setCurrentArtifactType(stepId)
-        switch (stepId) {
-          case "minimundo":
-            setShowMinimundoModal(true)
-            break
-          case "diagram":
-            setShowDiagramModal(true)
-            break
-          case "use-cases":
-            setShowUseCasesModal(true)
-            break
-          case "requirements":
-            setShowRequirementsModal(true)
-            break
-        }
-      })
+    })
 
-      // After an artifact is generated and its status is completed, check if the next step should start
-      // This is crucial for the non-paused flow
-      startProcessingNextStep(stepId)
-    }, 2000) // Simulate processing time
+    startProcessingNextStep(stepId)
+  } catch (error: any) {
+    // Optionally, handle error state here
+    setCurrentArtifactContent(`Erro ao gerar artefato: ${error?.message || "Erro desconhecido"}`)
+    updateStepStatus(stepId, "completed")
   }
+}
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
