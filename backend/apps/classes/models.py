@@ -41,7 +41,7 @@ class Documento(PolymorphicModel, models.Model):
     versao = models.CharField(max_length=300, null=True, blank=True)
     arquivo = models.CharField(max_length=300, null=True, blank=True)
 
-    Documento = models.CharField(max_length=18, choices=DOCS.choices, default=DOCS.MINIMUNDO)
+    Documento = models.CharField(max_length=20, choices=DOCS.choices, default=DOCS.MINIMUNDO)
 
 
     class Meta:
