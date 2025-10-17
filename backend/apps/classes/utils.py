@@ -19,3 +19,10 @@ class HashIdConverter:
 
     def to_url(self, value):
         return h_encode(value)
+
+
+def is_empty_or_null(string):
+    '''
+    Verify if a string is empty or if its a None
+    '''
+    return not (string and string.strip())

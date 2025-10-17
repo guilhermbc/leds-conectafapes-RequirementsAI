@@ -50,3 +50,5 @@ uritemplate
 urllib3
 whitenoise
 wrapt
+hashids
+faker
