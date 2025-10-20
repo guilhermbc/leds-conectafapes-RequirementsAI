@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bullseye as python
+FROM python:3.12-slim as python
 
 ENV DJANGO_SETTINGS_MODULE rai.settings.local
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
