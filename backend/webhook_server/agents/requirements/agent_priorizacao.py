@@ -1,7 +1,7 @@
 from langchain_core.messages import SystemMessage
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from app_config import llm_model, parser  # Garantindo consistência com seu projeto
+from webhook_server.app_config import llm_model, parser  # Garantindo consistência com seu projeto
 
 # System message in English
 persona_message_prioritization = SystemMessage(

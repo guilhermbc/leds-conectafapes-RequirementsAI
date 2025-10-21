@@ -1,13 +1,13 @@
 from langgraph.graph import StateGraph, END
-from state import MyState
+from webhook_server.state import MyState
 
-from agents.use_cases.agent_identuc import identuc_node
-from agents.use_cases.agent_identevent import identevent_node
-from agents.use_cases.agent_validateuc import validateuc_node
-from agents.use_cases.agent_formatuc import formatuc_node
-from agents.use_cases.agent_diagramuc import diagramuc_node
+from webhook_server.agents.use_cases.agent_identuc import identuc_node
+from webhook_server.agents.use_cases.agent_identevent import identevent_node
+from webhook_server.agents.use_cases.agent_validateuc import validateuc_node
+from webhook_server.agents.use_cases.agent_formatuc import formatuc_node
+from webhook_server.agents.use_cases.agent_diagramuc import diagramuc_node
 
-from nodes import input_check, final
+from webhook_server.nodes import input_check, final
 
 # Nós
 # Builder

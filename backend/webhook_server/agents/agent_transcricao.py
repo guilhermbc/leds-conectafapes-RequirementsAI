@@ -1,7 +1,7 @@
 from langchain_core.messages import SystemMessage
 from langgraph.prebuilt import create_react_agent
 #from RequirementsAI.webhook_server.app_config import llm_model  # Seu modelo Gemini ou outro
-from app_config import llm_model, parser
+from webhook_server.app_config import llm_model, parser
 import google.generativeai as genai
 import tomllib
 from pathlib import Path

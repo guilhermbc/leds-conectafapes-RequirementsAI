@@ -1,7 +1,7 @@
 from langchain_core.messages import SystemMessage
 from langchain.prompts import ChatPromptTemplate
 #from RequirementsAI.webhook_server.app_config import llm_model
-from app_config import llm_model, parser
+from webhook_server.app_config import llm_model, parser
 from langchain_core.output_parsers import StrOutputParser
 
 # Definição da persona via mensagem de sistema

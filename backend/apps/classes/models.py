@@ -40,14 +40,18 @@ class Documento(PolymorphicModel, models.Model):
 
     versao = models.CharField(max_length=300, null=True, blank=True)
     arquivo = models.CharField(null=True, blank=True)
+
     # origin is audio if Documento is Minimundo
-    fromAudioFile = models.BinaryField(null=True, blank=True)
+    # audio path here
+    origemAudio = models.CharField(null=True, blank=True)
+
     # origin is markdown/text if Documento is anything else
-    fromMarkdownFile = models.CharField(null=True, blank=True)
-    basedOn = models.CharField(null=True, blank=True)
+    # markdown/text origin can be from multiple sources
+    origemMarkdown = models.JSONField(blank=True, null=True)
+
+    documentoAnterior = models.ForeignKey('Documento', blank=True, null=True, on_delete=models.DO_NOTHING, related_name="documento_%(class)s_anteior")
 
     Documento = models.CharField(max_length=20, choices=DOCS.choices, default=DOCS.MINIMUNDO)
-
 
     class Meta:
         db_table = 'documento'

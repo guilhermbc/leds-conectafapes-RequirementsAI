@@ -155,8 +155,8 @@ class DocumentoViewSet(ModelViewSet):
 
         return Response(serializer.data)
         '''
-        # return super().update(request, *args, **kwargs)
-        NotImplementedError(('segura a onda'))
+        return super().update(request, *args, **kwargs)
+        # NotImplementedError(('segura a onda'))
 
 def send_to_llm(data: dict) -> str | tuple:
     match (data['Documento']):

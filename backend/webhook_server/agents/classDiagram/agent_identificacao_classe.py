@@ -2,7 +2,7 @@ from langchain_core.messages import SystemMessage
 from langgraph.prebuilt import create_react_agent
 from langchain.prompts import ChatPromptTemplate
 #from RequirementsAI.webhook_server.app_config import llm_model
-from app_config import llm_model, parser
+from webhook_server.app_config import llm_model, parser
 import datetime
 from langchain_core.output_parsers import StrOutputParser
 

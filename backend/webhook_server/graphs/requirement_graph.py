@@ -1,12 +1,12 @@
 from langgraph.graph import StateGraph, END
-from state import MyState
+from webhook_server.state import MyState
 
-from agents.requirements.agent_analise import analyze_node
-from agents.requirements.agent_extracao import extract_node
-from agents.requirements.agent_priorizacao import prioritize_node
-from agents.requirements.agent_refinamento import refine_node
+from webhook_server.agents.requirements.agent_analise import analyze_node
+from webhook_server.agents.requirements.agent_extracao import extract_node
+from webhook_server.agents.requirements.agent_priorizacao import prioritize_node
+from webhook_server.agents.requirements.agent_refinamento import refine_node
 
-from nodes import input_check, final
+from webhook_server.nodes import input_check, final
 
 # Nós
 # Builder

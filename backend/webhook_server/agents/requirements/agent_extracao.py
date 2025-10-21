@@ -2,7 +2,7 @@ from langchain_core.messages import SystemMessage
 from langchain.prompts import ChatPromptTemplate
 #from RequirementsAI.webhook_server.app_config import llm_model
 from langchain_core.output_parsers import StrOutputParser
-from app_config import llm_model, parser
+from webhook_server.app_config import llm_model, parser
 
 
 persona_message_extracao = SystemMessage(

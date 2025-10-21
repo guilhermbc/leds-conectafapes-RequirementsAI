@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graphs.requirement_graph import graphRq
+from webhook_server.graphs.requirement_graph import graphRq
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback

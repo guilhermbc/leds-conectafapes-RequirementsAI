@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graphs.miniworld_graph import graphMW
+from webhook_server.graphs.miniworld_graph import graphMW
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback

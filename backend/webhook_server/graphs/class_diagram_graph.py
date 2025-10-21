@@ -1,12 +1,12 @@
 from langgraph.graph import StateGraph, END
-from state import MyState
+from webhook_server.state import MyState
 
-from agents.classDiagram.agent_extracao_classe import extract_node as extract_CD
-from agents.classDiagram.agent_identificacao_classe import identify_node as identify_CD
-from agents.classDiagram.agent_revisao_classe import revise_node as revise_CD
-from agents.classDiagram.agent_refinamento_classe import refine_node as refine_CD
+from webhook_server.agents.classDiagram.agent_extracao_classe import extract_node as extract_CD
+from webhook_server.agents.classDiagram.agent_identificacao_classe import identify_node as identify_CD
+from webhook_server.agents.classDiagram.agent_revisao_classe import revise_node as revise_CD
+from webhook_server.agents.classDiagram.agent_refinamento_classe import refine_node as refine_CD
 
-from nodes import input_check, final
+from webhook_server.nodes import input_check, final
 
 # Nós
 # Builder

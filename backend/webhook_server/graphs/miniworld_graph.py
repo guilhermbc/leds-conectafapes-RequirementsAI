@@ -1,10 +1,10 @@
 from langgraph.graph import StateGraph, END
-from state import MyState
+from webhook_server.state import MyState
 
-from agents.agent_transcricao import transcribe_audio_agent
-from agents.miniworld.agent_minimundo import generate_minimundo_node
+from webhook_server.agents.agent_transcricao import transcribe_audio_agent
+from webhook_server.agents.miniworld.agent_minimundo import generate_minimundo_node
 
-from nodes import input_check, final
+from webhook_server.nodes import input_check, final
 
 # Nós
 # Builder

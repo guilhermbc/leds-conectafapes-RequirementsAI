@@ -1,5 +1,5 @@
 from langsmith import traceable
-from graphs.use_case_graph import graphUC
+from webhook_server.graphs.use_case_graph import graphUC
 from fastapi import Request, APIRouter
 from fastapi.responses import JSONResponse
 import traceback
