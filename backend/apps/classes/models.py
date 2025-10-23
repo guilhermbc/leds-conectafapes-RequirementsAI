@@ -15,10 +15,7 @@ class Projeto(PolymorphicModel, models.Model):
     ''''''
 
     nome = models.CharField(max_length=300, null=True, blank=True)
-    descricao = models.CharField(max_length=300, null=True, blank=True)
-
-
-    Projeto = models.ForeignKey('Modulo', blank=True, null=True, on_delete=models.CASCADE, related_name="projeto_%(class)s")
+    descricao = models.TextField(null=True, blank=True)
 
     class Meta:
         db_table = 'projeto'
@@ -27,31 +24,35 @@ class Modulo(PolymorphicModel, models.Model):
     ''''''
 
     nome = models.CharField(max_length=300, null=True, blank=True)
-    descricao = models.CharField(max_length=300, null=True, blank=True)
+    descricao = models.TextField(null=True, blank=True)
 
-
-    Modulo = models.ForeignKey('Documento', blank=True, null=True, on_delete=models.CASCADE, related_name="modulo_%(class)s")
+    Projeto = models.ForeignKey('Projeto', blank=True, null=True, on_delete=models.CASCADE, related_name="projeto_%(class)s")
 
     class Meta:
         db_table = 'modulo'
 
 class Documento(PolymorphicModel, models.Model):
     ''''''
-
+    # versao do documento
     versao = models.CharField(max_length=300, null=True, blank=True)
-    arquivo = models.CharField(null=True, blank=True)
 
-    # origin is audio if Documento is Minimundo
-    # audio path here
+    # string do documento
+    arquivo = models.TextField(null=True, blank=True)
+    
+    # path do audio de origem do documento (se houver)
     origemAudio = models.CharField(null=True, blank=True)
-
-    # origin is markdown/text if Documento is anything else
-    # markdown/text origin can be from multiple sources
-    origemMarkdown = models.JSONField(blank=True, null=True)
-
-    documentoAnterior = models.ForeignKey('Documento', blank=True, null=True, on_delete=models.DO_NOTHING, related_name="documento_%(class)s_anteior")
-
-    Documento = models.CharField(max_length=20, choices=DOCS.choices, default=DOCS.MINIMUNDO)
+    
+    # id dos documentos de origem
+    DocumentoOrigem = models.ManyToManyField('Documento', blank=True, null=True, symmetrical=False, related_name='documento_%(class)s_origem')
+    
+    # id da versao anterior do documento (se houver)
+    DocumentoAnterior = models.ForeignKey('Documento', blank=True, null=True, on_delete=models.DO_NOTHING, related_name="documento_%(class)s_anteior")
+    
+    # id do modulo que o documento pertence
+    Modulo = models.ForeignKey('Modulo', blank=True, null=True, on_delete=models.CASCADE, related_name="modulo_%(class)s")
+    
+    # tipo do documento
+    TipoDocumento = models.CharField(max_length=20, choices=DOCS.choices, default=DOCS.MINIMUNDO)
 
     class Meta:
         db_table = 'documento'

@@ -55,7 +55,7 @@ def generate_minimundo_node(state):
     Step 0:
     - Transcription of the domain narrative.
     """
-    resultado = agent_minimundo_chain.invoke({"transcricao": state["transcricao"], "mw_instruction": state["mw_instruction"], "old_mw":state["old_mw"]})
+    resultado = agent_minimundo_chain.invoke({"transcricao": state["transcricao"], "mw_instruction": "", "old_mw":""})
     print("📚 Minimundo gerado:", resultado)
 
     return {**state, "minimundo": resultado}

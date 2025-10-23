@@ -114,7 +114,6 @@ class DocumentoViewSet(ModelViewSet):
             return DocumentoReadSerializer
         return DocumentoWriteSerializer
     
-    # specify behavior of create Documento
     def create(self, request, *args, **kwargs):
         '''
         Specific behavior of the create Documento
@@ -133,7 +132,6 @@ class DocumentoViewSet(ModelViewSet):
         request.data['arquivo'] = result_string
 
         return super().create(request, *args, **kwargs)
-
 
     # specify behavior of update Documento
     def update(self, request, *args, **kwargs):
@@ -156,23 +154,43 @@ class DocumentoViewSet(ModelViewSet):
         return Response(serializer.data)
         '''
         return super().update(request, *args, **kwargs)
-        # NotImplementedError(('segura a onda'))
 
 def send_to_llm(data: dict) -> str | tuple:
-    match (data['Documento']):
+    result = None
+
+    match (data['TipoDocumento']):
         case 'MINIMUNDO':
-            mw_data = run_mw()
-            if mw_data and isinstance(mw_data, dict):
-                state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
-                result = state.get('minimundo')
+            try:
+                if data['origemAudio']:
+                    path = '../shared/uploads/' + data['origemAudio']
+
+                    mw_data = run_mw({ 'video_entrevista': path })
+                    if mw_data and isinstance(mw_data, dict):
+                        state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
+                        result = state.get('minimundo')
+            except:
+                result = None
             
         case 'REQUISITOS':
-            rq_data = run_rq()
-            if rq_data and isinstance(rq_data, dict):
-                state = next(iter(rq_data.values())) if len(rq_data) == 1 else rq_data
-                result = state.get('report')
+            try:
+                if data['DocumentoOrigem'] != []:
+                    originMw = ''
+                    for docId in data['DocumentoOrigem']:
+                        doc = Documento.objects.get(pk=docId)
+                        if doc.TipoDocumento == 'MINIMUNDO':
+                            originMw = doc.arquivo
+
+                    rq_data = run_rq({ 'minimundo': originMw })
+                    if rq_data and isinstance(rq_data, dict):
+                        state = next(iter(rq_data.values())) if len(rq_data) == 1 else rq_data
+                        result = state.get('report')
+            except:
+                result = None
 
         case 'CASO_USO':
+            result = None
+            return result if result else ''
+
             data = run_uc
             if mw_data and isinstance(mw_data, dict):
                 state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
@@ -183,12 +201,18 @@ def send_to_llm(data: dict) -> str | tuple:
                 result = (diagrama, tabela, descricao)
         
         case 'DIAGRAMA_CLASSE':
+            result = None
+            return result if result else ''
+
             data = run_dc()
             if mw_data and isinstance(mw_data, dict):
                 state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
                 result = state.get("diagrama_classes_final")
 
         case 'PROTOTIPO_INTERFACE':
+            result = None
+            return result if result else ''
+
             data = run_ip()
             if mw_data and isinstance(mw_data, dict):
                 state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
