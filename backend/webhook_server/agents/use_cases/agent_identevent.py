@@ -126,10 +126,12 @@ agent_identevent_chain = identevent_prompt | llm_model | StrOutputParser()
 # Função refinada para o nó
 def identevent_node(state):
     print("🔍 Estado recebido no nó de identificação de eventos:", state)
-    resultado = agent_identevent_chain.invoke({"report": state["report"], 
-                                               "minimundo": state["minimundo"],
-                                               "ident_usecases": state["ident_usecases"],
-                                               "info_usecases": state["uc_information"],
-                                               "previous_usecases": state["old_uc"]})
+    resultado = agent_identevent_chain.invoke({
+        "report": state["report"], 
+        "minimundo": state["minimundo"],
+        "ident_usecases": state["ident_usecases"],
+        "info_usecases": "",
+        "previous_usecases": ""
+        })
 
     return {**state, "ident_events": resultado}

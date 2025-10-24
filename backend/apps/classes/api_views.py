@@ -179,8 +179,14 @@ def send_to_llm(data: dict) -> str | tuple:
                         doc = Documento.objects.get(pk=docId)
                         if doc.TipoDocumento == 'MINIMUNDO':
                             originMw = doc.arquivo
+                    
+                    oldRq = ''
+                    if data['DocumentoAnterior']:
+                        doc = Documento.objects.get(pk=data['DocumentoAnterior'])
+                        if doc.TipoDocumento == 'REQUISITOS':
+                            oldRq = doc.arquivo
 
-                    rq_data = run_rq({ 'minimundo': originMw })
+                    rq_data = run_rq({ 'minimundo': originMw, 'old_requirements':oldRq })
                     if rq_data and isinstance(rq_data, dict):
                         state = next(iter(rq_data.values())) if len(rq_data) == 1 else rq_data
                         result = state.get('report')
@@ -188,34 +194,73 @@ def send_to_llm(data: dict) -> str | tuple:
                 result = None
 
         case 'CASO_USO':
-            result = None
-            return result if result else ''
+            try:
+                if data['DocumentoOrigem'] != []:
+                    
+                    originMw = ''
+                    originRq = ''
+                    for docId in data['DocumentoOrigem']:
+                        doc = Documento.objects.get(pk=docId)
+                        if doc.TipoDocumento == 'MINIMUNDO':
+                            originMw = doc.arquivo
+                        elif doc.TipoDocumento == 'REQUISITOS':
+                            originRq = doc.arquivo
 
-            data = run_uc
-            if mw_data and isinstance(mw_data, dict):
-                state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
-                diagrama = state.get("usecases_diagram")
-                tabela = state.get("format_uc")
-                descricao = state.get("report_validateuc")
+                    uc_data = run_uc({ 'minimundo':originMw, 'report':originRq})
+                    if uc_data and isinstance(uc_data, dict):
+                        state = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
+                        diagrama = state.get("usecases_diagram")
+                        tabela = state.get("format_uc")
+                        descricao = state.get("report_validateuc")
 
-                result = (diagrama, tabela, descricao)
-        
+                        result = (diagrama, tabela, descricao)
+            except:
+                result = None
+            
         case 'DIAGRAMA_CLASSE':
-            result = None
-            return result if result else ''
 
-            data = run_dc()
-            if mw_data and isinstance(mw_data, dict):
-                state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
-                result = state.get("diagrama_classes_final")
+            '''
+            expected data
+            { minimundo: str, report: str, format_uc: str, report_validateuc: str }
+            '''
+            try:
+                if data['DocumentoOrigem'] != []:
+                    originMw = ''
+                    originRq = ''
+                    originUcTable = ''
+                    originUcDescr = ''
+
+                    for docId in data['DocumentoOrigem']:
+                        doc = Documento.objects.get(pk=docId)
+                        if doc.TipoDocumento == 'MINIMUNDO':
+                            originMw = doc.arquivo
+                        elif doc.TipoDocumento == 'REQUISITOS':
+                            originRq = doc.arquivo
+                        elif doc.TipoDocumento == 'CASO_USO':
+                            _, originUcTable, originUcDescr = doc.arquivo.split('\n<!-- -->\n')
+
+                    cd_data = run_dc({
+                        'minimundo': originMw,
+                        'report': originRq,
+                        'format_uc': originUcTable,
+                        'report_validateuc': originUcDescr })
+                    if cd_data and isinstance(cd_data, dict):
+                        state = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
+                        result = state.get("diagrama_classes_final")
+            except:
+                result = None
 
         case 'PROTOTIPO_INTERFACE':
             result = None
             return result if result else ''
 
-            data = run_ip()
-            if mw_data and isinstance(mw_data, dict):
-                state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
+            '''
+            expected data
+            { report: str, cdinuc_description_revised: str, ucincd_revised: str }
+            '''
+            ip_data = run_ip()
+            if ip_data and isinstance(ip_data, dict):
+                state = next(iter(ip_data.values())) if len(ip_data) == 1 else ip_data
                 prototipo_interface = state.get("interface_prototype")
                 descricao_interface = state.get("interface_description")
 

@@ -333,7 +333,9 @@ interface_prompt = ChatPromptTemplate.from_messages([
 agent_interface_chain = interface_prompt | llm_model | StrOutputParser()
 
 def interface_node(state):
-    resultado = agent_interface_chain.invoke({"cdinuc_description_revised": state["cdinuc_description_revised"], 
-                                            "ucincd_revised": state["ucincd_revised"]})
+    resultado = agent_interface_chain.invoke({
+        "cdinuc_description_revised": state["cdinuc_description_revised"], 
+        "ucincd_revised": state["ucincd_revised"]
+        })
 
     return {**state, "interface_prototype": resultado}

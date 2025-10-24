@@ -78,9 +78,11 @@ agent_identuc_chain = identuc_prompt | llm_model | StrOutputParser()
 # Função refinada para o nó
 def identuc_node(state):
     print("🔍 Estado recebido no nó de identificação de UCs:", state)
-    resultado = agent_identuc_chain.invoke({"report": state["report"], 
-                                            "minimundo": state["minimundo"],
-                                            "info_usecases": state["uc_information"],
-                                            "previous_usecases": state["old_uc"]})
+    resultado = agent_identuc_chain.invoke({
+        "report": state["report"], 
+        "minimundo": state["minimundo"],
+        "info_usecases": "",
+        "previous_usecases": ""
+        })
 
     return {**state, "ident_usecases": resultado}

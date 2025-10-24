@@ -103,8 +103,8 @@ def identify_node(state):
     resultado = agent_identificacao_chain.invoke({
         "minimundo": state["minimundo"],
         "report_validateuc": state["report_validateuc"],
-        "cd_instruction": state["cd_instruction"],
-        "old_cd": state["old_cd"]
+        "cd_instruction": "",
+        "old_cd": ""
         })
 
     return {**state, "rascunho_classes": resultado}
