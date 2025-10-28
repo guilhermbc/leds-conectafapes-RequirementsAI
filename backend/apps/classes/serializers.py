@@ -5,17 +5,16 @@ from .models import (
     Documento,
 )
 
-class ProjetoWriteSerializer(serializers.ModelSerializer):
+class DocumentoWriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Projeto
+        model = Documento
         exclude = ("polymorphic_ctype",)
 
-class ProjetoReadSerializer(serializers.ModelSerializer):
+class DocumentoReadSerializer(serializers.ModelSerializer):
     class Meta:
         depth = 1
-        model = Projeto
+        model = Documento
         exclude = ("polymorphic_ctype",)
-
 
 class ModuloWriteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -28,15 +27,15 @@ class ModuloReadSerializer(serializers.ModelSerializer):
         model = Modulo
         exclude = ("polymorphic_ctype",)
 
-
-class DocumentoWriteSerializer(serializers.ModelSerializer):
+class ProjetoWriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Documento
+        model = Projeto
         exclude = ("polymorphic_ctype",)
 
-class DocumentoReadSerializer(serializers.ModelSerializer):
+class ProjetoReadSerializer(serializers.ModelSerializer):
+    projeto_modulo = ModuloReadSerializer(many=True, read_only=True)
+
     class Meta:
         depth = 1
-        model = Documento
+        model = Projeto
         exclude = ("polymorphic_ctype",)
-
