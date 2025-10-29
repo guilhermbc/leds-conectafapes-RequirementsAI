@@ -22,6 +22,8 @@ class ModuloWriteSerializer(serializers.ModelSerializer):
         exclude = ("polymorphic_ctype",)
 
 class ModuloReadSerializer(serializers.ModelSerializer):
+    modulo_documento = DocumentoReadSerializer(many=True, read_only=True)
+
     class Meta:
         depth = 1
         model = Modulo

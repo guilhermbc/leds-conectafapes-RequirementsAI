@@ -106,11 +106,20 @@ class ModuloViewSet(ModelViewSet):
             return ModuloReadSerializer
         return ModuloWriteSerializer
     
-    def retrieve(self, request, *args, **kwargs):
+    def get_object(self):
+        '''
+        return the Modulo and the associated Documento's objects
+        '''
 
-        # select * from documento where documento.id == request.data['id'] 
+        queryset = self.filter_queryset(self.get_queryset())
 
-        return super().retrieve(request, *args, **kwargs)
+        if self.action == 'retrieve':
+            queryset = queryset.prefetch_related('modulo_documento')
+        
+        obj = get_object_or_404(queryset, **self.kwargs)
+        
+        self.check_object_permissions(self.request, obj)
+        return obj
 
 class DocumentoViewSet(ModelViewSet):
     queryset = Documento.objects.all()
@@ -252,19 +261,33 @@ def send_to_llm(data: dict) -> str | tuple:
                 result = None
 
         case 'PROTOTIPO_INTERFACE':
-            result = None
-            return result if result else ''
-
             '''
             expected data
             { report: str, cdinuc_description_revised: str, ucincd_revised: str }
             '''
-            ip_data = run_ip()
-            if ip_data and isinstance(ip_data, dict):
-                state = next(iter(ip_data.values())) if len(ip_data) == 1 else ip_data
-                prototipo_interface = state.get("interface_prototype")
-                descricao_interface = state.get("interface_description")
+            try:
+                if data['DocumentoOrigem'] != []:
+                    originRq = ''
+                    originUcDescr = ''
+                    originCd = ''
 
-                result = (prototipo_interface, descricao_interface)
+                    for docId in data['DocumentoOrigem']:
+                        doc = Documento.objects.get(pk=docId)
+                        if doc.TipoDocumento == 'REQUISITOS':
+                            originRq = doc.arquivo
+                        elif doc.TipoDocumento == 'CASO_USO':
+                            _, _, originUcDescr = doc.arquivo.split('\n<!-- -->\n')
+                        elif doc.TipoDocumento == 'DIAGRAMA_CLASSE':
+                            originCd = doc.arquivo
+
+                ip_data = run_ip({ 'report': originRq, 'cdinuc_description_revised': originUcDescr, 'ucincd_revised': originCd })
+                if ip_data and isinstance(ip_data, dict):
+                    state = next(iter(ip_data.values())) if len(ip_data) == 1 else ip_data
+                    prototipo_interface = state.get("interface_prototype")
+                    descricao_interface = state.get("interface_description")
+
+                    result = (prototipo_interface, descricao_interface)
+            except:
+                result = None
 
     return result if result else ''
