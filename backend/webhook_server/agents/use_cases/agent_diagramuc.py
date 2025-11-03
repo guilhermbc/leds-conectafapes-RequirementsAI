@@ -1,0 +1,112 @@
+import datetime
+from langchain_core.messages import SystemMessage
+from langchain.prompts import ChatPromptTemplate
+from webhook_server.app_config import llm_model, parser
+from langchain_core.output_parsers import StrOutputParser
+import tomllib
+from pathlib import Path
+
+# System message em inglês com orientações completas
+persona_message_diagramuc = SystemMessage(
+    content=(
+    """
+    You are a Use Case Diagram Generator.
+    Your task is to read a Markdown table of use cases and generate a **PlantUML** use case diagram.
+
+    Although the table contains the following fields: Code, Name, Actors, Events, Related Requirements, Preconditions, and Classes — consider **only**:
+    - Code
+    - Name
+    - Actors
+
+    **Output Format**:
+    - A single `@startuml` to `@enduml` PlantUML diagram;
+    - One `actor` declaration for each actor;
+    - One `(Code)` declaration for each use case, optionally using `as "Name"` for clarity;
+    - Use `Actor --> (UseCase)` to show relationships;
+    - Do **not** add include/extend relationships unless explicitly instructed;
+    - If you find inconsistencies or missing data, list them below the diagram under a heading called **Perguntas**.
+
+    **Important**: Your entire response must be written in **Portuguese**.
+    """
+    ) #**Important**: The entire response must be in Portuguese.
+)
+
+# Prompt template
+diagramuc_prompt = ChatPromptTemplate.from_messages([
+    persona_message_diagramuc,
+    ("human", 
+    """
+    You are a Use Case Diagram Generator agent.
+
+    Your task is to read a Markdown table that describes the system's use cases and generate a **Use Case Diagram** using the **PlantUML** syntax.
+
+    The Markdown table will contain the following fields for each use case:
+    - **Code**: A unique identifier for the use case (e.g., UC01, UC02);
+    - **Name**: The title of the use case (e.g., Cadastrar Cliente);
+    - **Actors**: One or more relevant actors (primary or secondary) who participate in the use case;
+    - **Events**: A summarized version of the main steps from the normal flow;
+    - **Related Requirements**: List of requirement IDs related to the use case;
+    - **Preconditions**: Conditions that must be met before the use case starts;
+    - **Classes**: Any listed classes (may be blank).
+
+    **Important**: Although all fields are provided in the input, your task must consider **only** the following:
+    - `Code`
+    - `Name`
+    - `Actors`
+
+    **Input**:
+    - Markdown table with the use cases: {format_uc}
+
+    ---
+
+    **Output Instructions**:
+    - Generate a **PlantUML** diagram using the `@startuml` and `@enduml` tags.
+    - Represent each actor using the `actor` keyword.
+    - Represent each use case using its `Code` in parentheses (e.g., `(UC01)`).
+    - Connect each actor to their respective use cases using `ActorName --> (UseCaseCode)`.
+    - Do **not** infer or generate include/extend relationships unless explicitly present in the data.
+    - Maintain a clean and consistent structure as in the example below.
+
+    ---
+
+    **Example Output**:
+    @startuml
+
+    actor Cliente
+    actor Bibliotecário
+
+    (UC01) as "Cadastrar Cliente"
+    (UC02) as "Devolver Livro"
+
+    Cliente --> (UC01)
+    Bibliotecário --> (UC02)
+
+    @enduml
+
+    ---
+    **Final Output Format**:
+    - One single PlantUML code block;
+    - No extra explanations or markdown sections outside the diagram;
+    - If you find inconsistencies or missing information, list them after the diagram under a heading titled **Perguntas**.
+    ---
+
+    **Important**: Your entire response must be written in **Portuguese**.
+
+    """
+    )
+])
+
+# Cadeia de execução do agente
+agent_diagramuc_chain = diagramuc_prompt | llm_model | StrOutputParser()
+
+# Função refinada para o nó
+def diagramuc_node(state):
+    print("🔍 Estado recebido no nó de geração de diagrama de casos de uso:", state)
+    resultado = agent_diagramuc_chain.invoke({"format_uc": state["format_uc"]})
+
+    stringona = ""
+    stringona += resultado + "\n\n"
+    stringona += state["format_uc"] + "\n\n"
+    stringona += state["report_validateuc"]
+    
+    return {**state, "usecases_diagram": resultado}
