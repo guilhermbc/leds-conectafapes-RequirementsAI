@@ -40,8 +40,6 @@ const updateNomeValido = (novoValor: boolean) => {
   nomeValido.value = novoValor
 }
 
-const descricao = ref('')
-
 const criar = async () => {
   if (!nomeValido.value) {
     ui.exibirAlerta({
