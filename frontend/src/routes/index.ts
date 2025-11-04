@@ -6,16 +6,25 @@ export const routes: RouteRecordRaw[] = [
   {
     name: 'login',
     path: '/',
-    // impedindo que o usuario navegue para a pagina de login
-    // se estiver logado
     beforeEnter: () => {
       const auth = useAuthStore()
       if (auth.estaLogado()) {
         return { name: 'projeto-home' }
       }
       return true
-
     },
     component: Login
+  },
+  {
+    name: 'projeto-detalhe',
+    path: '/projeto/:id',
+    component: () => import('@/modules/Projeto/views/Detalhe.vue'),
+    beforeEnter: () => {
+      const auth = useAuthStore()
+      if (!auth.estaLogado()) {
+        return { name: 'login' }
+      }
+      return true
+    }
   }
 ]

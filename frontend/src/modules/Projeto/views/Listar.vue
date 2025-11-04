@@ -62,37 +62,24 @@ onBeforeMount(carregarProjetos)
     </div>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <article
+      <router-link
         v-for="proj in items"
         :key="proj.Id"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col"
+        :to="{ name: 'projeto-detalhe', params: { id: proj.Id }}"
+        class="block group"
       >
-        <header class="mb-3">
-          <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 truncate">{{ proj.nome }}</h2>
-        </header>
+        <article
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
+        >
+          <header class="mb-3">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 truncate">{{ proj.nome }}</h2>
+          </header>
 
-        <p class="text-sm text-gray-600 dark:text-gray-300 grow mb-4">
-          {{ proj.descricao || 'Sem descrição' }}
-        </p>
-
-        <div class="mt-2 flex items-center justify-between gap-2">
-          <button
-            class="flex-1 text-sm bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition"
-            @click="editarProjeto(proj)"
-            aria-label="Editar projeto"
-          >
-            Editar
-          </button>
-
-          <button
-            class="flex-1 text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 transition"
-            @click="excluirProjetoSingle(proj)"
-            aria-label="Excluir projeto"
-          >
-            Excluir
-          </button>
-        </div>
-      </article>
+          <p class="text-sm text-gray-600 dark:text-gray-300 grow mb-4">
+            {{ proj.descricao || 'Sem descrição' }}
+          </p>
+        </article>
+      </router-link>
     </div>
   </div>
 </template>
