@@ -13,10 +13,12 @@ import type {
 } from '../types/projeto.d.ts'
 
 const projetoReqConf = {
-  baseURL: adminApiConfig.baseURL + 'projeto',
+  baseURL: adminApiConfig.baseURL + 'projeto/',
+  url: adminApiConfig.baseURL + 'projeto/'
 }
 
 export const listarProjeto = async () => {
+  console.log(projetoReqConf)
   return await adminApi.get<ProjetoListRes>('/', projetoReqConf)
 }
 

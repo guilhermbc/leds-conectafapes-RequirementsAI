@@ -12,15 +12,7 @@ import type { Projeto, ProjetoCreateReq } from '../types/projeto'
 import { useUiStore } from '@/stores/ui'
 import { AxiosError } from 'axios'
 
-// export const listarProjeto = async () => {
-//   try {
-//     const { data } = await _listarProjeto()
-//     return data.value
-//   } catch (error) {
-//     throw error
-//   }
-// }
-
+/*
 // Mock em memória com alguns projetos de exemplo
 let mockProjects: Projeto[] = [
   {
@@ -64,7 +56,21 @@ export const salvarProjeto = async (proj: Partial<Projeto> & { Id?: string }): P
   mockProjects.unshift(novo)
   return novo
 }
-// ...existing code...
+*/
+
+
+
+
+export const listarProjeto = async () => {
+  try {
+    const { data } = await _listarProjeto()
+    console.log(data.value)
+    return data.value
+  } catch (error) {
+    throw error
+  }
+}
+
 export const criarProjeto = async (projeto: ProjetoCreateReq) => {
   const ui = useUiStore()
 
@@ -124,13 +130,13 @@ export const excluirProjeto = async (id: string) => {
   }
 }
 
-// export const excluirProjetos = async (ids: string[]) => {
-//   try {
-//     for (const id of ids) {
-//       const sucesso = await excluirProjeto(id)
-//     }
-//     return true
-//   } catch (error) {
-//     throw error
-//   }
-// }    
+export const excluirProjetos = async (ids: string[]) => {
+  try {
+    for (const id of ids) {
+      const sucesso = await excluirProjeto(id)
+    }
+    return true
+  } catch (error) {
+    throw error
+  }
+}    

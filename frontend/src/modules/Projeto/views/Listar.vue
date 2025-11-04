@@ -18,7 +18,7 @@ const headers = [
 const items = ref<Projeto[]>([])
 
 const carregarProjetos = async () => {
-  const projetos = await listarProjeto() // <-- nome em plural
+  const projetos = await listarProjeto()
   items.value = projetos
 }
 

@@ -5,6 +5,9 @@ import { useUiStore } from '@/stores/ui'
 import { obterProjeto } from '../controllers/projeto'
 import type { Projeto } from '../types/projeto'
 
+// Importa o componente de listagem de módulos
+import ListarModulo from '../../Modulo/views/Listar.vue'
+
 const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
@@ -45,7 +48,7 @@ onBeforeMount(carregarProjeto)
         </button>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           {{ projeto.nome }}
         </h1>
@@ -55,6 +58,12 @@ onBeforeMount(carregarProjeto)
             {{ projeto.descricao || 'Sem descrição' }}
           </p>
         </div>
+      </div>
+
+      <!-- Listagem dos módulos do projeto -->
+      <div>
+        <h2 class="text-xl font-semibold mb-4">Módulos deste projeto</h2>
+        <ListarModulo :projeto-id="projeto.Id ?? projeto.Id" />
       </div>
     </template>
   </div>
