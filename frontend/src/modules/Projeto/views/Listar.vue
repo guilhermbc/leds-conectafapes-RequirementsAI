@@ -8,24 +8,24 @@ import {
 } from '../controllers/projeto'
 import type { Projeto } from '../types/projeto'
 
-
-
 const ui = useUiStore()
-const headers = [
-    { value: 'nome', title: 'nome' },
-    { value: 'descricao', title: 'descricao' }
 
+const headers = [
+  { value: 'nome', title: 'nome' },
+  { value: 'descricao', title: 'descricao' }
 ]
+
 const items = ref<Projeto[]>([])
 
 const carregarProjetos = async () => {
-  const projeto = await listarProjeto()
-  items.value = projeto
+  const projetos = await listarProjeto() // <-- nome em plural
+  items.value = projetos
 }
 
 const router = useRouter()
+
 const editarProjeto = (cls: Projeto) => {
-  router.push({ name: 'projeto-criar', params: { id: cls.Id }})
+  router.push({ name: 'projeto-criar', params: { id: cls.Id } })
 }
 
 const excluirprojeto = async (cls: Projeto[]) => {
@@ -34,14 +34,65 @@ const excluirprojeto = async (cls: Projeto[]) => {
   await carregarProjetos()
 }
 
+// Novo helper para excluir um único projeto com confirmação
+const excluirProjetoSingle = async (proj: Projeto) => {
+  const ok = confirm(`Deseja realmente excluir o projeto "${proj.nome}"?`)
+  if (!ok) return
+  await excluirProjetos([proj.Id])
+  await carregarProjetos()
+}
+
 onBeforeMount(carregarProjetos)
 </script>
 
 <template>
-  <data-table
-    :headers="headers"
-    :items="items"
-    @editar="editarProjeto"
-    @excluir="excluirprojeto"
-  />
+  <div class="p-4">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-semibold text-gray-800">Projetos</h1>
+      <button
+        class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition"
+        @click="$router.push({ name: 'projeto-criar' })"
+      >
+        Novo Projeto
+      </button>
+    </div>
+
+    <div v-if="items.length === 0" class="text-center text-gray-500 py-12">
+      Nenhum projeto encontrado.
+    </div>
+
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <article
+        v-for="proj in items"
+        :key="proj.Id"
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col"
+      >
+        <header class="mb-3">
+          <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 truncate">{{ proj.nome }}</h2>
+        </header>
+
+        <p class="text-sm text-gray-600 dark:text-gray-300 grow mb-4">
+          {{ proj.descricao || 'Sem descrição' }}
+        </p>
+
+        <div class="mt-2 flex items-center justify-between gap-2">
+          <button
+            class="flex-1 text-sm bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition"
+            @click="editarProjeto(proj)"
+            aria-label="Editar projeto"
+          >
+            Editar
+          </button>
+
+          <button
+            class="flex-1 text-sm bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 transition"
+            @click="excluirProjetoSingle(proj)"
+            aria-label="Excluir projeto"
+          >
+            Excluir
+          </button>
+        </div>
+      </article>
+    </div>
+  </div>
 </template>

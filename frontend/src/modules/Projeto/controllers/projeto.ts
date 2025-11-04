@@ -12,15 +12,59 @@ import type { Projeto, ProjetoCreateReq } from '../types/projeto'
 import { useUiStore } from '@/stores/ui'
 import { AxiosError } from 'axios'
 
-export const listarProjeto = async () => {
-  try {
-    const { data } = await _listarProjeto()
-    return data.value
-  } catch (error) {
-    throw error
-  }
+// export const listarProjeto = async () => {
+//   try {
+//     const { data } = await _listarProjeto()
+//     return data.value
+//   } catch (error) {
+//     throw error
+//   }
+// }
+
+// Mock em memória com alguns projetos de exemplo
+let mockProjects: Projeto[] = [
+  {
+    Id: 'proj_1',
+    nome: 'Portal de Tarefas',
+    descricao: 'Sistema para gerenciar tarefas, projetos e notificações.',
+  },
+  {
+    Id: 'proj_2',
+    nome: 'Agenda Escolar',
+    descricao: 'Gerenciamento de turmas, aulas e avaliações.',
+  },
+]
+
+// Retorna a lista de projetos (simula latência)
+export const listarProjeto = async (): Promise<Projeto[]> => {
+  await new Promise((r) => setTimeout(r, 200)) // 200ms de simulação
+  return mockProjects
 }
 
+// Exclui projetos por ids (atualiza mock em memória)
+export const excluirProjetos = async (ids: string[]): Promise<void> => {
+  mockProjects = mockProjects.filter((p) => !ids.includes(p.Id))
+  await new Promise((r) => setTimeout(r, 100))
+}
+
+// Cria ou atualiza um projeto no mock (útil para testar criação/edição)
+export const salvarProjeto = async (proj: Partial<Projeto> & { Id?: string }): Promise<Projeto> => {
+  if (proj.Id) {
+    const idx = mockProjects.findIndex((p) => p.Id === proj.Id)
+    if (idx >= 0) {
+      mockProjects[idx] = { ...mockProjects[idx], ...proj } as Projeto
+      return mockProjects[idx]
+    }
+  }
+  const novo: Projeto = {
+    Id: `proj_${Date.now()}`,
+    nome: proj.nome ?? 'Novo Projeto',
+    descricao: proj.descricao ?? '',
+  }
+  mockProjects.unshift(novo)
+  return novo
+}
+// ...existing code...
 export const criarProjeto = async (projeto: ProjetoCreateReq) => {
   const ui = useUiStore()
 
@@ -80,13 +124,13 @@ export const excluirProjeto = async (id: string) => {
   }
 }
 
-export const excluirProjetos = async (ids: string[]) => {
-  try {
-    for (const id of ids) {
-      const sucesso = await excluirProjeto(id)
-    }
-    return true
-  } catch (error) {
-    throw error
-  }
-}    
+// export const excluirProjetos = async (ids: string[]) => {
+//   try {
+//     for (const id of ids) {
+//       const sucesso = await excluirProjeto(id)
+//     }
+//     return true
+//   } catch (error) {
+//     throw error
+//   }
+// }    

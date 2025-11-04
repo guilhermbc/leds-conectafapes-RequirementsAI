@@ -22,6 +22,7 @@ const ui = useUiStore()
 
 const id = ref('')
 const nome = ref('')
+const descricao = ref('')
 
 const primeiraMaiuscula: ValidationResultFunction = (novoNome: string) => {
   if (/^[A-Z].*$/.test(novoNome)) {
