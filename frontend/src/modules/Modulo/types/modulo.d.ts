@@ -1,8 +1,8 @@
 export type Modulo = {
+  Id : string
   nome : string
-descricao : string
-Id : string
-
+  descricao : string
+  Projeto: string | number
 }
 
 export type ModuloCreateReq = Pick<Modulo, "nome" | "descricao">
