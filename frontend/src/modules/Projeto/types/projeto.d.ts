@@ -12,7 +12,7 @@ export type ProjetoCreateReq = Pick<Projeto, "nome" | "descricao">
 
 export type ProjetoListRes = {
   "@odata.context": string
-  value: Projeto[]
+  data: Projeto[]
 }
 
 export type ProjetoCreateRes = {
