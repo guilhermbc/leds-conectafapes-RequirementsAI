@@ -5,6 +5,8 @@ Ir para a pasta `backend`
 cd backend
 ```
 
+Criar um .env segundo o template no `.env.example`
+
 Criar as migrações
 ```bash
 python manage.py makemigrations

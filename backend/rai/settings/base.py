@@ -37,6 +37,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
 # Django Apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -184,6 +186,10 @@ URL = config('URL')
 URL_VALIDATION = config('URL_VALIDATION')
 
 HASHIDS_SALT = config('HASHIDS_SALT')
+
+CORS_ALLOWED_ORIGINS = [
+    config("CORS_ORIGIN"),
+]
 
 
 LOGGING = {
