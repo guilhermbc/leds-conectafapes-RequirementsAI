@@ -12,20 +12,38 @@ import type { Projeto, ProjetoCreateReq } from '../types/projeto'
 import { useUiStore } from '@/stores/ui'
 import { AxiosError } from 'axios'
 
-/*
+
 // Mock em memória com alguns projetos de exemplo
 let mockProjects: Projeto[] = [
   {
-    Id: 'proj_1',
+    id: '1',
     nome: 'Portal de Tarefas',
     descricao: 'Sistema para gerenciar tarefas, projetos e notificações.',
+    projeto_modulo: [
+      {
+      "id": "1",
+      "modulo_documento": [],
+      "nome": "Sal",
+      "descricao": "Pitada de sal",
+      "Projeto": {
+          "id" : "1",
+          "modulo_documento": [],
+          "nome" : "Sal",
+          "descricao" : "Pitada de sal",
+          "Projeto": Projeto
+      },
+    ]
   },
   {
-    Id: 'proj_2',
+    id: '2',
     nome: 'Agenda Escolar',
     descricao: 'Gerenciamento de turmas, aulas e avaliações.',
+    projeto_modulos: [
+      
+    ],
   },
 ]
+
 
 // Retorna a lista de projetos (simula latência)
 export const listarProjeto = async (): Promise<Projeto[]> => {
@@ -35,32 +53,32 @@ export const listarProjeto = async (): Promise<Projeto[]> => {
 
 // Exclui projetos por ids (atualiza mock em memória)
 export const excluirProjetos = async (ids: string[]): Promise<void> => {
-  mockProjects = mockProjects.filter((p) => !ids.includes(p.Id))
+  mockProjects = mockProjects.filter((p) => !ids.includes(p.id))
   await new Promise((r) => setTimeout(r, 100))
 }
 
 // Cria ou atualiza um projeto no mock (útil para testar criação/edição)
-export const salvarProjeto = async (proj: Partial<Projeto> & { Id?: string }): Promise<Projeto> => {
-  if (proj.Id) {
-    const idx = mockProjects.findIndex((p) => p.Id === proj.Id)
+export const salvarProjeto = async (proj: Partial<Projeto> & { id?: string }): Promise<Projeto> => {
+  if (proj.id) {
+    const idx = mockProjects.findIndex((p) => p.id === proj.id)
     if (idx >= 0) {
       mockProjects[idx] = { ...mockProjects[idx], ...proj } as Projeto
       return mockProjects[idx]
     }
   }
   const novo: Projeto = {
-    Id: `proj_${Date.now()}`,
+    id: `proj_${Date.now()}`,
     nome: proj.nome ?? 'Novo Projeto',
     descricao: proj.descricao ?? '',
   }
   mockProjects.unshift(novo)
   return novo
 }
-*/
 
 
 
 
+/*
 export const listarProjeto = async () => {
   try {
     const { data } = await _listarProjeto()
@@ -139,4 +157,5 @@ export const excluirProjetos = async (ids: string[]) => {
   } catch (error) {
     throw error
   }
-}    
+}
+*/

@@ -1,8 +1,10 @@
-export type Projeto = {
-  nome : string
-descricao : string
-Id : string
+import { Modulo } from "@/modules/Modulo/types/modulo"
 
+export type Projeto = {
+  id : string
+  projeto_modulo :  Modulo[]
+  nome : string
+  descricao : string
 }
 
 export type ProjetoCreateReq = Pick<Projeto, "nome" | "descricao">

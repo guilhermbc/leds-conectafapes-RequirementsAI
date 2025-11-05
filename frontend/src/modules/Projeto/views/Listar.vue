@@ -25,11 +25,11 @@ const carregarProjetos = async () => {
 const router = useRouter()
 
 const editarProjeto = (cls: Projeto) => {
-  router.push({ name: 'projeto-criar', params: { id: cls.Id } })
+  router.push({ name: 'projeto-criar', params: { id: cls.id } })
 }
 
 const excluirprojeto = async (cls: Projeto[]) => {
-  const ids = cls.map((a) => a.Id)
+  const ids = cls.map((a) => a.id)
   await excluirProjetos(ids)
   await carregarProjetos()
 }
@@ -38,7 +38,7 @@ const excluirprojeto = async (cls: Projeto[]) => {
 const excluirProjetoSingle = async (proj: Projeto) => {
   const ok = confirm(`Deseja realmente excluir o projeto "${proj.nome}"?`)
   if (!ok) return
-  await excluirProjetos([proj.Id])
+  await excluirProjetos([proj.id])
   await carregarProjetos()
 }
 
@@ -64,8 +64,8 @@ onBeforeMount(carregarProjetos)
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <router-link
         v-for="proj in items"
-        :key="proj.Id"
-        :to="{ name: 'projeto-detalhe', params: { id: proj.Id }}"
+        :key="proj.id"
+        :to="{ name: 'projeto-detalhe', params: { id: proj.id }}"
         class="block group"
       >
         <article

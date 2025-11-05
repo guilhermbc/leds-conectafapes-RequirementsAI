@@ -1,8 +1,14 @@
-export type Documento = {
-  versao : string
-arquivo : string
-Id : string
+import { Modulo } from "@/modules/Modulo/types/modulo"
 
+export type Documento = {
+  id : string
+  versao : string
+  arquivo : string
+  origemAudio: string
+  TipoDocumento: string
+  DocumentoAnterior: Documento | int
+  Modulo: Modulo 
+  DocumentoOrigem: Documento | int
 }
 
 export type DocumentoCreateReq = Pick<Documento, "versao" | "arquivo">

@@ -1,8 +1,12 @@
+import { Projeto } from "@/modules/Projeto/types/projeto"
+import { Documento } from "@/modules/Documento/types/documento"
+
 export type Modulo = {
-  Id : string
+  id : string
+  modulo_documento: Documento[]
   nome : string
   descricao : string
-  Projeto: string | number
+  Projeto: Projeto
 }
 
 export type ModuloCreateReq = Pick<Modulo, "nome" | "descricao">
