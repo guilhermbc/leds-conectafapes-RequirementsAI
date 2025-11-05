@@ -7,6 +7,8 @@ SECRET_KEY = config(
     default="django-insecure-&we(0t(&@t(90rx$19tr3dms-3_4ngz6*6d=9=5ghz=ov#%^4^",
 )
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 if config("USE_SQLITE", default=True, cast=bool):
     DATABASES = {
         "default": {
