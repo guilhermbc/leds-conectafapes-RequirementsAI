@@ -70,10 +70,9 @@ const atualizar = async () => {
   }
 
   const sucesso = await atualizarProjeto({
-    Id: id.value,
+    id: id.value,
     nome: nome.value,
-    descricao: descricao.value
-
+    descricao: descricao.value,
   })
   return true
 }
@@ -89,7 +88,7 @@ onBeforeMount(async () => {
   if (modo.value === 'editar') {
     const routeId: string = Array.isArray(route.params.id) ? route.params.id[0] : route.params.id
     const cls = await obterProjeto(routeId)
-    id.value = cls.Id
+    id.value = cls.id
     nome.value = cls.nome
     descricao.value = cls.descricao
 

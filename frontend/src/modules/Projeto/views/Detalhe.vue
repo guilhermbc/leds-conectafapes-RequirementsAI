@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount } from 'vue'
+import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { obterProjeto } from '../controllers/projeto'
@@ -19,9 +19,12 @@ const carregarProjeto = async () => {
   try {
     loading.value = true
     const id = route.params.id as string
+    console.log('Loading project with id:', id)
     const data = await obterProjeto(id)
+    console.log('Project data received:', data)
     projeto.value = data
   } catch (error) {
+    console.error('Error loading project:', error)
     ui.exibirAlerta({ message: 'Erro ao carregar projeto', color: 'error' })
     router.push({ name: 'projeto-home' })
   } finally {
@@ -29,7 +32,18 @@ const carregarProjeto = async () => {
   }
 }
 
-onBeforeMount(carregarProjeto)
+// Add route watcher to handle navigation changes
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    console.log('Route param changed, reloading project:', newId)
+    carregarProjeto()
+  }
+})
+
+onBeforeMount(() => {
+  console.log('Detalhe component mounting, params:', route.params)
+  carregarProjeto()
+})
 </script>
 
 <template>
@@ -63,7 +77,7 @@ onBeforeMount(carregarProjeto)
       <!-- Listagem dos módulos do projeto -->
       <div>
         <h2 class="text-xl font-semibold mb-4">Módulos deste projeto</h2>
-        <ListarModulo :projeto-id="projeto.Id ?? projeto.Id" />
+        <ListarModulo :projeto-id="projeto.id ?? projeto.id" />
       </div>
     </template>
   </div>

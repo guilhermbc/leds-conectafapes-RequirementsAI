@@ -27,12 +27,14 @@ export const criarProjeto = async (projeto: ProjetoCreateReq) => {
 }
 
 export const obterProjeto = async (id: string) => {
-  const { data } = await adminApi.get<ProjetoGetRes>('/' + id, projetoReqConf)
-  return data.data[0]
+  // const { data } = await adminApi.get<ProjetoGetRes>('/' + id, projetoReqConf)
+  // console.log(data)
+  // return data.data[0]
+  return await adminApi.get<ProjetoGetRes>('/' + id, projetoReqConf)
 }
 
 export const atualizarProjeto = async (projeto: Projeto) => {
-  return await adminApi.put<ProjetoUpdateRes>('/' + projeto.Id, projeto, projetoReqConf)
+  return await adminApi.put<ProjetoUpdateRes>('/' + projeto.id, projeto, projetoReqConf)
 }
 
 export const excluirProjeto = async (id: string) => {

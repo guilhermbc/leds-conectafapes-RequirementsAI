@@ -20,13 +20,6 @@ const headers = [
 ]
 const items = ref<Modulo[]>([])
 
-// MOCK PARA TESTE LOCAL
-const mockModulos: Modulo[] = [
-  { Id: '1', nome: 'Módulo A', descricao: 'Descrição do módulo A', Projeto: '1' },
-  { Id: '2', nome: 'Módulo B', descricao: 'Descrição do módulo B', Projeto: '1' },
-  { Id: '3', nome: 'Módulo C', descricao: 'Descrição do módulo C', Projeto: '2' },
-]
-
 const carregarModulos = async () => {
   // const modulos = await listarModulo()
   // Use o mock ao invés do backend:

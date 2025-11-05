@@ -65,8 +65,8 @@ onBeforeMount(carregarProjetos)
       <router-link
         v-for="proj in items"
         :key="proj.id"
-        :to="{ name: 'projeto-detalhe', params: { id: proj.id }}"
-        class="block group"
+        :to="{ name: 'projeto-detalhe', params: { id: proj.id }}" 
+        class="block group h-48"
       >
         <article
           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
@@ -75,7 +75,7 @@ onBeforeMount(carregarProjetos)
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 truncate">{{ proj.nome }}</h2>
           </header>
 
-          <p class="text-sm text-gray-600 dark:text-gray-300 grow mb-4">
+          <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-4 overflow-hidden">
             {{ proj.descricao || 'Sem descrição' }}
           </p>
         </article>
