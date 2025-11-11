@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onBeforeMount } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onBeforeMount, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import {
   listarProjeto,
@@ -8,6 +8,7 @@ import {
 } from '../controllers/projeto'
 import type { Projeto } from '../types/projeto'
 
+const route = useRoute()
 const ui = useUiStore()
 
 const headers = [
@@ -43,14 +44,19 @@ const excluirProjetoSingle = async (proj: Projeto) => {
 }
 
 onBeforeMount(carregarProjetos)
+
+watch(route, (val) => console.log('Rota mudou:', val.fullPath))
+
 </script>
+
+
 
 <template>
   <div class="p-4">
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold text-gray-800">Projetos</h1>
       <button
-        class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition"
+        class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
         @click="$router.push({ name: 'projeto-criar' })"
       >
         Novo Projeto
@@ -68,11 +74,13 @@ onBeforeMount(carregarProjetos)
         :to="{ name: 'projeto-detalhe', params: { id: proj.id }}" 
         class="block group h-48"
       >
+
+        <!-- Card do Projeto -->
         <article
           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
         >
           <header class="mb-3">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 truncate">{{ proj.nome }}</h2>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 break-words">{{ proj.nome }}</h2>
           </header>
 
           <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-4 overflow-hidden">

@@ -21,24 +21,21 @@ const headers = [
 const items = ref<Modulo[]>([])
 
 const carregarModulos = async () => {
-  // const modulos = await listarModulo()
-  // Use o mock ao invés do backend:
-  const modulos = mockModulos
-  // Se projetoId foi passado, filtra os módulos desse projeto
-  if (props.projetoId) {
-    items.value = modulos.filter(m => String(m.Projeto) === String(props.projetoId))
-  } else {
-    items.value = modulos
+  const modulos = await listarModulo()
+  for (const modulo of modulos){
+    if (modulo.Projeto.id == props.projetoId){
+      items.value.push(modulo)
+    }
   }
 }
 
 const router = useRouter()
 const editarModulo = (cls: Modulo) => {
-  router.push({ name: 'modulo-criar', params: { id: cls.Id }})
+  router.push({ name: 'modulo-criar', params: { id: cls.id }})
 }
 
 const excluirmodulo = async (cls: Modulo[]) => {
-  const ids = cls.map((a) => a.Id)
+  const ids = cls.map((a) => a.id)
   await excluirModulos(ids)
   await carregarModulos()
 }
@@ -57,17 +54,17 @@ watch(() => props.projetoId, carregarModulos)
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <router-link
         v-for="modulo in items"
-        :key="modulo.Id"
-        :to="{ name: 'modulo-detalhe', params: { id: modulo.Id }}"
-        class="block group"
+        :key="modulo.id"
+        :to="{ name: 'modulo-home', params: { id: modulo.id }}"
+        class="block group h-48"
       >
         <article
           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
         >
           <header class="mb-3">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 truncate">{{ modulo.nome }}</h2>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 break-words">{{ modulo.nome }}</h2>
           </header>
-          <p class="text-sm text-gray-600 dark:text-gray-300 grow mb-4">
+          <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-4 overflow-hidden">
             {{ modulo.descricao || 'Sem descrição' }}
           </p>
         </article>

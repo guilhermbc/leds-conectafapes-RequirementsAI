@@ -11,12 +11,12 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     name: 'projeto-criar',
-    path: 'criar/:id?',
+    path: ':id?',
     component: Criar,
   },
   {
     name: 'projeto-detalhe',
-    path: 'projeto/:id',
+    path: ':id',
     component: Detalhes,
   }
 ]

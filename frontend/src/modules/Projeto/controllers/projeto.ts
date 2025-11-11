@@ -78,7 +78,6 @@ import { AxiosError } from 'axios'
 export const listarProjeto = async () => {
   try {
     const { data } = await _listarProjeto()
-    console.log(data.data)
     return data.data
   } catch (error) {
     throw error
@@ -119,7 +118,7 @@ export const criarProjeto = async (projeto: ProjetoCreateReq) => {
 
 export const obterProjeto = async (id: string) => {
   try {
-    const data = await _obterProjeto(id)
+    const { data } = await _obterProjeto(id)
     return data
   } catch (error) {
     throw error

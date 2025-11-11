@@ -18,7 +18,6 @@ const projetoReqConf = {
 }
 
 export const listarProjeto = async () => {
-  console.log(projetoReqConf)
   return await adminApi.get<ProjetoListRes>('/', projetoReqConf)
 }
 
@@ -27,9 +26,6 @@ export const criarProjeto = async (projeto: ProjetoCreateReq) => {
 }
 
 export const obterProjeto = async (id: string) => {
-  // const { data } = await adminApi.get<ProjetoGetRes>('/' + id, projetoReqConf)
-  // console.log(data)
-  // return data.data[0]
   return await adminApi.get<ProjetoGetRes>('/' + id, projetoReqConf)
 }
 

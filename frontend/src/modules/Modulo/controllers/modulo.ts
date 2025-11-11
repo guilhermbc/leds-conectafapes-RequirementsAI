@@ -15,7 +15,8 @@ import { AxiosError } from 'axios'
 export const listarModulo = async () => {
   try {
     const { data } = await _listarModulo()
-    return data.value
+    // O return é data.data mesmo
+    return data.data
   } catch (error) {
     throw error
   }

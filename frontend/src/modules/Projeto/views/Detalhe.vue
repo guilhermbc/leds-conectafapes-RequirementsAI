@@ -12,17 +12,26 @@ const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
 
-const projeto = ref<Projeto | null>(null)
+const projeto = ref<Projeto[]>([])
+
 const loading = ref(true)
+
+const voltar = () => {
+  if (window.history.length > 1) {
+    router.back()
+  }
+  else {
+    router.push({ name: 'projeto-home'})
+  }
+}
 
 const carregarProjeto = async () => {
   try {
     loading.value = true
     const id = route.params.id as string
-    console.log('Loading project with id:', id)
     const data = await obterProjeto(id)
-    console.log('Project data received:', data)
-    projeto.value = data
+    // Para obter o 'dado' desejado, use projeto.value.dado
+    projeto.value = data as unknown as Projeto[]
   } catch (error) {
     console.error('Error loading project:', error)
     ui.exibirAlerta({ message: 'Erro ao carregar projeto', color: 'error' })
@@ -40,10 +49,7 @@ watch(() => route.params.id, (newId) => {
   }
 })
 
-onBeforeMount(() => {
-  console.log('Detalhe component mounting, params:', route.params)
-  carregarProjeto()
-})
+onBeforeMount(carregarProjeto)
 </script>
 
 <template>
@@ -52,33 +58,25 @@ onBeforeMount(() => {
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
 
-    <template v-else-if="projeto">
+    <div v-else-if="projeto">
       <div class="mb-6">
-        <button
-          class="text-gray-600 hover:text-gray-900 flex items-center gap-2"
-          @click="$router.back()"
+        <button 
+          class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
+          @click="voltar"
         >
           ← Voltar
         </button>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          {{ projeto.nome }}
-        </h1>
-
-        <div class="prose dark:prose-invert max-w-none">
-          <p class="text-gray-600 dark:text-gray-300">
-            {{ projeto.descricao || 'Sem descrição' }}
-          </p>
-        </div>
+      <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-semibold text-gray-800"> {{ projeto.nome }}</h1>
       </div>
 
       <!-- Listagem dos módulos do projeto -->
       <div>
         <h2 class="text-xl font-semibold mb-4">Módulos deste projeto</h2>
-        <ListarModulo :projeto-id="projeto.id ?? projeto.id" />
+        <ListarModulo :projeto-id="projeto.id" />
       </div>
-    </template>
+    </div>
   </div>
 </template>
