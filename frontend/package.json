@@ -11,9 +11,11 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@kangc/v-md-editor": "^2.3.18",
     "@vueuse/integrations": "^13.1.0",
     "axios": "^1.8.4",
     "pinia": "^3.0.2",
+    "prismjs": "^1.30.0",
     "roboto-fontface": "*",
     "universal-cookie": "^7.2.2",
     "vue": "^3.4.31",
