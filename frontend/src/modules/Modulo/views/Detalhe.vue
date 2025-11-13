@@ -47,7 +47,7 @@ onBeforeMount(carregarModulo)
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="w-11/12 my-auto mt-6 p-4">
     <div v-if="loading" class="flex justify-center py-8">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
@@ -64,7 +64,7 @@ onBeforeMount(carregarModulo)
 
       <!-- Nome -->
       <div class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-semibold text-gray-800"> {{ modulo.nome }}</h1>
+      <h1 class="text-3xl font-semibold text-gray-800"> {{ modulo.nome }}</h1>
       </div>
 
       <!-- Descrição -->

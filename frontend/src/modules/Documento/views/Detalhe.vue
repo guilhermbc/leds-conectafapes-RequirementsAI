@@ -33,21 +33,6 @@ const voltar = () => {
   }
 }
 
-/*
-onMounted(async () => {
-  const id = route.params.id
-  try {
-    // Aqui você faria a requisição ao backend
-    const response = await fetch(`/api/documentos/${id}`)
-    documento.value = await response.json()
-  } catch (error) {
-    console.error('Erro ao carregar documento:', error)
-  } finally {
-    loading.value = false
-  }
-})
-*/
-
 const carregarDocumento = async () => {
   try {
     loading.value = true
@@ -94,82 +79,82 @@ audio {
 </style>
 
 <template>
-  <div class="p-6">
-    <!-- Botão de voltar -->
-    <div class="mb-6">
-      <button
-        class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
-        @click="voltar"
-      >
-        ← Voltar
-      </button>
-    </div>
-
-    <!-- Carregando -->
-    <div v-if="loading" class="flex justify-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-    </div>
-
-    <!-- Conteúdo -->
-    <div v-else-if="documento">
-      <!-- Título -->
-      <h1 class="text-2xl font-semibold text-gray-800 mb-4">
-        {{ capitalizarPrimeiraLetra(documento.TipoDocumento)}} (v{{ documento.versao }})
-      </h1>
-
-      <!-- Origem de Áudio (somente se tipo = MINIMUNDO) -->
-      <!-- <div v-if="documento.TipoDocumento === 'MINIMUNDO'" class="mb-4"> -->
-        <!-- <p class="text-gray-600 font-medium mb-1">Áudio de Origem:</p> -->
-        <!-- <audio v-if="documento.origemAudio" :src="documento.origemAudio" controls class="w-full" /> -->
-        <!-- <p v-else class="text-gray-500 italic">Sem áudio associado.</p> -->
-      <!-- </div> -->
-
-      <!-- Documento Origem -->
-      <div v-if="documento.DocumentoOrigem?.length" class="mb-4">
-        <p class="text-gray-600 font-medium mb-1">Documentos de Origem:</p>
-        <ul class="list-disc ml-6 text-blue-600">
-          <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">
-            <RouterLink :to="`/Documento/${origem.id}`" class="hover:underline">
-              {{ capitalizarPrimeiraLetra(origem.TipoDocumento) }} (v{{ origem.versao }})
-            </RouterLink>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Documento Anterior -->
-      <div v-if="documento.DocumentoAnterior" class="mb-4">
-        <p class="text-gray-600 font-medium mb-1">Versão Anterior:</p>
-        <RouterLink
-          :to="`/Documento/${documento.DocumentoAnterior.id}`"
-          class="text-blue-600 hover:underline"
+    <div class="w-11/12 my-auto mt-6 p-4">
+      <!-- Botão de voltar -->
+      <div class="mb-6">
+        <button
+          class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
+          @click="voltar"
         >
-          {{ documento.DocumentoAnterior.TipoDocumento }} {{ documento.DocumentoAnterior.versao }}
-        </RouterLink>
+          ← Voltar
+        </button>
       </div>
 
-      <!-- Documento Seguinte (obviamente está errado, a ser feito ainda)-->
-      <div v-if="documento.documentoSeguinte" class="mb-4">
-        <p class="text-gray-600 font-medium mb-1">Nova Versão:</p>
-        <RouterLink
-          :to="`/Documento/${documento.documentoSeguinte.id}`"
-          class="text-blue-600 hover:underline"
-        >
-          {{ documento.documentoSeguinte.tipoDocumento }} {{ documento.documentoSeguinte.versao }}
-        </RouterLink>
+      <!-- Carregando -->
+      <div v-if="loading" class="flex justify-center py-8">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
       </div>
 
-      <!-- Editor Markdown -->
-      <div class="w-[900px] mx-auto">
-        <p class="text-gray-600 font-medium mb-2">Conteúdo do Documento:</p>
-        <v-md-editor
-          v-model="documento.arquivo"
-          mode="preview"
-          height="500px"
-        />
+      <!-- Conteúdo -->
+      <div v-else-if="documento">
+        <!-- Título -->
+        <h1 class="text-3xl font-semibold text-gray-800 mb-4">
+          {{ capitalizarPrimeiraLetra(documento.TipoDocumento)}} (v{{ documento.versao }})
+        </h1>
+
+        <!-- Origem de Áudio (somente se tipo = MINIMUNDO) -->
+        <!-- <div v-if="documento.TipoDocumento === 'MINIMUNDO'" class="mb-4"> -->
+          <!-- <p class="text-gray-600 font-medium mb-1">Áudio de Origem:</p> -->
+          <!-- <audio v-if="documento.origemAudio" :src="documento.origemAudio" controls class="w-full" /> -->
+          <!-- <p v-else class="text-gray-500 italic">Sem áudio associado.</p> -->
+        <!-- </div> -->
+
+        <!-- Documento Origem -->
+        <div v-if="documento.DocumentoOrigem?.length" class="mb-4">
+          <p class="text-gray-600 font-medium mb-1">Documentos de Origem:</p>
+          <ul class="list-disc ml-6 text-blue-600">
+            <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">
+              <RouterLink :to="`/Documento/${origem.id}`" class="hover:underline">
+                {{ capitalizarPrimeiraLetra(origem.TipoDocumento) }} (v{{ origem.versao }})
+              </RouterLink>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Documento Anterior -->
+        <div v-if="documento.DocumentoAnterior" class="mb-4">
+          <p class="text-gray-600 font-medium mb-1">Versão Anterior:</p>
+          <RouterLink
+            :to="`/Documento/${documento.DocumentoAnterior.id}`"
+            class="text-blue-600 hover:underline"
+          >
+            {{ documento.DocumentoAnterior.TipoDocumento }} {{ documento.DocumentoAnterior.versao }}
+          </RouterLink>
+        </div>
+
+        <!-- Documento Seguinte (obviamente está errado, a ser feito ainda)-->
+        <div v-if="documento.documentoSeguinte" class="mb-4">
+          <p class="text-gray-600 font-medium mb-1">Nova Versão:</p>
+          <RouterLink
+            :to="`/Documento/${documento.documentoSeguinte.id}`"
+            class="text-blue-600 hover:underline"
+          >
+            {{ documento.documentoSeguinte.tipoDocumento }} {{ documento.documentoSeguinte.versao }}
+          </RouterLink>
+        </div>
+
+        <!-- Editor Markdown -->
+        <div class="w-[900px]">
+          <p class="text-gray-600 font-medium mb-2">Conteúdo do Documento:</p>
+          <v-md-editor
+            v-model="documento.arquivo"
+            mode="preview"
+            height="500px"
+          />
+        </div>
       </div>
+
+      <!-- Erro ou documento não encontrado -->
+      <div v-else class="text-gray-500 italic">Documento não encontrado.</div>
     </div>
-
-    <!-- Erro ou documento não encontrado -->
-    <div v-else class="text-gray-500 italic">Documento não encontrado.</div>
-  </div>
 </template>

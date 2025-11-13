@@ -50,7 +50,7 @@ onBeforeMount(carregarProjetos)
 
 
 <template>
-  <div class="p-4">
+  <div class="w-11/12 my-auto mt-20 p-4">
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold text-gray-800">Projetos</h1>
       <button
