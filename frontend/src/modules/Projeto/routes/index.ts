@@ -11,7 +11,7 @@ export const routes: RouteRecordRaw[] = [
   },
   {
     name: 'projeto-criar',
-    path: ':id?',
+    path: 'criar/:id?',
     component: Criar,
   },
   {

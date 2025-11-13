@@ -56,7 +56,7 @@ export const criarModulo = async (modulo: ModuloCreateReq) => {
 
 export const obterModulo = async (id: string) => {
   try {
-    const data = await _obterModulo(id)
+    const { data } = await _obterModulo(id)
     return data
   } catch (error) {
     throw error

@@ -25,12 +25,11 @@ export const criarDocumento = async (documento: DocumentoCreateReq) => {
 }
 
 export const obterDocumento = async (id: string) => {
-  const { data } = await adminApi.get<DocumentoGetRes>('/' + id, documentoReqConf)
-  return data.value[0]
+  return await adminApi.get<DocumentoGetRes>('/' + id, documentoReqConf)
 }
 
 export const atualizarDocumento = async (documento: Documento) => {
-  return await adminApi.put<DocumentoUpdateRes>('/' + documento.Id, documento, documentoReqConf)
+  return await adminApi.put<DocumentoUpdateRes>('/' + documento.id, documento, documentoReqConf)
 }
 
 export const excluirDocumento = async (id: string) => {

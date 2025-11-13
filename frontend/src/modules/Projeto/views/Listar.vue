@@ -45,8 +45,6 @@ const excluirProjetoSingle = async (proj: Projeto) => {
 
 onBeforeMount(carregarProjetos)
 
-watch(route, (val) => console.log('Rota mudou:', val.fullPath))
-
 </script>
 
 

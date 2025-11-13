@@ -15,7 +15,7 @@ import { AxiosError } from 'axios'
 export const listarDocumento = async () => {
   try {
     const { data } = await _listarDocumento()
-    return data.value
+    return data.data
   } catch (error) {
     throw error
   }
@@ -55,7 +55,7 @@ export const criarDocumento = async (documento: DocumentoCreateReq) => {
 
 export const obterDocumento = async (id: string) => {
   try {
-    const data = await _obterDocumento(id)
+    const { data } = await _obterDocumento(id)
     return data
   } catch (error) {
     throw error

@@ -25,8 +25,7 @@ export const criarModulo = async (modulo: ModuloCreateReq) => {
 }
 
 export const obterModulo = async (id: string) => {
-  const { data } = await adminApi.get<ModuloGetRes>('/' + id, moduloReqConf)
-  return data.value[0]
+  return await adminApi.get<ModuloGetRes>('/' + id, moduloReqConf)
 }
 
 export const atualizarModulo = async (modulo: Modulo) => {

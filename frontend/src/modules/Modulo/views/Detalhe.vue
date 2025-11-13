@@ -2,17 +2,18 @@
 import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
-import { obterProjeto } from '../controllers/projeto'
-import type { Projeto } from '../types/projeto'
+import { obterModulo } from '../controllers/modulo'
+import type { Modulo } from '../types/modulo'
 
 // Importa o componente de listagem de módulos
-import ListarModulo from '../../Modulo/views/Listar.vue'
+import ListarDocumento from '../../Documento/views/Listar.vue'
+
 
 const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
 
-const projeto = ref<Projeto[]>([])
+const modulo = ref<Modulo[]>([])
 
 const loading = ref(true)
 
@@ -25,31 +26,24 @@ const voltar = () => {
   }
 }
 
-const carregarProjeto = async () => {
+const carregarModulo = async () => {
   try {
     loading.value = true
     const id = route.params.id as string
-    const data = await obterProjeto(id)
-    // Para obter o 'dado' desejado, use projeto.value.dado
-    projeto.value = data
+    const data = await obterModulo(id)
+    // Para obter o 'dado' desejado, use modulo.value.dado
+    modulo.value = data
   } catch (error) {
-    console.error('Error loading project:', error)
-    ui.exibirAlerta({ message: 'Erro ao carregar projeto', color: 'error' })
+    console.error('Error loading modulo:', error)
+    ui.exibirAlerta({ message: 'Erro ao carregar módulo', color: 'error' })
     router.push({ name: 'projeto-home' })
   } finally {
     loading.value = false
   }
 }
 
-// Add route watcher to handle navigation changes
-watch(() => route.params.id, (newId) => {
-  if (newId) {
-    console.log('Route param changed, reloading project:', newId)
-    carregarProjeto()
-  }
-})
+onBeforeMount(carregarModulo)
 
-onBeforeMount(carregarProjeto)
 </script>
 
 <template>
@@ -58,7 +52,7 @@ onBeforeMount(carregarProjeto)
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
 
-    <div v-else-if="projeto">
+    <div v-else-if="modulo">
       <div class="mb-6">
         <button 
           class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
@@ -68,18 +62,19 @@ onBeforeMount(carregarProjeto)
         </button>
       </div>
 
+      <!-- Nome -->
       <div class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-semibold text-gray-800"> {{ projeto.nome }}</h1>
+      <h1 class="text-2xl font-semibold text-gray-800"> {{ modulo.nome }}</h1>
       </div>
 
       <!-- Descrição -->
       <div class="flex items-center justify-between mb-4">
-      <p class="text-gray-500 dark:text-gray-500 leading-relaxed"> {{ projeto.descricao }}</p>
+      <p class="text-gray-500 dark:text-gray-500 leading-relaxed"> {{ modulo.descricao }}</p>
       </div>
-      
-      <!-- Listagem dos módulos do projeto -->
+
+      <!-- Listagem dos documentos do módulo -->
       <div>
-        <ListarModulo :projeto-id="projeto.id" />
+        <ListarDocumento :modulo-id="modulo.id" />
       </div>
     </div>
   </div>
