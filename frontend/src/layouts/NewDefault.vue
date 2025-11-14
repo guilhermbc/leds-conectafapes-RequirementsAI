@@ -9,8 +9,11 @@ const sair = async () => {
 
 <template>
   <div class="flex flex-row w-screen h-screen">
-    <nav class="flex flex-col justify-between w-sm border-r-2 border-zinc-500 bg-blue-800">
-      <NavMenu />
+    <nav class="fixed top-0 left-0 w-full h-14 bg-blue-800 border-b-2 border-blue-1000 flex items-center justify-between px-4 z-50 text-white">
+      <!-- Nome do projeto -->
+      <span class="text-lg font-semibold">
+        RequirementsAI
+      </span>
       <p-button class="bg-blue-950" @click="sair">SAIR</p-button>
     </nav>
     <main class="flex justify-center items-center w-full">

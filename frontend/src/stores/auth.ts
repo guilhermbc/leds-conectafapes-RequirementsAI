@@ -20,7 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
         path: '/',
         // 10 minutos, para que seja possivel ver a expiracao de sessao
         // em funcionamento
-        maxAge:  600
+        maxAge:  1800
       })
   }
 

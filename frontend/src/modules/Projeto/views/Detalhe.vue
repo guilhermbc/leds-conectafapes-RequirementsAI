@@ -53,7 +53,7 @@ onBeforeMount(carregarProjeto)
 </script>
 
 <template>
-  <div class="w-11/12 my-auto mt-6 p-4">
+  <div class="w-11/12 my-auto mt-20 p-4">
     <div v-if="loading" class="flex justify-center py-8">
       <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
     </div>
