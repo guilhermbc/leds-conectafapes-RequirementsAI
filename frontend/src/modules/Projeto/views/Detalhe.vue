@@ -68,6 +68,14 @@ onBeforeMount(carregarProjeto)
         </button>
       </div>
 
+      <!-- <modal v-if="showEditar" @close="showEditar = false">
+        <CriarProjeto
+          :projeto="projetoSelecionado"
+          @salvo="carregarProjetos"
+          @close="showEditar = false"
+        />
+      </modal> -->
+
       <div class="flex items-center justify-between mb-4">
       <h1 class="text-3xl font-semibold text-gray-800"> {{ projeto.nome }}</h1>
       </div>

@@ -11,6 +11,7 @@ declare module 'vue' {
     DataTable: typeof import('./src/components/DataTable.vue')['default']
     GenericTextInput: typeof import('./src/components/GenericTextInput.vue')['default']
     IconNav: typeof import('./src/components/icons/IconNav.vue')['default']
+    Modal: typeof import('./src/components/Modal.vue')['default']
     NavGroup: typeof import('./src/components/sidenav/NavGroup.vue')['default']
     NavItem: typeof import('./src/components/sidenav/NavItem.vue')['default']
     NavMenu: typeof import('./src/components/sidenav/NavMenu.vue')['default']

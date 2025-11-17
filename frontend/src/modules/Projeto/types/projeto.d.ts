@@ -7,7 +7,7 @@ export type Projeto = {
   descricao : string
 }
 
-export type ProjetoCreateReq = Pick<Projeto, "nome" | "descricao">
+export type ProjetoCreateReq = Pick<Projeto, "nome" | "descricao" | "projeto_modulo">
 
 
 export type ProjetoListRes = {
