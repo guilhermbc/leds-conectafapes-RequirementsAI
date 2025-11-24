@@ -43,33 +43,43 @@ const entrar = async () => {
 </script>
 
 <template>
-  <card class="w-md">
-    <text-input
-      class="w-full"
-      placeholder="exemplo123"
-      v-model="usuario"
-      :rules="regrasUsuario"
-      @validationUpdate="updateUsuarioValido"
-      @keyup-enter="entrar"
-    >
-      Nome de Usuário
-    </text-input>
-
-    <text-input
-      class="w-full"
-      v-model="senha"
-      :rules="regrasSenha"
-      @validationUpdate="updateSenhaValida"
-      @keyup-enter="entrar"
-      type="password"
-    >
-      Senha
-    </text-input>
-
-    <div class="flex justify-end">
-      <p-button @click="entrar">
-        Entrar
-      </p-button>
+  <div class="flex flex-col items-center justify-center">
+    <!-- Título -->
+    <div class="text-[80px] text-white font-semibold my-auto bg-blue-800 rounded-lg p-4 mb-12">
+      <h1>RequirementsAI</h1>
     </div>
-  </card>
+
+    <!-- Card de Login -->
+    <div>
+      <card class="w-md">
+        <text-input
+          class="w-full"
+          placeholder="exemplo123"
+          v-model="usuario"
+          :rules="regrasUsuario"
+          @validationUpdate="updateUsuarioValido"
+          @keyup-enter="entrar"
+        >
+          Nome de Usuário
+        </text-input>
+
+        <text-input
+          class="w-full"
+          v-model="senha"
+          :rules="regrasSenha"
+          @validationUpdate="updateSenhaValida"
+          @keyup-enter="entrar"
+          type="password"
+        >
+          Senha
+        </text-input>
+
+        <div class="flex justify-end">
+          <p-button @click="entrar">
+            Entrar
+          </p-button>
+        </div>
+      </card>
+    </div>
+  </div>
 </template>
