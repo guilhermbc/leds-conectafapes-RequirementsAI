@@ -45,7 +45,7 @@ const entrar = async () => {
 <template>
   <div class="flex flex-col items-center justify-center">
     <!-- Título -->
-    <div class="text-[80px] text-white font-semibold my-auto bg-blue-800 rounded-lg p-4 mb-12">
+    <div class="text-[80px] text-blue-800 font-bold text-shadow-md my-auto mb-10">
       <h1>RequirementsAI</h1>
     </div>
 
