@@ -152,6 +152,9 @@ class DocumentoViewSet(ModelViewSet):
 
         if is_empty_or_null(request.data['arquivo']):
             result = send_to_llm(request.data)
+            generated_by_ia = True
+        else:
+            generated_by_ia = False
 
         result_string = ''
         if not isinstance(result, str):
@@ -161,6 +164,7 @@ class DocumentoViewSet(ModelViewSet):
             result_string = result
 
         request.data['arquivo'] = result_string
+        request.data['geradoIA'] = generated_by_ia
 
         return super().create(request, *args, **kwargs)
 
