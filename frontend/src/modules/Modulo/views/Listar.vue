@@ -6,27 +6,30 @@ import {
   listarModulo,
   excluirModulos,
 } from '../controllers/modulo'
+import Criar from './Criar.vue'
 import type { Modulo } from '../types/modulo'
+import { obterProjeto } from '@/modules/Projeto/controllers/projeto'
 
 // Permite receber o id do projeto como prop (opcional)
 const props = defineProps<{
-  projetoId?: string | number
+  projetoId: string | number
 }>()
 
-const ui = useUiStore()
-const headers = [
-    { value: 'nome', title: 'nome' },
-    { value: 'descricao', title: 'descricao' }
-]
-const items = ref<Modulo[]>([])
+const modulos = ref<Modulo[]>([])
 
 const carregarModulos = async () => {
-  const modulos = await listarModulo()
-  for (const modulo of modulos){
-    if (modulo.Projeto.id == props.projetoId){
-      items.value.push(modulo)
-    }
-  }
+  const projeto = await obterProjeto(props.projetoId as string)
+  modulos.value = projeto.projeto_modulo
+
+  // const modulos = await listarModulo()
+  // for (const modulo of modulos){
+  //   console.log("modulo.Projeto.id:", modulo.Projeto.id)
+  //   console.log("props.projetoId:", modulo.Projeto.id)
+
+  //   if (modulo.Projeto.id == props.projetoId){
+  //     items.value.push(modulo)
+  //   }
+  // }
 }
 
 const router = useRouter()
@@ -38,6 +41,12 @@ const excluirmodulo = async (cls: Modulo[]) => {
   const ids = cls.map((a) => a.id)
   await excluirModulos(ids)
   await carregarModulos()
+}
+
+const mostrarModal = ref(false)
+
+function abrirModal(){
+  mostrarModal.value = true
 }
 
 // Recarrega ao montar e se o projetoId mudar
@@ -52,18 +61,22 @@ watch(() => props.projetoId, carregarModulos)
       <h1 class="text-2xl font-semibold text-gray-800">Módulos</h1>
       <button
         class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
-        @click="$router.push({ name: 'modulo-criar' })"
+        @click="abrirModal()"
       >
         Novo Módulo
       </button>
+
+      <!-- Modal -->
+      <Criar v-model="mostrarModal" @salvo="carregarModulos" :projetoId="projetoId"/>
+
     </div>
 
-    <div v-if="items.length === 0" class="text-center text-gray-500 py-12">
+    <div v-if="modulos.length === 0" class="text-center text-gray-500 py-12">
       Nenhum módulo encontrado.
     </div>
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <router-link
-        v-for="modulo in items"
+        v-for="modulo in modulos"
         :key="modulo.id"
         :to="{ name: 'modulo-detalhe', params: { id: modulo.id }}"
         class="block group h-48"

@@ -6,27 +6,18 @@ import {
   listarDocumento,
   excluirDocumentos,
 } from '../controllers/documento'
+import { obterModulo } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 
 const props = defineProps<{
   moduloId?: string | number
 }>()
 
-const ui = useUiStore()
-const headers = [
-    { value: 'versao', title: 'versao' },
-    { value: 'arquivo', title: 'arquivo' }
-
-]
-const items = ref<Documento[]>([])
+const documentos = ref<Documento[]>([])
 
 const carregarDocumentos = async () => {
-  const documentos = await listarDocumento()
-  for (const documento of documentos){
-    if (documento.Modulo.id == props.moduloId) {
-      items.value.push(documento)
-    }
-  }
+  const modulo = await obterModulo(props.moduloId as string)
+  documentos.value = modulo.modulo_documento
 }
 
 const router = useRouter()
@@ -65,12 +56,12 @@ function capitalizarPrimeiraLetra(palavra: string): string {
       </button>
     </div>
 
-    <div v-if="items.length === 0" class="text-center text-gray-500 py-12">
+    <div v-if="documentos.length === 0" class="text-center text-gray-500 py-12">
       Nenhum documento encontrado.
     </div>
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       <router-link
-        v-for="documento in items"
+        v-for="documento in documentos"
         :key="documento.id"
         :to="{ name: 'documento-detalhe', params: { id: documento.id }}"
         class="block group h-48"

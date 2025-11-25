@@ -21,6 +21,7 @@ export const listarModulo = async () => {
 }
 
 export const criarModulo = async (modulo: ModuloCreateReq) => {
+  console.log("modulo no api:", modulo)
   return await adminApi.post<ModuloCreateRes>('/', modulo, moduloReqConf)
 }
 

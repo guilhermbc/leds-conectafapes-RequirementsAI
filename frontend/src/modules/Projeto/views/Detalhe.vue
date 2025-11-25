@@ -87,7 +87,7 @@ onBeforeMount(carregarProjeto)
       
       <!-- Listagem dos módulos do projeto -->
       <div>
-        <ListarModulo :projeto-id="projeto.id" />
+        <ListarModulo :projetoId="projeto.id" />
       </div>
     </div>
   </div>

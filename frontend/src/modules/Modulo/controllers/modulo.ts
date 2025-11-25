@@ -27,6 +27,7 @@ export const criarModulo = async (modulo: ModuloCreateReq) => {
 
   try {
     const { data } = await _criarModulo(modulo)
+    console.log("data:", data)
 
     ui.exibirAlerta({
       text: data.message,

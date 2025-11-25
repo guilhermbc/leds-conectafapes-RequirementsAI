@@ -1,21 +1,12 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useUiStore } from '@/stores/ui'
+import { ref, onBeforeMount} from 'vue'
+import { useRouter } from 'vue-router'
 import {
   listarProjeto,
   excluirProjetos,
 } from '../controllers/projeto'
 import Criar from './Criar.vue'
 import type { Projeto } from '../types/projeto'
-
-const route = useRoute()
-const ui = useUiStore()
-
-const headers = [
-  { value: 'nome', title: 'nome' },
-  { value: 'descricao', title: 'descricao' }
-]
 
 const items = ref<Projeto[]>([])
 
@@ -48,15 +39,6 @@ const mostrarModal = ref(false)
 
 function abrirModal(){
   mostrarModal.value = true
-}
-
-function fecharModal(){
-  mostrarModal.value = false
-}
-
-function onProjetoCriado(){
-  fecharModal()
-  carregarProjetos()
 }
 
 onBeforeMount(carregarProjetos)

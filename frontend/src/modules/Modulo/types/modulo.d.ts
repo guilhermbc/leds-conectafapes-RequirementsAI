@@ -6,10 +6,10 @@ export type Modulo = {
   modulo_documento: Documento[]
   nome : string
   descricao : string
-  Projeto: Projeto
+  projeto: Projeto | string
 }
 
-export type ModuloCreateReq = Pick<Modulo, "nome" | "descricao">
+export type ModuloCreateReq = Pick<Modulo, "nome" | "descricao" | "Projeto">
 
 
 export type ModuloListRes = {
