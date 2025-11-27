@@ -201,6 +201,14 @@ def run_graphIP_with_trace(input_data: dict):
         final_state = step
     return final_state
 
+# Rota: Health Check
+@app.get("/health")
+def health_check():
+    return JSONResponse(
+            status_code=200,
+            content={"status": "ok"}
+        )
+
 # Rota: Minimundo
 @app.post("/webhook/miniworld")
 async def call_agent_miniworld(request: Request):
