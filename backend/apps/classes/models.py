@@ -35,6 +35,9 @@ class Documento(PolymorphicModel, models.Model):
     ''''''
     # versao do documento
     versao = models.CharField(max_length=300, null=True, blank=True)
+    
+    # gerado por IA
+    geradoIA = models.BooleanField(null=True, blank=True)
 
     # string do documento
     arquivo = models.TextField(null=True, blank=True)
