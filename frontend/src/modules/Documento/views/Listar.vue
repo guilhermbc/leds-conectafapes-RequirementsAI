@@ -3,7 +3,6 @@ import { ref, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import {
-  listarDocumento,
   excluirDocumentos,
 } from '../controllers/documento'
 import { obterModulo } from '@/modules/Modulo/controllers/modulo'

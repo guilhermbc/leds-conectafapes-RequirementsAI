@@ -57,37 +57,47 @@ watch(
 
 const modo = computed(() => (props.projeto ? "editar" : "criar"))
 
+const carregando = ref(false)
+
 // Métodos ------------------------------------------------------
 
 const salvar = async () => {
-  if (!nomeValido.value) {
-    ui.exibirAlerta({
-      color: "error",
-      text: "Por favor corrija os campos inválidos."
-    })
-    return
-  }
+  if (carregando.value) return
 
-  let sucesso = false
+  carregando.value = true
 
-  if (modo.value === "criar") {
-    sucesso = await criarProjeto({
-      nome: nome.value,
-      descricao: descricao.value,
-      projeto_modulo: projeto_modulo.value
-    })
-  } else {
-    sucesso = await atualizarProjeto({
-      id: id.value,
-      nome: nome.value,
-      descricao: descricao.value,
-      projeto_modulo: projeto_modulo.value
-    })
-  }
+  try{
+    if (!nomeValido.value) {
+      ui.exibirAlerta({
+        color: "error",
+        text: "Por favor corrija os campos inválidos."
+      })
+      return
+    }
 
-  if (sucesso) {
-    emit("salvo")
-    close()
+    let sucesso = false
+
+    if (modo.value === "criar") {
+      sucesso = await criarProjeto({
+        nome: nome.value,
+        descricao: descricao.value,
+        projeto_modulo: projeto_modulo.value
+      })
+    } else {
+      sucesso = await atualizarProjeto({
+        id: id.value,
+        nome: nome.value,
+        descricao: descricao.value,
+        projeto_modulo: projeto_modulo.value
+      })
+    }
+
+    if (sucesso) {
+      emit("salvo")
+      close()
+    }
+  } finally {
+    carregando.value = false
   }
 }
 </script>
@@ -115,7 +125,7 @@ const salvar = async () => {
     <div class="flex justify-end gap-3">
       <p-button class= "bg-red-700 "color="secondary" @click="close">Cancelar</p-button>
 
-      <p-button @click="salvar">
+      <p-button :disabled="carregando" @click="salvar">
         {{ modo === "criar" ? "Registrar" : "Atualizar" }}
       </p-button>
     </div>
