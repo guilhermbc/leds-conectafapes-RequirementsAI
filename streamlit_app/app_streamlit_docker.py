@@ -7,20 +7,23 @@ import tomllib
 
 st.title("📼 Enviar Vídeo para Análise de Requisitos com IA")
 
-UPLOAD_DIR = "shared/uploads" #ajuste do que eu eERRRRREI...... (tinha tirado os dois pontos de voltar para a pasta anterior)
+UPLOAD_DIR = "shared/uploads"
+
 load_dotenv()
 webhook = os.getenv('WEBHOOK')
 URL = f"http://{webhook}:8001/webhook"
 
-opt = st.selectbox(" Escolha o que deseja criar: ", ["Escolha uma das opções", 
-                                                     "Minimundo", 
-                                                     "Tabela de Requisitos", 
-                                                     "Casos de Uso", 
-                                                     "Diagrama de Classe",
-                                                     "Casos de Uso e Diagrama de Classe (com validação mútua)",
-                                                     "Protótipo de Interface e Descrição de Uso",
-                                                     "Tudo!",
-                                                     ])
+opt = st.selectbox(" Escolha o que deseja criar: ", [
+    "Escolha uma das opções", 
+    "Minimundo", 
+    "Tabela de Requisitos", 
+    "Casos de Uso", 
+    "Diagrama de Classe",
+    "Casos de Uso e Diagrama de Classe (com validação mútua)",
+    "Protótipo de Interface e Descrição de Uso",
+    "Tudo!",
+])
+
 opt = opt.lower().replace(" ", "")
 
 match opt:
