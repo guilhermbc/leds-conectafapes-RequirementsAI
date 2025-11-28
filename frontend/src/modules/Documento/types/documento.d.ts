@@ -3,15 +3,25 @@ import { Modulo } from "@/modules/Modulo/types/modulo"
 export type Documento = {
   id : string
   versao : string
+  geradoIA : boolean
   arquivo : string
   origemAudio: string
   TipoDocumento: string
   DocumentoAnterior: Documento | int
-  Modulo: Modulo 
+  Modulo: Modulo | string
   DocumentoOrigem: Documento | int
 }
 
-export type DocumentoCreateReq = Pick<Documento, "versao" | "arquivo">
+export type DocumentoCreateReq = Pick<Documento, 
+                                      "versao"
+                                      | "arquivo"
+                                      | "geradoIA"
+                                      | "origemAudio"
+                                      | "TipoDocumento"
+                                      | "DocumentoAnterior"
+                                      | "Modulo"
+                                      | "DocumentoOrigem"
+                                      >
 
 
 export type DocumentoListRes = {

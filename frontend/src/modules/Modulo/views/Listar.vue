@@ -1,38 +1,26 @@
 <script setup lang="ts">
 import { ref, onBeforeMount, watch, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUiStore } from '@/stores/ui'
 import {
-  listarModulo,
   excluirModulos,
 } from '../controllers/modulo'
 import Criar from './Criar.vue'
 import type { Modulo } from '../types/modulo'
 import { obterProjeto } from '@/modules/Projeto/controllers/projeto'
 
-// Permite receber o id do projeto como prop (opcional)
 const props = defineProps<{
   projetoId: string | number
 }>()
+
+const router = useRouter()
 
 const modulos = ref<Modulo[]>([])
 
 const carregarModulos = async () => {
   const projeto = await obterProjeto(props.projetoId as string)
   modulos.value = projeto.projeto_modulo
-
-  // const modulos = await listarModulo()
-  // for (const modulo of modulos){
-  //   console.log("modulo.Projeto.id:", modulo.Projeto.id)
-  //   console.log("props.projetoId:", modulo.Projeto.id)
-
-  //   if (modulo.Projeto.id == props.projetoId){
-  //     items.value.push(modulo)
-  //   }
-  // }
 }
 
-const router = useRouter()
 const editarModulo = (cls: Modulo) => {
   router.push({ name: 'modulo-criar', params: { id: cls.id }})
 }
@@ -49,7 +37,6 @@ function abrirModal(){
   mostrarModal.value = true
 }
 
-// Recarrega ao montar e se o projetoId mudar
 onBeforeMount(carregarModulos)
 watch(() => props.projetoId, carregarModulos)
 

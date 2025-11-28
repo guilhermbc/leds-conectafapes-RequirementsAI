@@ -26,6 +26,7 @@ export const criarDocumento = async (documento: DocumentoCreateReq) => {
 
   try {
     const { data } = await _criarDocumento(documento)
+    console.log(data)
 
     ui.exibirAlerta({
       text: data.message,

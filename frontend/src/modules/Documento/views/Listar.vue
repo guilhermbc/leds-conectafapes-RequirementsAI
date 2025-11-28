@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref, onBeforeMount } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUiStore } from '@/stores/ui'
 import {
   excluirDocumentos,
 } from '../controllers/documento'
+import Criar from './Criar.vue'
 import { obterModulo } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 
 const props = defineProps<{
   moduloId?: string | number
 }>()
+
+const router = useRouter()
 
 const documentos = ref<Documento[]>([])
 
@@ -19,7 +21,6 @@ const carregarDocumentos = async () => {
   documentos.value = modulo.modulo_documento
 }
 
-const router = useRouter()
 const editarDocumento = (cls: Documento) => {
   router.push({ name: 'documento-criar', params: { id: cls.id }})
 }
@@ -30,7 +31,13 @@ const excluirdocumento = async (cls: Documento[]) => {
   await carregarDocumentos()
 }
 
+const mostrarModal = ref(false)
+
 onBeforeMount(carregarDocumentos)
+
+function abrirModal(){
+  mostrarModal.value = true
+}
 
 function capitalizarPrimeiraLetra(palavra: string): string {
   if (!palavra) {
@@ -49,10 +56,13 @@ function capitalizarPrimeiraLetra(palavra: string): string {
       <h1 class="text-2xl font-semibold text-gray-800">Documentos</h1>
       <button
         class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
-        @click="$router.push({ name: 'documento-criar' })"
+        @click="abrirModal()"
       >
         Novo Documento
       </button>
+
+      <!-- Modal -->
+      <Criar v-model="mostrarModal" @salvo="carregarDocumentos" :moduloId="moduloId"/>
     </div>
 
     <div v-if="documentos.length === 0" class="text-center text-gray-500 py-12">

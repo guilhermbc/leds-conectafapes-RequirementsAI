@@ -68,7 +68,7 @@ watch(isValid, (newValue) => {
 
 <template>
   <div class="w-[280px]">
-    <div class="h-[19px] mb-[16px]">
+    <div class="m-1">
       <label class="">
         <slot />
       </label>
