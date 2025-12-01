@@ -19,9 +19,9 @@ class ModuloAdmin(admin.ModelAdmin):
 
 @admin.register(Documento)
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ['id', 'versao', 'arquivo']
-    list_display_links = ['id', 'versao', 'arquivo']
-    search_fields = ['id', 'versao', 'arquivo']
+    list_display = ['id', 'vMajor', 'vMinor', 'arquivo']
+    list_display_links = ['id', 'vMajor', 'vMinor', 'arquivo']
+    search_fields = ['id', 'vMajor', 'vMinor', 'arquivo']
     list_per_page = 25
     ordering = ['-id']
 
