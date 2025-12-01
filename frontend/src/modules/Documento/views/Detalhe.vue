@@ -4,14 +4,13 @@ import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
 import '@kangc/v-md-editor/lib/style/base-editor.css'
 import '@kangc/v-md-editor/lib/theme/style/github.css'
 import Prism from 'prismjs'
-import { ref, onBeforeMount, onMounted, watch } from 'vue'
+import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { listarDocumento, obterDocumento } from '../controllers/documento'
 import type { Documento } from '../types/documento'
-
-// Importa o componente de listagem de módulos
-import ListarDocumento from '../../Documento/views/Listar.vue'
+import NovaVersao from './NovaVersao.vue'
+import Editar from './Editar.vue'
 
 // Configura o editor Markdown
 VMdEditor.use(githubTheme, { Prism })
@@ -20,6 +19,7 @@ const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
 
+const documentoId = ref(route.params.id as string)
 const documento = ref<Documento[]>([])
 const documentosSeguintes = ref<Documento[]>([])
 
@@ -37,8 +37,8 @@ const voltar = () => {
 const carregarDocumento = async () => {
   try {
     loading.value = true
-    const id = route.params.id as string
-    const data = await obterDocumento(id)
+    documentoId.value = route.params.id as string
+    const data = await obterDocumento(documentoId.value)
     // Para obter o 'dado' desejado, use documento.value.dado
     documento.value = data
   } catch (error) {
@@ -52,12 +52,12 @@ const carregarDocumento = async () => {
 
 const carregarDocumentosSeguintes = async () => {
   try {
-    const id = route.params.id as string
+    documentoId.value = route.params.id as string
     const documentosData = await listarDocumento()
     documentosSeguintes.value = []
     // Lista de documentos seguintes
     for (const doc of documentosData){
-      if (String(doc.DocumentoAnterior?.id) === id && String(doc.id) !== id) {
+      if (String(doc.DocumentoAnterior?.id) === documentoId.value && String(doc.id) !== documentoId.value) {
         documentosSeguintes.value.push(doc)
       }
     }
@@ -96,6 +96,19 @@ function capitalizarPrimeiraLetra(palavra: string): string {
   return primeiraLetra + restanteDaString;
 }
 
+const mostrarModalEditar = ref(false)
+
+function abrirModalEditar(){
+  mostrarModalEditar.value = true
+}
+
+// Mostrar modal nova versão
+const mostrarModalNV = ref(false)
+
+function abrirModalNV(){
+  mostrarModalNV.value = true
+}
+
 </script>
 
 <style scoped>
@@ -117,13 +130,29 @@ audio {
           ← Voltar
         </button>
 
-        <!-- Botão de criar nova versão do documento -->
-        <button :disabled="true"
-            class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
-            @click="$router.push({ name: 'documento-criar' })"
+        <div>
+          <button
+            class="px-4 py-2 mr-2 border border-gray-700 bg-white text-gray-700 rounded-md hover:bg-gray-700 hover:text-white transition cursor-pointer"
+            @click="abrirModalEditar"
           >
-            Nova Versão
-        </button>
+            Editar
+          </button>
+
+          <!-- Modal -->
+          <Editar v-model="mostrarModalEditar" @salvo="carregarDocumento" :documentoId="route.params.id"/>
+
+          <!-- Botão de criar nova versão do documento -->
+          <button
+              class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
+              @click="abrirModalNV"
+            >
+              Nova Versão
+          </button>
+
+          <!-- Modal -->
+          <NovaVersao v-model="mostrarModalNV" @salvo="carregarDocumento" :documentoId="documentoId"/>
+        </div>
+        
       </div>
 
       <!-- Carregando -->
@@ -137,13 +166,6 @@ audio {
         <h1 class="text-3xl font-semibold text-gray-800 mb-4">
           {{ capitalizarPrimeiraLetra(documento.TipoDocumento)}} (v{{ documento.versao }})
         </h1>
-
-        <!-- Origem de Áudio (somente se tipo = MINIMUNDO) -->
-        <!-- <div v-if="documento.TipoDocumento === 'MINIMUNDO'" class="mb-4"> -->
-          <!-- <p class="text-gray-600 font-medium mb-1">Áudio de Origem:</p> -->
-          <!-- <audio v-if="documento.origemAudio" :src="documento.origemAudio" controls class="w-full" /> -->
-          <!-- <p v-else class="text-gray-500 italic">Sem áudio associado.</p> -->
-        <!-- </div> -->
 
         <!-- Editor Markdown -->
         <div class="w-10/12">
@@ -215,8 +237,6 @@ audio {
           </li>
         </ul>
       </div>
-
-
     </div>
   </div>
 </template>

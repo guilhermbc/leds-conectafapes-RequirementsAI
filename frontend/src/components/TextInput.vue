@@ -74,7 +74,7 @@ watch(isValid, (newValue) => {
       </label>
     </div>
     <generic-text-input
-      class="mb-[8px]"
+      class=""
       v-model="value"
       :type="type"
       :placeholder="placeholder"

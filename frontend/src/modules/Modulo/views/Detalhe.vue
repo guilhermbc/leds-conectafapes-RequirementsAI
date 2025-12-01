@@ -30,7 +30,6 @@ const carregarModulo = async () => {
   try {
     loading.value = true
     const id = route.params.id as string
-    console.log('Modulo ID:', id)
     const data = await obterModulo(id)
     // Para obter o 'dado' desejado, use modulo.value.dado
     modulo.value = data
