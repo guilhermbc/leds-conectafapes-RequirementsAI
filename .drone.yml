@@ -129,7 +129,7 @@ steps:
       - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook@$DIGEST_WEBHOOK\"" leds-conectafapes-infra/agentes/stage/Requirements-AI/webhook/deployment.yaml
 
       - DIGEST_AI=$(docker inspect --format='{{index .RepoDigests 0}}' ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai:develop | cut -d'@' -f2)
-      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/agentes/testing/Requirements-AI/streamlit/deployment.yaml
+      - yq -i ".spec.template.spec.containers[0].image = \"ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai@$DIGEST_AI\"" leds-conectafapes-infra/agentes/stage/Requirements-AI/streamlit/deployment.yaml
 
       - cd leds-conectafapes-infra
       - echo "Deployment images updated successfully"
