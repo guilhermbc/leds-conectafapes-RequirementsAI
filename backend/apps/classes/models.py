@@ -34,8 +34,9 @@ class Modulo(PolymorphicModel, models.Model):
 class Documento(PolymorphicModel, models.Model):
     ''''''
     # versao do documento
-    versao = models.CharField(max_length=300, null=True, blank=True)
-    
+    vMajor = models.IntegerField(null=True, blank=True)
+    vMinor = models.IntegerField(null=True, blank=True)
+
     # gerado por IA
     geradoIA = models.BooleanField(null=True, blank=True)
 
