@@ -21,7 +21,7 @@ persona_message_transcricao = SystemMessage(
 def transcribe_audio_agent(inputs):
     audio_file_path = inputs["video_entrevista"]
     genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model_gemini = genai.GenerativeModel("gemini-2.5-flash-preview-05-20")
+    model_gemini = genai.GenerativeModel("gemini-2.5-flash")
     if not os.path.exists(audio_file_path):
         raise FileNotFoundError(f"Arquivo de áudio não encontrado: {audio_file_path}")
     
