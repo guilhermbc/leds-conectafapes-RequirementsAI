@@ -9,8 +9,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { listarDocumento, obterDocumento } from '../controllers/documento'
 import type { Documento } from '../types/documento'
-import NovaVersao from './NovaVersao.vue'
-import Editar from './Editar.vue'
+import NovaVersao from './NovaVersaoIA.vue'
+import Editar from './NovaVersaoManual.vue'
+import { formatarTipoDocumento } from '@/utils/formatacoesDocumentos';
 
 // Configura o editor Markdown
 VMdEditor.use(githubTheme, { Prism })
@@ -109,6 +110,44 @@ function abrirModalNV(){
   mostrarModalNV.value = true
 }
 
+function baixarMarkdown() {
+  if (!documento.value || !documento.value.arquivo) {
+    console.error("Nenhum conteúdo encontrado para download.");
+    return;
+  }
+
+  // Formatar nome do tipo de documento
+  const nomeTipo = formatarTipoDocumento(documento.value.TipoDocumento);
+
+  // Versão no formato vX_Y
+  const versao = documento.value.versao; // ex: "3.4"
+  let versaoFormatada = "v0_0";
+
+  if (versao) {
+    const partes = versao.toString().split(".");
+    const maior = partes[0] ?? "0";
+    const menor = partes[1] ?? "0";
+    versaoFormatada = `v${maior}_${menor}`;
+  }
+
+  const nomeArquivo = `${nomeTipo}(${versaoFormatada}).md`;
+
+  // Criar o arquivo markdown
+  const blob = new Blob(
+    [documento.value.arquivo],
+    { type: "text/markdown;charset=utf-8" }
+  );
+
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = nomeArquivo;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
 </script>
 
 <style scoped>
@@ -118,11 +157,14 @@ audio {
 }
 </style>
 
+
 <template>
   <div class="flex my-auto mt-20 w-11/12 gap-6 items-start">
     <div class="w-11/12 mb-0 p-4 border border-1 border-gray-500 rounded-lg">
-      <!-- Botão de voltar -->
-      <div class="flex items-center justify-between mb-6">
+      <!-- Cabeçalho com alinhamento correto -->
+      <div class="flex items-start justify-between mb-6 w-full">
+
+        <!-- Botão voltar -->
         <button
           class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
           @click="voltar"
@@ -130,29 +172,50 @@ audio {
           ← Voltar
         </button>
 
-        <div>
-          <button
-            class="px-4 py-2 mr-2 border border-gray-700 bg-white text-gray-700 rounded-md hover:bg-gray-700 hover:text-white transition cursor-pointer"
-            @click="abrirModalEditar"
-          >
-            Editar
-          </button>
+        <!-- Container dos botões à direita -->
+        <div class="flex flex-col items-end">
 
-          <!-- Modal -->
-          <Editar v-model="mostrarModalEditar" @salvo="carregarDocumento" :documentoId="route.params.id"/>
+          <!-- Linha dos dois botões -->
+          <div class="flex gap-3">
+            <button
+              class="px-4 py-2 border border-gray-700 bg-white text-gray-700 rounded-md
+                    hover:bg-gray-700 hover:text-white transition cursor-pointer"
+              @click="abrirModalEditar"
+            >
+              Editar
+            </button>
 
-          <!-- Botão de criar nova versão do documento -->
-          <button
-              class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
+            <Editar
+              v-model="mostrarModalEditar"
+              @salvo="carregarDocumento"
+              :documentoId="route.params.id"
+            />
+
+            <button
+              class="bg-blue-600 text-white px-4 py-2 rounded-md shadow
+                    hover:bg-blue-700 transition cursor-pointer"
               @click="abrirModalNV"
             >
-              Nova Versão
+              Gerar Nova Versão
+            </button>
+
+            <NovaVersao
+              v-model="mostrarModalNV"
+              @salvo="carregarDocumento"
+              :documentoId="documentoId"
+            />
+          </div>
+
+          <!-- Botão de download com largura exata dos dois botões -->
+          <button
+            class="mt-3 bg-gray-500 text-white px-4 py-2 rounded-md shadow
+                  hover:bg-gray-800 transition cursor-pointer w-[calc(100%)]"
+            @click="baixarMarkdown"
+          >
+            Download
           </button>
 
-          <!-- Modal -->
-          <NovaVersao v-model="mostrarModalNV" @salvo="carregarDocumento" :documentoId="documentoId"/>
         </div>
-        
       </div>
 
       <!-- Carregando -->
@@ -168,7 +231,7 @@ audio {
         </h1>
 
         <!-- Editor Markdown -->
-        <div class="w-10/12">
+        <div class="w-full">
           <p class="text-gray-600 font-medium mb-2">Conteúdo do Documento:</p>
           <div class="border border-1 border-gray-500 rounded-md pr-2 py-2">
             <v-md-editor

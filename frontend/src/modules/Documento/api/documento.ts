@@ -29,7 +29,9 @@ export const obterDocumento = async (id: string) => {
 }
 
 export const atualizarDocumento = async (documento: Documento) => {
-  return await adminApi.put<DocumentoUpdateRes>('/' + documento.id, documento, documentoReqConf)
+  const { id, ...payload } = documento; // remove o id
+
+  return await adminApi.put<DocumentoUpdateRes>('/' + id + '/', payload, documentoReqConf)
 }
 
 export const excluirDocumento = async (id: string) => {

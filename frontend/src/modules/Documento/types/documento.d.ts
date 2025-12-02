@@ -1,7 +1,7 @@
 import { Modulo } from "@/modules/Modulo/types/modulo"
 
 export type Documento = {
-  id : string
+  id? : string
   versao : string
   geradoIA : boolean
   arquivo : string

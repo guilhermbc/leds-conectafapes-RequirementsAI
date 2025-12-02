@@ -21,8 +21,6 @@ const emit = defineEmits<{
 
 const close = () => emit("update:modelValue", false)
 
-const ui = useUiStore()
-
 // Campos do documento
 // const id = ref('')
 // const versao = ref('1.0')
@@ -103,7 +101,6 @@ watch(
 // Métodos ------------------------------------------------------
 
 const carregarDocumentos = async () => {
-  console.log(props.moduloId)
   const documentos = await listarDocumento()
 
   minimundos.value = []
@@ -172,10 +169,9 @@ const salvar = async () => {
 
 <template>
   <modal v-model="props.modelValue" @close="close">
-    <h2 class="text-xl font-bold mb-4">Criar Documento</h2>
+    <h2 class="text-xl font-bold mb-4"> Criar Documento </h2>
 
-    <h3 class="font-semibold">Tipo do arquivo:</h3>
-
+    <h3 class="font-semibold">Tipo do documento:</h3>
 
     <!-- Dropdown com os tipos de documento -->
     <select
