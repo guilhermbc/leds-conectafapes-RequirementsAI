@@ -2,7 +2,6 @@
 import { ref, watch, computed} from 'vue'
 import type { Documento } from '../types/documento'
 import {
-  atualizarDocumento,
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
@@ -81,12 +80,7 @@ const salvar = async () => {
   try{
     let sucesso = false
 
-    // Coloquei aqui para não travar a UI caso demore a atualizar o documento
-    emit("salvo")
-    close()
-
-    sucesso = await atualizarDocumento({
-      id: id.value,
+    sucesso = await criarDocumento({
       versao: incrementarVersaoMenor(versao.value),
       geradoIA: false,
       arquivo: conteudoMarkdown.value,
@@ -96,6 +90,12 @@ const salvar = async () => {
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
+
+    if (sucesso) {
+      emit("salvo")
+      close()
+    }
+    
   } finally {
     carregando.value = false
   }
