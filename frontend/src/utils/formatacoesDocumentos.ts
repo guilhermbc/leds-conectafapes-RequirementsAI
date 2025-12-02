@@ -68,6 +68,17 @@ export function incrementarVersaoMenor(versao: string): string {
 }
 
 /**
+ * Formata a versão de um documento dadas duas partes: vMajor e vMinor.
+ *
+ * @param vMajor O número da versão principal (major).
+ * @param vMinor O número da versão secundária (minor).
+ * @returns String de versão no formato 'X.Y'.
+ */
+export function formatarVersao(vMajor: number, vMinor: number): string {
+  return `${vMajor}.${vMinor}`;
+}
+
+/**
  * Retorna o nome formatado do tipo de documento com base no identificador fornecido.
  *
  * @param tipo A string do tipo do documento (ex: CASO_USO).

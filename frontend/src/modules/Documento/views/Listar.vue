@@ -1,18 +1,13 @@
 <script setup lang="ts">
 import { ref, onBeforeMount } from 'vue'
-import { useRouter } from 'vue-router'
-import {
-  excluirDocumentos,
-} from '../controllers/documento'
 import Criar from './Criar.vue'
 import { obterModulo } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
+import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos'
 
 const props = defineProps<{
   moduloId?: string | number
 }>()
-
-const router = useRouter()
 
 const documentos = ref<Documento[]>([])
 
@@ -21,15 +16,11 @@ const carregarDocumentos = async () => {
   documentos.value = modulo.modulo_documento
 }
 
-const editarDocumento = (cls: Documento) => {
-  router.push({ name: 'documento-criar', params: { id: cls.id }})
-}
-
-const excluirdocumento = async (cls: Documento[]) => {
-  const ids = cls.map((a) => a.id)
-  await excluirDocumentos(ids)
-  await carregarDocumentos()
-}
+// const excluirdocumento = async (cls: Documento[]) => {
+//   const ids = cls.map((a) => a.id)
+//   await excluirDocumentos(ids)
+//   await carregarDocumentos()
+// }
 
 const mostrarModal = ref(false)
 
@@ -39,15 +30,6 @@ function abrirModal(){
   mostrarModal.value = true
 }
 
-function capitalizarPrimeiraLetra(palavra: string): string {
-  if (!palavra) {
-    return ""; 
-  }
-  const primeiraLetra = palavra[0].toUpperCase();
-  const restanteDaString = palavra.slice(1).toLowerCase();
-
-  return primeiraLetra + restanteDaString;
-}
 </script>
 
 <template>
@@ -79,7 +61,7 @@ function capitalizarPrimeiraLetra(palavra: string): string {
           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
         >
           <header class="mb-3">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 break-words">{{ capitalizarPrimeiraLetra(documento.TipoDocumento) }} (v{{ documento.versao }})</h2>
+            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 break-words">{{ formatarTipoDocumento(documento.TipoDocumento) }} (v{{formatarVersao(documento.vMajor, documento.vMinor)  }})</h2>
           </header>
         </article>
       </router-link>

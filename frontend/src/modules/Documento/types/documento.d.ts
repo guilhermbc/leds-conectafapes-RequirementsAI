@@ -2,7 +2,8 @@ import { Modulo } from "@/modules/Modulo/types/modulo"
 
 export type Documento = {
   id? : string
-  versao : string
+  vMajor : number
+  vMinor : number
   geradoIA : boolean
   arquivo : string
   origemAudio: string
@@ -13,7 +14,8 @@ export type Documento = {
 }
 
 export type DocumentoCreateReq = Pick<Documento, 
-                                      "versao"
+                                      "vMajor"
+                                      | "vMinor"
                                       | "arquivo"
                                       | "geradoIA"
                                       | "origemAudio"

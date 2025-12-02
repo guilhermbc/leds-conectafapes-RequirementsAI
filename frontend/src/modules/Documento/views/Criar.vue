@@ -7,7 +7,7 @@ import {
   atualizarDocumento,
   listarDocumento
 } from '../controllers/documento'
-import { useUiStore } from '@/stores/ui'
+import { formatarTipoDocumento, formatarVersao, incrementarVersaoMaior } from '@/utils/formatacoesDocumentos';
 
 const props = defineProps<{
   modelValue: boolean
@@ -42,23 +42,6 @@ const categoriasDropdown = [
 
 // Tipo de documento (categoria) escolhido na hora de criar
 const categoriaEscolhida = ref('')
-
-// Formata o nome do tipo de documento para o padrão do backend
-const TipoDocumento = computed(() => {
-  if (categoriaEscolhida.value === 'Minimundo') {
-    return 'MINIMUNDO'
-  } else if (categoriaEscolhida.value === 'Requisitos') {
-    return 'REQUISITOS'
-  } else if (categoriaEscolhida.value === 'Casos de Uso') {
-    return 'CASO_USO'
-  } else if (categoriaEscolhida.value === 'Diagrama de Classes') {
-    return 'DIAGRAMA_CLASSE'
-  } else if (categoriaEscolhida.value === 'Protótipo de Interface') {
-    return 'PROTOTIPO_INTERFACE'
-  } else {
-    return ''
-  }
-})
 
 // Arrays p/ armazenarem as versões dos documentos p/ escolha nos dropdowns
 const minimundos = ref<Documento[]>([])
