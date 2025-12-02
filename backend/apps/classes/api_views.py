@@ -2,6 +2,7 @@ from .models import (
     Projeto,
     Modulo,
     Documento,
+    DOCS
 )
 from .serializers import (
     ProjetoReadSerializer, ProjetoWriteSerializer,
@@ -93,7 +94,43 @@ class ModuloViewSet(ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
 
         if self.action == 'retrieve':
-            queryset = queryset.prefetch_related('modulo_documento')
+            from django.db.models import OuterRef, Subquery, Max, Q, Prefetch
+
+            highest_major_subquery = Documento.objects.filter(
+                Modulo=OuterRef("pk")
+            ).order_by("-vMajor").values("vMajor")[:1]
+            
+            tipos = [ tipo for tipo, _ in DOCS.choices ]
+
+            base_filtered_docs = Documento.objects.filter(
+                Modulo=OuterRef("pk"),
+                vMajor=Subquery(highest_major_subquery)
+            )
+
+            from django.db.models.expressions import Case, When
+
+            # Lista de condições When para filtrar os IDs
+            whens = []
+            for tipo in tipos:
+                # subquery para aquela combinação (módulo + maior major + tipo)
+                doc_sub = base_filtered_docs.filter(
+                    TipoDocumento=tipo
+                ).order_by("-vMinor").values("id")[:1]
+
+                whens.append(When(TipoDocumento=tipo, then=Subquery(doc_sub)))
+
+            # queryset final que será usado no Prefetch
+            final_docs = Documento.objects.filter(
+                id__in=Subquery(
+                    base_filtered_docs.annotate(
+                        chosen_id=Case(*whens)
+                    ).values("chosen_id")
+                )
+            )
+
+            queryset = queryset.prefetch_related(
+                Prefetch("modulo_documento", queryset=final_docs)
+            )
         
         obj = get_object_or_404(queryset, **self.kwargs)
         
@@ -113,8 +150,8 @@ class DocumentoViewSet(ModelViewSet):
         filters.OrderingFilter,
         django_filters.rest_framework.DjangoFilterBackend
     )
-    # filterset_fields = '__all__'
-    filterser_class = DocumentoFilter
+    filterset_fields = '__all__'
+    # filterser_class = DocumentoFilter
     search_fields = ['versao', 'arquivo', 'Documento']
     ordering_fields = '__all__'
     ordering = ["id"]
@@ -148,7 +185,6 @@ class DocumentoViewSet(ModelViewSet):
                 doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
                 vMajor, vMinor = version_from_audio(doc_anterior)
             else:
-                print('error')
                 vMajor = 1
                 vMinor = 0
         # If its not, update the vMinor
@@ -161,7 +197,6 @@ class DocumentoViewSet(ModelViewSet):
                 doc_origem = get_object_or_404(Documento, id=doc_origem_id)
                 vMajor, vMinor = update_version(doc_origem)
             else:
-                print('error')
                 vMajor = 1
                 vMinor = 0
 
@@ -179,6 +214,3 @@ class DocumentoViewSet(ModelViewSet):
         request.data['geradoIA'] = generated_by_ai
 
         return super().create(request, *args, **kwargs)
-    
-def versioning():
-    pass

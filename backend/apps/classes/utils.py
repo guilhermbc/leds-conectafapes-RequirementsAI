@@ -73,7 +73,7 @@ Returns:
     
     return v_major, v_minor
 
-def version_from_audio(doc_old_v: Documento) -> tuple[int, int]:
+def increment_version(doc_old_v: Documento) -> tuple[int, int]:
     '''
 Args:
     doc_old_v (Documento): The document with the new document will be based from
@@ -84,8 +84,12 @@ Returns:
 
     return doc_old_v.vMajor, doc_old_v.vMinor + 1
 
-def update_version(doc_origin: Documento) -> tuple[int, int]:
-    return doc_origin.vMajor, doc_origin.vMinor + 1
+def update_version(doc_origin: Documento, doc_old_v: Documento | None = None) -> tuple[int, int]:
+    # if have old version it is a update
+    if doc_old_v:
+        return doc_old_v.vMajor, doc_old_v.vMinor + 1
+    # otherwise copy the origin document version
+    return doc_origin.vMajor, doc_origin.vMinor
 
 def send_to_llm(data: dict) -> str | tuple:
     result = None
