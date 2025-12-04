@@ -23,6 +23,7 @@ from .pagination import CustomPagination
 from rest_framework import generics
 from rest_framework import filters
 import django_filters.rest_framework
+import json
 
 from rest_framework.permissions import AllowAny # for testing
 from .filters import DocumentoFilter
@@ -30,7 +31,7 @@ from .utils import is_empty_or_null, send_to_llm, version_from_another_doc, vers
 
 class HealthViewSet(ViewSet):
 
-    @action(detail='')
+    @action(detail='', url_path='')
     def check(self, request):
         response_data = {'content': 'OK'}
         return JsonResponse(response_data, status=201)
@@ -97,56 +98,60 @@ class ModuloViewSet(ModelViewSet):
             return ModuloReadSerializer
         return ModuloWriteSerializer
     
-    def get_object(self):
-        '''
-        return the Modulo and the associated Documento's objects
-        '''
-
+    def get_object(self) -> any:
         queryset = self.filter_queryset(self.get_queryset())
 
         if self.action == 'retrieve':
-            from django.db.models import OuterRef, Subquery, Max, Q, Prefetch
-
-            highest_major_subquery = Documento.objects.filter(
-                Modulo=OuterRef("pk")
-            ).order_by("-vMajor").values("vMajor")[:1]
-            
-            tipos = [ tipo for tipo, _ in DOCS.choices ]
-
-            base_filtered_docs = Documento.objects.filter(
-                Modulo=OuterRef("pk"),
-                vMajor=Subquery(highest_major_subquery)
-            )
-
-            from django.db.models.expressions import Case, When
-
-            # Lista de condições When para filtrar os IDs
-            whens = []
-            for tipo in tipos:
-                # subquery para aquela combinação (módulo + maior major + tipo)
-                doc_sub = base_filtered_docs.filter(
-                    TipoDocumento=tipo
-                ).order_by("-vMinor").values("id")[:1]
-
-                whens.append(When(TipoDocumento=tipo, then=Subquery(doc_sub)))
-
-            # queryset final que será usado no Prefetch
-            final_docs = Documento.objects.filter(
-                id__in=Subquery(
-                    base_filtered_docs.annotate(
-                        chosen_id=Case(*whens)
-                    ).values("chosen_id")
-                )
-            )
-
-            queryset = queryset.prefetch_related(
-                Prefetch("modulo_documento", queryset=final_docs)
-            )
+            queryset = queryset.prefetch_related('modulo_documento')
         
         obj = get_object_or_404(queryset, **self.kwargs)
         
         self.check_object_permissions(self.request, obj)
         return obj
+    
+    @action(detail=False, methods=['get'], url_path=r'get_last_docs/(?P<modulo_id>\d+)', filter_backends = [])
+    def get_last_docs(self, request, modulo_id=None):
+        
+        mod = get_object_or_404(Modulo, id=int(modulo_id))
+
+        docs: list[Documento] = list(mod.modulo_documento.all())
+
+        separated_docs = {tipo: [] for tipo, _ in DOCS.choices}
+
+        for d in docs:
+            tipo = d.TipoDocumento
+            if tipo in separated_docs:
+                separated_docs[tipo].append(d)
+
+        latest_docs: list[Documento] = []
+
+        def get_latest(docs: list[Documento], hi_major: int = 0) -> Documento:
+            for d in docs:
+                if d.vMajor > hi_major:
+                    hi_major = d.vMajor
+            
+            hi_minor_index = 0
+            hi_minor = -1
+            i = 0
+            while i < len(docs):
+                if (docs[i].vMajor == hi_major) and (docs[i].vMinor > hi_minor):
+                    hi_minor = docs[i].vMinor
+                    hi_minor_index = i                
+                i += 1
+
+            return docs[hi_minor_index]
+
+        for key, elem in list(separated_docs.items()):
+            try:
+                latest_docs.append(get_latest(elem))
+            except:
+                pass
+
+        major = max(d.vMajor for d in latest_docs)
+
+        result = [d for d in latest_docs if d.vMajor == major]
+
+        return Response(DocumentoReadSerializer(result, many=True).data)
 
 class DocumentoViewSet(ModelViewSet):
     queryset = Documento.objects.all()
@@ -193,7 +198,7 @@ class DocumentoViewSet(ModelViewSet):
                     request.data.get('DocumentoAnterior')
                 )
 
-            elif request.data.get('audioOrigem') and request.data.get('DocumentoAnterior'):
+            elif request.data.get('origemAudio') and request.data.get('DocumentoAnterior'):
                 doc_anterior_id = request.data.get('DocumentoAnterior')
                 doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
                 vMajor, vMinor = version_from_audio(doc_anterior)
@@ -208,11 +213,11 @@ class DocumentoViewSet(ModelViewSet):
             generated_by_ai = False
             result = request.data.get('arquivo')
 
-            if request.data.get(''):
-                doc_anterior_id = request.data.get('')
+            if request.data.get('DocumentoAnterior'):
+                doc_anterior_id = request.data.get('DocumentoAnterior')
                 doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
                 vMajor, vMinor = update_version(doc_anterior)
-            if request.data.get('DocumentoOrigem') and len(request.data.get('DocumentoOrigem')) != 0:
+            elif request.data.get('DocumentoOrigem') and len(request.data.get('DocumentoOrigem')) != 0:
                 doc_origem_id = request.data.get('DocumentoOrigem')[-1]
                 doc_origem = get_object_or_404(Documento, id=doc_origem_id)
                 vMajor, vMinor = version_from_another_doc(doc_origem)

@@ -15,4 +15,10 @@ router.register(r'health', HealthViewSet, basename='health')
 
 urlpatterns = [
     path('classes/', include(router.urls))
+    # path('classes/modulo/get_last_docs/<int:modulo_id>', , name='get_last_docs')
 ]
+
+
+# urlpatterns = [
+#     path('topics/<int:topic_id>/', views.topic, name='topic'),
+# ]
