@@ -53,14 +53,7 @@ def is_empty_or_null(string: str) -> bool:
     return not (string and string.strip())
 
 def version_from_another_doc(doc_origin: Documento, doc_old_v: Documento | None = None) -> tuple[int, int]:
-    '''
-Args:
-    doc_origin: origin document for the new document
-    doc_old_v (optional): older version of the new document
-
-Returns:
-    tuple[int, int]: respectively, major and minor versions of the new document
-    '''
+    print('from another document')
 
     v_major = doc_origin.vMajor
 
@@ -74,18 +67,14 @@ Returns:
     return v_major, v_minor
 
 def version_from_audio(doc_old_v: Documento) -> tuple[int, int]:
-    '''
-Args:
-    doc_old_v (Documento): The document with the new document will be based from
+    print('new major')
 
-Returns:
-    tuple[int, int]: respectively, major and minor versions of the new document
-    '''
+    return doc_old_v.vMajor + 1, 0
+
+def update_version(doc_old_v: Documento) -> tuple[int, int]:
+    print('update')
 
     return doc_old_v.vMajor, doc_old_v.vMinor + 1
-
-def update_version(doc_origin: Documento) -> tuple[int, int]:
-    return doc_origin.vMajor, doc_origin.vMinor + 1
 
 def send_to_llm(data: dict) -> str | tuple:
     result = None
