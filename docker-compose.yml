@@ -1,24 +1,24 @@
 version: '3.9'
 services:
 
-  streamlit_app:
-    build: ./streamlit_app
-    env_file:
-      - ./streamlit_app/.env
-    ports:
-      - "8501:8501"
-    volumes:
-      - ./shared/uploads:/app/shared/uploads
-      - ./pyproject.toml:/app/pyproject.toml
-    depends_on:
-      - webhook_server
-    networks:
-      - lang_net
+  # streamlit_app:
+  #   build: ./streamlit_app
+  #   env_file:
+  #     - ./streamlit_app/.env
+  #   ports:
+  #     - "8501:8501"
+  #   volumes:
+  #     - ./shared/uploads:/app/shared/uploads
+  #     - ./pyproject.toml:/app/pyproject.toml
+  #   depends_on:
+  #     - webhook_server
+  #   networks:
+  #     - lang_net
 
-  webhook_server:
-    build: ./webhook_server
+  rai_backend:
+    build: ./backend
     ports:
-      - "8001:8001"
+      - "8000:8000"
     volumes:
       - ./shared/uploads:/app/shared/uploads
     networks:
