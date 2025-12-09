@@ -5,7 +5,7 @@ import {
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
-import { incrementarVersaoMaior, formatarTipoDocumento } from '@/utils/formatacoesDocumentos'
+import { formatarTipoDocumento } from '@/utils/formatacoesDocumentos'
 
 const props = defineProps<{
   modelValue: boolean
@@ -21,7 +21,8 @@ const close = () => emit("update:modelValue", false)
 
 // Campos do documento
 const id = ref('')
-const versao = ref('')
+const vMajor = ref()
+const vMinor = ref()
 const origemAudio = ref('')
 const TipoDocumento = ref('')
 const Modulo = ref('')
@@ -46,7 +47,8 @@ const carregarDocumento = async () => {
 
   // Campos necessários para a nova versão
   id.value = documento.id
-  versao.value = documento.versao
+  vMajor.value = documento.vMajor
+  vMinor.value = documento.vMinor
   origemAudio.value = documento.origemAudio
   TipoDocumento.value = documento.TipoDocumento
   Modulo.value = documento.Modulo.id
@@ -61,12 +63,9 @@ const salvar = async () => {
   try{
     let sucesso = false
 
-    // Coloquei aqui para não travar a UI caso demore a criar o documento
-    emit("salvo")
-    close()
-
     sucesso = await criarDocumento({
-      versao: incrementarVersaoMaior(versao.value),
+      vMajor: vMajor.value,
+      vMinor: vMinor.value,
       geradoIA: true,
       arquivo: '',
       origemAudio: origemAudio.value,
@@ -75,6 +74,10 @@ const salvar = async () => {
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
+
+    emit("salvo")
+    close()
+
   } finally {
     carregando.value = false
   }
@@ -96,7 +99,8 @@ const salvar = async () => {
 
     <div>
       <h3 class="text-lg text-center font-semibold my-4"> 
-        Gerando {{ formatarTipoDocumento(TipoDocumento) }} (v{{ incrementarVersaoMaior(versao) }}) </h3>
+        Deseja mesmo gerar uma nova versão de {{ formatarTipoDocumento(TipoDocumento) }}?
+      </h3>
     </div>
 
     <div class="flex justify-end gap-3">

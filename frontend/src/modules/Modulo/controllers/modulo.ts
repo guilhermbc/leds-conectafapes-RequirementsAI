@@ -4,6 +4,7 @@
 import {
   criarModulo as _criarModulo,
   listarModulo as _listarModulo,
+  listarUltimosDocumentos as _listarUltimosDocumentos,
   obterModulo as _obterModulo,
   atualizarModulo as _atualizarModulo,
   excluirModulo as _excluirModulo,
@@ -21,6 +22,17 @@ export const listarModulo = async () => {
     throw error
   }
 }
+
+export const listarUltimosDocumentos = async (id: string) => {
+  try {
+    const { data } = await _listarUltimosDocumentos(id)
+    // O return é data.data mesmo
+    return data.data
+  } catch (error) {
+    throw error
+  }
+}
+
 
 export const criarModulo = async (modulo: ModuloCreateReq) => {
   const ui = useUiStore()

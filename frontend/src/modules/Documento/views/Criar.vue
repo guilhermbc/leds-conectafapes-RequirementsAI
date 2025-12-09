@@ -59,6 +59,23 @@ const diagramaDeClasse_origem = ref('')
 
 const carregando = ref(false)
 
+const TipoDocumento = computed(() => {
+  switch (categoriaEscolhida.value) {
+    case 'Minimundo':
+      return 'MINIMUNDO'
+    case 'Requisitos':
+      return 'REQUISITOS'
+    case 'Casos de Uso':
+      return 'CASO_USO'
+    case 'Diagrama de Classes':
+      return 'DIAGRAMA_CLASSE'
+    case 'Protótipo de Interface':
+      return 'PROTOTIPO_INTERFACE'
+    default:
+      return ''
+  }
+})
+
 // Recarrega a lista de documentos ao abrir o modal
 watch(
   () => props.modelValue,
@@ -130,10 +147,6 @@ const salvar = async () => {
       DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value))
     }
 
-    // Coloquei aqui para não travar a UI caso demore a criar o documento
-    emit("salvo")
-    close()
-
     sucesso = await criarDocumento({
       versao: '1.0',
       geradoIA: true,
@@ -144,6 +157,8 @@ const salvar = async () => {
       Modulo: props.moduloId as string,
       DocumentoOrigem: DocumentoOrigem.value,
     })
+    emit('salvo')
+    close()
   } finally {
     carregando.value = false
   }

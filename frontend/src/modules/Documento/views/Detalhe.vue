@@ -11,7 +11,7 @@ import { listarDocumento, obterDocumento } from '../controllers/documento'
 import type { Documento } from '../types/documento'
 import NovaVersao from './NovaVersaoIA.vue'
 import Editar from './NovaVersaoManual.vue'
-import { formatarTipoDocumento } from '@/utils/formatacoesDocumentos';
+import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
 
 // Configura o editor Markdown
 VMdEditor.use(githubTheme, { Prism })
@@ -55,6 +55,7 @@ const carregarDocumentosSeguintes = async () => {
   try {
     documentoId.value = route.params.id as string
     const documentosData = await listarDocumento()
+    console.log('Documentos data:', documentosData)
     documentosSeguintes.value = []
     // Lista de documentos seguintes
     for (const doc of documentosData){
@@ -62,6 +63,8 @@ const carregarDocumentosSeguintes = async () => {
         documentosSeguintes.value.push(doc)
       }
     }
+    console.log('Documentos seguintes:', documentosSeguintes.value)
+
   }
   catch (error){
     console.error('Error loading documentos seguintes:', error)
@@ -87,16 +90,6 @@ watch(
   }
 )
 
-function capitalizarPrimeiraLetra(palavra: string): string {
-  if (!palavra) {
-    return ""; 
-  }
-  const primeiraLetra = palavra[0].toUpperCase();
-  const restanteDaString = palavra.slice(1).toLowerCase();
-
-  return primeiraLetra + restanteDaString;
-}
-
 const mostrarModalEditar = ref(false)
 
 function abrirModalEditar(){
@@ -120,17 +113,10 @@ function baixarMarkdown() {
   const nomeTipo = formatarTipoDocumento(documento.value.TipoDocumento);
 
   // Versão no formato vX_Y
-  const versao = documento.value.versao; // ex: "3.4"
-  let versaoFormatada = "v0_0";
+  const vMajor = documento.value.vMajor;
+  const vMinor = documento.value.vMinor;
 
-  if (versao) {
-    const partes = versao.toString().split(".");
-    const maior = partes[0] ?? "0";
-    const menor = partes[1] ?? "0";
-    versaoFormatada = `v${maior}_${menor}`;
-  }
-
-  const nomeArquivo = `${nomeTipo}(${versaoFormatada}).md`;
+  const nomeArquivo = `${nomeTipo}(v${vMajor}_${vMinor}).md`;
 
   // Criar o arquivo markdown
   const blob = new Blob(
@@ -187,8 +173,8 @@ audio {
 
             <Editar
               v-model="mostrarModalEditar"
-              @salvo="carregarDocumento"
-              :documentoId="route.params.id"
+              @salvo="carregarDocumentosSeguintes"
+              :documentoId="route.params.id as string"
             />
 
             <button
@@ -201,7 +187,7 @@ audio {
 
             <NovaVersao
               v-model="mostrarModalNV"
-              @salvo="carregarDocumento"
+              @salvo="carregarDocumentosSeguintes"
               :documentoId="documentoId"
             />
           </div>
@@ -227,7 +213,7 @@ audio {
       <div v-else-if="documento">
         <!-- Título -->
         <h1 class="text-3xl font-semibold text-gray-800 mb-4">
-          {{ capitalizarPrimeiraLetra(documento.TipoDocumento)}} (v{{ documento.versao }})
+          {{ formatarTipoDocumento(documento.TipoDocumento)}} (v{{ formatarVersao(documento.vMajor, documento.vMinor) }})
         </h1>
 
         <!-- Editor Markdown -->
@@ -260,7 +246,7 @@ audio {
         <ul v-else="documento.TipoDocumento !== 'MINIMUNDO'" class="list-disc ml-6 text-blue-600">
           <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">
             <RouterLink :to="`/Documento/${origem.id}`" class="hover:underline">
-              {{ capitalizarPrimeiraLetra(origem.TipoDocumento) }} (v{{ origem.versao }})
+              {{ formatarTipoDocumento(origem.TipoDocumento) }} (v{{ formatarVersao(origem.vMajor, origem.vMinor) }})
             </RouterLink>
           </li>
         </ul>
@@ -279,7 +265,7 @@ audio {
               :to="`/Documento/${documento.DocumentoAnterior.id}`"
               class="text-blue-600 hover:underline"
             >
-              {{ capitalizarPrimeiraLetra(documento.DocumentoAnterior.TipoDocumento) }} (v{{ documento.DocumentoAnterior.versao }})
+              {{ formatarTipoDocumento(documento.DocumentoAnterior.TipoDocumento) }} (v{{ formatarVersao(documento.DocumentoAnterior.vMajor, documento.DocumentoAnterior.vMinor)}})
             </RouterLink>
           </li>
         </ul>
@@ -295,7 +281,7 @@ audio {
         <ul v-else="documentosSeguintes.length > 0"class="list-disc ml-6 text-blue-600">
           <li v-for="seguinte in documentosSeguintes" :key="seguinte.id">
             <RouterLink :to="{ name: 'documento-detalhe', params: { id: seguinte.id }}" class="text-blue-600 hover:underline">
-              {{ capitalizarPrimeiraLetra(seguinte.TipoDocumento) }} (v{{ seguinte.versao }})
+              {{ formatarTipoDocumento(seguinte.TipoDocumento) }} (v{{formatarVersao(seguinte.vMajor, seguinte.vMinor)}})
             </RouterLink>
           </li>
         </ul>

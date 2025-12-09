@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { ref, watch, computed} from 'vue'
-import type { Documento } from '../types/documento'
+import { ref, watch} from 'vue'
 import {
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
-import { formatarTipoDocumento, incrementarVersaoMenor } from '@/utils/formatacoesDocumentos';
+import { formatarTipoDocumento, formatarVersao} from '@/utils/formatacoesDocumentos';
 
 const props = defineProps<{
   modelValue: boolean
@@ -21,7 +20,8 @@ const close = () => emit("update:modelValue", false)
 
 // Campos do documento
 const id = ref('')
-const versao = ref('')
+const vMajor = ref()
+const vMinor = ref()
 const origemAudio = ref('')
 const TipoDocumento = ref('')
 const Modulo = ref('')
@@ -48,7 +48,8 @@ const carregarDocumento = async () => {
 
   // Campos necessários para a nova versão
   id.value = documento.id
-  versao.value = documento.versao
+  vMajor.value = documento.vMajor
+  vMinor.value = documento.vMinor
   origemAudio.value = documento.origemAudio
   TipoDocumento.value = documento.TipoDocumento
   Modulo.value = documento.Modulo.id
@@ -81,20 +82,19 @@ const salvar = async () => {
     let sucesso = false
 
     sucesso = await criarDocumento({
-      versao: incrementarVersaoMenor(versao.value),
+      vMajor: vMajor.value,
+      vMinor: vMinor.value,
       geradoIA: false,
       arquivo: conteudoMarkdown.value,
       origemAudio: origemAudio.value,
       TipoDocumento: TipoDocumento.value,
-      DocumentoAnterior: DocumentoAnterior.value.id,
+      DocumentoAnterior: id.value,
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
 
-    if (sucesso) {
-      emit("salvo")
-      close()
-    }
+    emit("salvo")
+    close()
     
   } finally {
     carregando.value = false
@@ -105,11 +105,6 @@ const salvar = async () => {
 <template>
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4"> Editar Documento </h2>
-
-    <div>
-      <h3 class="text-lg text-center font-semibold my-4"> 
-        Gerando {{ formatarTipoDocumento(TipoDocumento) }} (v{{ incrementarVersaoMenor(versao) }}) </h3>
-    </div>
 
     <h3 class="font-semibold">
       Novo conteúdo do documento: 
@@ -131,6 +126,12 @@ const salvar = async () => {
         @change="onFileSelected"
       />
     </label>
+
+    <div>
+      <h3 class="text-lg text-center font-semibold my-4"> 
+        Deseja mesmo gerar uma nova versão de {{ formatarTipoDocumento(TipoDocumento) }}?
+      </h3>
+    </div>
 
     <div class="flex justify-end gap-3">
       <p-button class="bg-red-700" color="secondary" @click="close">

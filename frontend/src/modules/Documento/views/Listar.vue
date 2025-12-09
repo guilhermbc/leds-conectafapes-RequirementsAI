@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onBeforeMount } from 'vue'
 import Criar from './Criar.vue'
-import { obterModulo } from '@/modules/Modulo/controllers/modulo'
+import { obterModulo, listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos'
 
@@ -13,6 +13,8 @@ const documentos = ref<Documento[]>([])
 
 const carregarDocumentos = async () => {
   const modulo = await obterModulo(props.moduloId as string)
+  const ultimosDocumentos = await listarUltimosDocumentos(props.moduloId as string)
+  console.log('Ultimos Documentos:', ultimosDocumentos)
   documentos.value = modulo.modulo_documento
 }
 

@@ -20,6 +20,10 @@ export const listarModulo = async () => {
   return await adminApi.get<ModuloListRes>('/', moduloReqConf)
 }
 
+export const listarUltimosDocumentos = async (id: string) => {
+  return await adminApi.get<ModuloGetRes>('/get_last_docs/' + id, moduloReqConf)
+}
+
 export const criarModulo = async (modulo: ModuloCreateReq) => {
   console.log("modulo no api:", modulo)
   return await adminApi.post<ModuloCreateRes>('/', modulo, moduloReqConf)
