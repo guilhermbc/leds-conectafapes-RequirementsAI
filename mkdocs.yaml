@@ -5,14 +5,14 @@ nav:
   - 'Graphical Representation': 'graphical_representation.md'
   - 'Folder Structure': 'folder_structure.md'
   - 'Running the Project':
-    - 'Requirements': 'requirements.md'
+    - 'Requirements': 'Running the Project/requirements.md'
   - 'Configuring the Project': 'configuring.md'
   - 'Creating Virtual Environment':
-    - 'Using Python': 'python_venv.md'
-    - 'Using Docker Compose': 'docker_venv.md'
+    - 'Using Python': 'Creating Virtual Environment/python_venv.md'
+    - 'Using Docker Compose': 'Creating Virtual Environment/docker_venv.md'
     - 'Manual Execution':
-      - 'Backend (FastAPI)': 'manual_fast_api.md'
-      - 'Frontend (Streamlit)': 'manual_stream_lit.md'
+      - 'Backend (FastAPI)': 'Creating Virtual Environment/Manual Execution/manual_fast_api.md'
+      - 'Frontend (Streamlit)': 'Creating Virtual Environment/Manual Execution/manual_stream_lit.md'
   - 'Agents and Components': 'agents_and_components.md'
   - 'Input Files (audio or video)': 'input_files.md'
   - 'References': 'references.md'
