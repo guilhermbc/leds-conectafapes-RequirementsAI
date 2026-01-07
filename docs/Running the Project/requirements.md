@@ -1,4 +1,4 @@
-# (for local execution):
+> For local execution.
 
 - Python 3.12+
 - [Poetry](https://python-poetry.org/) or `pip`
