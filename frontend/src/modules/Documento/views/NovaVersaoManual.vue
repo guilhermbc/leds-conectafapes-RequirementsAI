@@ -54,7 +54,12 @@ const carregarDocumento = async () => {
   TipoDocumento.value = documento.TipoDocumento
   Modulo.value = documento.Modulo.id
   DocumentoAnterior.value = documento.DocumentoAnterior
-  DocumentoOrigem.value = documento.DocumentoOrigem
+
+  for (const docOrigem of documento.DocumentoOrigem) {
+    DocumentoOrigem.value.push(docOrigem.id)
+  }
+
+  console.log('DocumentoOrigem:', DocumentoOrigem.value)
 }
 
 function onFileSelected(event: Event) {
@@ -67,7 +72,6 @@ function onFileSelected(event: Event) {
   reader.onload = (e: ProgressEvent<FileReader>) => {
     const result = e.target?.result
     conteudoMarkdown.value = typeof result === 'string' ? result : ''
-    console.log("MD carregado:", conteudoMarkdown.value)
   }
 
   reader.readAsText(file)
@@ -80,6 +84,10 @@ const salvar = async () => {
 
   try{
     let sucesso = false
+
+    if (TipoDocumento.value === 'MINIMUNDO'){
+      
+    }
 
     sucesso = await criarDocumento({
       vMajor: vMajor.value,

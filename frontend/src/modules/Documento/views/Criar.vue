@@ -7,7 +7,7 @@ import {
   atualizarDocumento,
   listarDocumento
 } from '../controllers/documento'
-import { formatarTipoDocumento, formatarVersao, incrementarVersaoMaior } from '@/utils/formatacoesDocumentos';
+import { formatarTipoDocumento, formatarVersao} from '@/utils/formatacoesDocumentos';
 
 const props = defineProps<{
   modelValue: boolean
@@ -148,7 +148,8 @@ const salvar = async () => {
     }
 
     sucesso = await criarDocumento({
-      versao: '1.0',
+      vMajor: 1,
+      vMinor: 0,
       geradoIA: true,
       arquivo: '',
       origemAudio: origemAudio.value,
@@ -201,7 +202,7 @@ const salvar = async () => {
       >
         <option disabled value="">Selecione um tipo...</option>
         <option v-for="minimundo in minimundos" :key="minimundo.id" :value="minimundo.id">
-          Minimundo (v{{ minimundo.versao }})
+          Minimundo (v{{ formatarVersao(minimundo.vMajor, minimundo.vMinor) }})
         </option>
       </select>
     </div>
@@ -215,7 +216,7 @@ const salvar = async () => {
       >
         <option disabled value="">Selecione um tipo...</option>
         <option v-for="requisito in requisitos" :key="requisito.id" :value="requisito.id">
-          Requisitos (v{{ requisito.versao }})
+          Requisitos (v{{ formatarVersao(requisito.vMajor, requisito.vMinor) }})
         </option>
       </select>
     </div>
@@ -229,7 +230,7 @@ const salvar = async () => {
       >
         <option disabled value="">Selecione um tipo...</option>
         <option v-for="casoDeUso in casosDeUso" :key="casoDeUso.id" :value="casoDeUso.id">
-          Casos de Uso (v{{ casoDeUso.versao }})
+          Casos de Uso (v{{ formatarVersao(casoDeUso.vMajor, casoDeUso.vMinor) }})
         </option>
       </select>
     </div>
@@ -243,7 +244,7 @@ const salvar = async () => {
       >
         <option disabled value="">Selecione um tipo...</option>
         <option v-for="diagramaDeClasse in diagramasDeClasses" :key="diagramaDeClasse.id" :value="diagramaDeClasse.id">
-          Casos de Uso (v{{ diagramaDeClasse.versao }})
+          Diagrama de Classes (v{{ formatarVersao(diagramaDeClasse.vMajor, diagramaDeClasse.vMinor) }})
         </option>
       </select>
     </div>
