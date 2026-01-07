@@ -1,5 +1,7 @@
-  - [LangGraph](https://langchain-ai.github.io/langgraph/)
-  - [Gemini API](https://ai.google.dev/)
-  - [LangSmith Traceable](https://docs.smith.langchain.com/)
-  - [Streamlit](https://streamlit.io/)
-  - [FastAPI](https://fastapi.tiangolo.com/)
+# References
+
+- [LangGraph](https://langchain-ai.github.io/langgraph/)
+- [Gemini API](https://ai.google.dev/)
+- [LangSmith Traceable](https://docs.smith.langchain.com/)
+- [Streamlit](https://streamlit.io/)
+- [FastAPI](https://fastapi.tiangolo.com/)

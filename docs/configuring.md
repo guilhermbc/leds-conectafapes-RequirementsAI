@@ -1,3 +1,5 @@
+# Configuring
+
 1.  **Clone the repository and access the folder:**
 
 <!-- end list -->
