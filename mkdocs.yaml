@@ -2,7 +2,6 @@ site_name: 'LEDS ConectaFAPES Requirements AI'
 nav:
   - 'Overview': 'index.md'
   - 'Pipeline Overview': 'pipeline_overview.md'
-  - 'Graphical Overview': 'graphical_overview.md'
   - 'Graphical Representation': 'graphical_representation.md'
   - 'Folder Structure': 'folder_structure.md'
   - 'Running the Project':
