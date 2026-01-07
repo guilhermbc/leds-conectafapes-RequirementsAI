@@ -1,0 +1,22 @@
+site_name: 'LEDS ConectaFAPES Requirements AI'
+nav:
+  - 'Overview': 'index.md'
+  - 'Pipeline Overview': 'pipeline_overview.md'
+  - 'Graphical Overview': 'graphical_overview.md'
+  - 'Graphical Representation': 'graphical_representation.md'
+  - 'Folder Structure': 'folder_structure.md'
+  - 'Running the Project':
+    - 'Requirements': 'requirements.md'
+  - 'Configuring the Project': 'configuring.md'
+  - 'Creating Virtual Environment':
+    - 'Using Python': 'python_venv.md'
+    - 'Using Docker Compose': 'docker_venv.md'
+    - 'Manual Execution':
+      - 'Backend (FastAPI)': 'manual_fast_api.md'
+      - 'Frontend (Streamlit)': 'manual_stream_lit.md'
+  - 'Agents and Components': 'agents_and_components.md'
+  - 'Input Files (audio or video)': 'input_files.md'
+  - 'References': 'references.md'
+  - 'Contribution': 'contribution.md'
+plugins:
+  - techdocs-core
