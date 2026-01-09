@@ -15,12 +15,6 @@ const carregarProjetos = async () => {
   items.value = projetos
 }
 
-const router = useRouter()
-
-const editarProjeto = (cls: Projeto) => {
-  router.push({ name: 'projeto-criar', params: { id: cls.id } })
-}
-
 const excluirprojeto = async (cls: Projeto[]) => {
   const ids = cls.map((a) => a.id)
   await excluirProjetos(ids)
@@ -51,7 +45,7 @@ onBeforeMount(carregarProjetos)
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold text-gray-800">Projetos</h1>
       <button
-        class="bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
+        class="w-[160px] h-[48px] bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
         @click="abrirModal()"
       >
         Novo Projeto

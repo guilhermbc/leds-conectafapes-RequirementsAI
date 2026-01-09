@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { obterProjeto } from '../controllers/projeto'
 import type { Projeto } from '../types/projeto'
+import Criar from './Criar.vue'
 
 // Importa o componente de listagem de módulos
 import ListarModulo from '../../Modulo/views/Listar.vue'
@@ -12,7 +13,7 @@ const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
 
-const projeto = ref<Projeto[]>([])
+const projeto = ref<Projeto | null>(null)
 
 const loading = ref(true)
 
@@ -31,7 +32,7 @@ const carregarProjeto = async () => {
     const id = route.params.id as string
     const data = await obterProjeto(id)
     // Para obter o 'dado' desejado, use projeto.value.dado
-    projeto.value = data
+    projeto.value = Array.isArray(data) ? data[0] : data
   } catch (error) {
     console.error('Error loading project:', error)
     ui.exibirAlerta({ message: 'Erro ao carregar projeto', color: 'error' })
@@ -41,13 +42,18 @@ const carregarProjeto = async () => {
   }
 }
 
-// Add route watcher to handle navigation changes
 watch(() => route.params.id, (newId) => {
   if (newId) {
     console.log('Route param changed, reloading project:', newId)
     carregarProjeto()
   }
 })
+
+const mostrarModal = ref(false)
+
+function abrirModal(){
+  mostrarModal.value = true
+}
 
 onBeforeMount(carregarProjeto)
 </script>
@@ -59,13 +65,39 @@ onBeforeMount(carregarProjeto)
     </div>
 
     <div v-else-if="projeto">
-      <div class="mb-6">
+      <div class="flex items-start justify-between mb-6 w-full">
+        
+        <!-- Botão voltar -->
         <button 
           class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
           @click="voltar"
         >
           ← Voltar
         </button>
+
+        <div class="w-[160px] flex gap-3">
+
+          <!-- Botão de Editar -->
+          <button
+            class="px-4 py-2 border border-gray-700 bg-white text-gray-700 rounded-md
+                  hover:bg-gray-700 hover:text-white transition cursor-pointer"
+            @click="abrirModal()"
+          >
+            Editar
+          </button>
+
+          <Criar v-model="mostrarModal" @salvo="carregarProjeto" :projeto="projeto"/>
+
+          <!-- Botão de Excluir -->
+          <button
+            class="px-4 py-2 border rounded-md text-white bg-red-700 
+            hover:bg-red-800 transition cursor-pointer"
+          >
+            Excluir
+          </button>
+
+
+        </div>
       </div>
 
       <!-- <modal v-if="showEditar" @close="showEditar = false">

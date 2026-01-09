@@ -44,15 +44,12 @@ watch(
       nome.value = novo.nome
       descricao.value = novo.descricao
       projeto_modulo.value = novo.projeto_modulo
-      // Validar o nome carregado
-      nomeValido.value = regrasNome.every((regra) => regra(novo.nome) === true)
     } else {
       // Modo criar → limpar campos
       id.value = ""
       nome.value = ""
       descricao.value = ""
       projeto_modulo.value = []
-      nomeValido.value = false
     }
   },
   { immediate: true }
@@ -71,7 +68,6 @@ const salvar = async () => {
 
   try{
     if (!nomeValido.value) {
-      console.log("Passei aqui")
       ui.exibirAlerta({
         color: "error",
         text: "Por favor corrija os campos inválidos."

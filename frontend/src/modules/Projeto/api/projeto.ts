@@ -30,7 +30,7 @@ export const obterProjeto = async (id: string) => {
 }
 
 export const atualizarProjeto = async (projeto: Projeto) => {
-  return await adminApi.put<ProjetoUpdateRes>('/' + projeto.id, projeto, projetoReqConf)
+  return await adminApi.put<ProjetoUpdateRes>('/' + projeto.id + '/', projeto, projetoReqConf)
 }
 
 export const excluirProjeto = async (id: string) => {
