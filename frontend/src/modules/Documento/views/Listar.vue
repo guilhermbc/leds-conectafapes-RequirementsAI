@@ -39,7 +39,7 @@ function abrirModal(){
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold text-gray-800">Documentos</h1>
       <button
-        class="w-[160px] h-[48px] bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
+        class="w-[170px] h-[45px] bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
         @click="abrirModal()"
       >
         Novo Documento

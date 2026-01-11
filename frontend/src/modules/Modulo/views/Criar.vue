@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue"
-import { listarProjeto } from "@/modules/Projeto/controllers/projeto"
 import { criarModulo, atualizarModulo } from "../controllers/modulo"
 import type { Modulo } from "../types/modulo"
 import type { Projeto } from "@/modules/Projeto/types/projeto"
@@ -10,7 +9,7 @@ import { useUiStore } from "@/stores/ui"
 const props = defineProps<{
   modelValue: boolean
   modulo?: Modulo
-  projetoId: string | number
+  projetoId?: string | number
 }>()
 
 const emit = defineEmits<{
@@ -23,9 +22,9 @@ const close = () => emit("update:modelValue", false)
 const ui = useUiStore()
 
 // Campos
-const id = ref('')
-const nome = ref('')
-const descricao = ref('')
+const id = ref("")
+const nome = ref("")
+const descricao = ref("")
 const modulo_documento = ref<Documento[]>([])
 const projeto = ref(props.projetoId as string)
 
@@ -49,7 +48,17 @@ watch(
       descricao.value = novo.descricao
       modulo_documento.value = novo.modulo_documento
       projeto.value = novo.projeto as string
-    } 
+      // Validar o nome carregado
+      nomeValido.value = regrasNome.every((regra) => regra(novo.nome) === true)
+    } else {
+      // Modo criar → limpar campos
+      id.value = ""
+      nome.value = ""
+      descricao.value = ""
+      modulo_documento.value = []
+      projeto.value = props.projetoId as string
+      nomeValido.value = false
+    }
   },
   { immediate: true }
 )
@@ -67,6 +76,7 @@ const salvar = async () => {
 
   try{
     if (!nomeValido.value) {
+      console.log("Passei aqui")
       ui.exibirAlerta({
         color: "error",
         text: "Por favor corrija os campos inválidos."

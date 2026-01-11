@@ -65,18 +65,17 @@ onBeforeMount(carregarProjeto)
     </div>
 
     <div v-else-if="projeto">
-      <div class="flex items-start justify-between mb-6 w-full">
+      <div class="flex items-start mb-6 w-full">
         
         <!-- Botão voltar -->
         <button 
-          class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
+          class="h-[45px] px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
           @click="voltar"
         >
           ← Voltar
         </button>
 
-        <div class="w-[160px] flex gap-3">
-
+        <div class="ml-auto grid grid-cols-2 gap-3 h-[45px]">
           <!-- Botão de Editar -->
           <button
             class="px-4 py-2 border border-gray-700 bg-white text-gray-700 rounded-md
@@ -86,8 +85,6 @@ onBeforeMount(carregarProjeto)
             Editar
           </button>
 
-          <Criar v-model="mostrarModal" @salvo="carregarProjeto" :projeto="projeto"/>
-
           <!-- Botão de Excluir -->
           <button
             class="px-4 py-2 border rounded-md text-white bg-red-700 
@@ -95,18 +92,10 @@ onBeforeMount(carregarProjeto)
           >
             Excluir
           </button>
-
-
         </div>
-      </div>
 
-      <!-- <modal v-if="showEditar" @close="showEditar = false">
-        <CriarProjeto
-          :projeto="projetoSelecionado"
-          @salvo="carregarProjetos"
-          @close="showEditar = false"
-        />
-      </modal> -->
+        <Criar v-model="mostrarModal" @salvo="carregarProjeto" :projeto="projeto"/>
+      </div>
 
       <div class="flex items-center justify-between mb-4">
       <h1 class="text-3xl font-semibold text-gray-800"> {{ projeto.nome }}</h1>

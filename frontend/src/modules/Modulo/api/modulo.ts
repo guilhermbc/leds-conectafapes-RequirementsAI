@@ -34,7 +34,7 @@ export const obterModulo = async (id: string) => {
 }
 
 export const atualizarModulo = async (modulo: Modulo) => {
-  return await adminApi.put<ModuloUpdateRes>('/' + modulo.id, modulo, moduloReqConf)
+  return await adminApi.put<ModuloUpdateRes>('/' + modulo.id + '/', modulo, moduloReqConf)
 }
 
 export const excluirModulo = async (id: string) => {

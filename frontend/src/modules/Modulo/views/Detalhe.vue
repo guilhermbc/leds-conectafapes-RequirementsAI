@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { obterModulo } from '../controllers/modulo'
 import type { Modulo } from '../types/modulo'
+import Criar from './Criar.vue'
 
 // Importa o componente de listagem de módulos
 import ListarDocumento from '../../Documento/views/Listar.vue'
@@ -13,7 +14,7 @@ const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
 
-const modulo = ref<Modulo[]>([])
+const modulo = ref<Modulo | null>(null)
 
 const loading = ref(true)
 
@@ -32,7 +33,7 @@ const carregarModulo = async () => {
     const id = route.params.id as string
     const data = await obterModulo(id)
     // Para obter o 'dado' desejado, use modulo.value.dado
-    modulo.value = data
+    modulo.value = Array.isArray(data) ? data[0] : data
   } catch (error) {
     console.error('Error loading modulo:', error)
     ui.exibirAlerta({ message: 'Erro ao carregar módulo', color: 'error' })
@@ -40,6 +41,19 @@ const carregarModulo = async () => {
   } finally {
     loading.value = false
   }
+}
+
+watch(() => route.params.id, (newId) => {
+  if (newId) {
+    console.log('Route param changed, reloading modulo:', newId)
+    carregarModulo()
+  }
+})
+
+const mostrarModal = ref(false)
+
+function abrirModal(){
+  mostrarModal.value = true
 }
 
 onBeforeMount(carregarModulo)
@@ -53,13 +67,36 @@ onBeforeMount(carregarModulo)
     </div>
 
     <div v-else-if="modulo">
-      <div class="mb-6">
+      <div class="flex items-start mb-6 w-full">
+        
+        <!-- Botão voltar -->
         <button 
-          class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
+          class="h-[45px] px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
           @click="voltar"
         >
           ← Voltar
         </button>
+
+        <div class="ml-auto grid grid-cols-2 gap-3 h-[45px]">
+          <!-- Botão de Editar -->
+          <button
+            class="px-4 py-2 border border-gray-700 bg-white text-gray-700 rounded-md
+                  hover:bg-gray-700 hover:text-white transition cursor-pointer"
+            @click="abrirModal()"
+          >
+            Editar
+          </button>
+
+          <!-- Botão de Excluir -->
+          <button
+            class="px-4 py-2 border rounded-md text-white bg-red-700 
+            hover:bg-red-800 transition cursor-pointer"
+          >
+            Excluir
+          </button>
+        </div>
+
+        <Criar v-model="mostrarModal" @salvo="carregarModulo" :modulo="modulo"/>
       </div>
 
       <!-- Nome -->
