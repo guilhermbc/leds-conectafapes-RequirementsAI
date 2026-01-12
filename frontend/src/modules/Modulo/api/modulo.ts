@@ -38,5 +38,5 @@ export const atualizarModulo = async (modulo: Modulo) => {
 }
 
 export const excluirModulo = async (id: string) => {
-  return await adminApi.delete<ModuloDeleteRes>('/' + id, moduloReqConf)
+  return await adminApi.delete<ModuloDeleteRes>('/' + id + '/', moduloReqConf)
 }    

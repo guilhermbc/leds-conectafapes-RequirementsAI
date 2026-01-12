@@ -4,10 +4,9 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { obterModulo } from '../controllers/modulo'
 import type { Modulo } from '../types/modulo'
-import Criar from './Criar.vue'
-
-// Importa o componente de listagem de módulos
 import ListarDocumento from '../../Documento/views/Listar.vue'
+import Criar from './Criar.vue'
+import Excluir from './Excluir.vue'
 
 
 const route = useRoute()
@@ -45,15 +44,23 @@ const carregarModulo = async () => {
 
 watch(() => route.params.id, (newId) => {
   if (newId) {
-    console.log('Route param changed, reloading modulo:', newId)
     carregarModulo()
   }
 })
 
-const mostrarModal = ref(false)
+const mostrarModalEditar = ref(false)
+const mostrarModalExcluir = ref(false)
 
-function abrirModal(){
-  mostrarModal.value = true
+function abrirModalEditar(){
+  mostrarModalEditar.value = true
+}
+
+function abrirModalExcluir(){
+  mostrarModalExcluir.value = true
+}
+
+const handleExcluido = () => {
+  router.back()
 }
 
 onBeforeMount(carregarModulo)
@@ -82,7 +89,7 @@ onBeforeMount(carregarModulo)
           <button
             class="px-4 py-2 border border-gray-700 bg-white text-gray-700 rounded-md
                   hover:bg-gray-700 hover:text-white transition cursor-pointer"
-            @click="abrirModal()"
+            @click="abrirModalEditar()"
           >
             Editar
           </button>
@@ -91,12 +98,16 @@ onBeforeMount(carregarModulo)
           <button
             class="px-4 py-2 border rounded-md text-white bg-red-700 
             hover:bg-red-800 transition cursor-pointer"
+            @click="abrirModalExcluir()"
           >
             Excluir
           </button>
         </div>
 
-        <Criar v-model="mostrarModal" @salvo="carregarModulo" :modulo="modulo"/>
+        <!-- Editar Módulo (usa a mesma página de Criar) -->
+        <Criar v-model="mostrarModalEditar" @salvo="carregarModulo" :modulo="modulo"/>
+
+        <Excluir v-model="mostrarModalExcluir" @excluido="handleExcluido" :modulo="modulo"/>
       </div>
 
       <!-- Nome -->

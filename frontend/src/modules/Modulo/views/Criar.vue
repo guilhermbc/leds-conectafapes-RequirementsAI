@@ -2,7 +2,6 @@
 import { ref, watch, computed } from "vue"
 import { criarModulo, atualizarModulo } from "../controllers/modulo"
 import type { Modulo } from "../types/modulo"
-import type { Projeto } from "@/modules/Projeto/types/projeto"
 import type { Documento } from "@/modules/Documento/types/documento"
 import { useUiStore } from "@/stores/ui"
 
