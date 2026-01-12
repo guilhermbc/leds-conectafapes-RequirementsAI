@@ -2,8 +2,6 @@
 import { ref, watch} from "vue"
 import { excluirProjeto } from "../controllers/projeto"
 import type { Projeto } from "../types/projeto"
-import type { Modulo } from "@/modules/Modulo/types/modulo"
-import { useUiStore } from "@/stores/ui"
 
 const props = defineProps<{
   modelValue: boolean
@@ -17,13 +15,9 @@ const emit = defineEmits<{
 
 const close = () => emit("update:modelValue", false)
 
-const ui = useUiStore()
-
 // Campos
 const id = ref("")
 const nome = ref("")
-const descricao = ref("")
-const projeto_modulo = ref<Modulo[]>([])
 
 // Quando receber um projeto, carregar os dados
 watch(
@@ -32,8 +26,6 @@ watch(
     if (novo) {
       id.value = novo.id
       nome.value = novo.nome
-      descricao.value = novo.descricao
-      projeto_modulo.value = novo.projeto_modulo
     } 
   },
   { immediate: true }
