@@ -67,7 +67,7 @@ watch(isValid, (newValue) => {
 </script>
 
 <template>
-  <div class="w-[280px]">
+  <div class="w-[280px] mb-0">
     <div class="m-1">
       <label class="">
         <slot />
@@ -82,7 +82,7 @@ watch(isValid, (newValue) => {
       @keyup-enter="emitEnter"
     />
 
-    <div class="h-(--text-2xl) overflow-auto text-red-400">
+    <div class="h-(--text-2xl) my-1 overflow-auto text-red-400">
       {{ validationMessage }}
     </div>
   </div>

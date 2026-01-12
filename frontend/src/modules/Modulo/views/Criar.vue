@@ -117,26 +117,39 @@ const salvar = async () => {
       {{ modo === "criar" ? "Criar Módulo" : "Editar Módulo" }}
     </h2>
 
+    <h3 class="font-semibold">Nome:</h3>
     <text-input
-      class="w-full mb-2"
+      class="w-full"
       placeholder="Nome"
       v-model="nome"
       :rules="regrasNome"
       @validationUpdate="updateNomeValido"
     />
 
+    <h3 class="font-semibold">Descrição:</h3>
     <text-input
-      class="w-full mb-4"
+      class="w-full"
       placeholder="Descrição"
       v-model="descricao"
     />
 
     <div class="flex justify-end gap-3">
-      <p-button class="bg-red-700" color="secondary" @click="close">Cancelar</p-button>
+      <button 
+        class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white 
+        transition cursor-pointer" 
+        @click="close"
+      >
+        Cancelar
+      </button>
 
-      <p-button :disabled="carregando" @click="salvar">
-        {{ modo === "criar" ? "Registrar" : "Atualizar" }}
-      </p-button>
+      <button
+        class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 
+        transition cursor-pointer"
+        :disabled="carregando" 
+        @click="salvar"
+      >
+        {{ modo === "criar" ? "Criar" : "Atualizar" }}
+      </button>
     </div>
   </modal>
 </template>

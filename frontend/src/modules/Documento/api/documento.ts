@@ -35,5 +35,5 @@ export const atualizarDocumento = async (documento: Documento) => {
 }
 
 export const excluirDocumento = async (id: string) => {
-  return await adminApi.delete<DocumentoDeleteRes>('/' + id, documentoReqConf)
+  return await adminApi.delete<DocumentoDeleteRes>('/' + id + '/', documentoReqConf)
 }    

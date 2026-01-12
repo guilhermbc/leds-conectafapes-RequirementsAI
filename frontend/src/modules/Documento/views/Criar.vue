@@ -3,11 +3,9 @@ import { ref, watch, computed} from 'vue'
 import type { Documento } from '../types/documento'
 import {
   criarDocumento,
-  obterDocumento,
-  atualizarDocumento,
   listarDocumento
 } from '../controllers/documento'
-import { formatarTipoDocumento, formatarVersao} from '@/utils/formatacoesDocumentos';
+import { formatarVersao} from '@/utils/formatacoesDocumentos';
 
 const props = defineProps<{
   modelValue: boolean
@@ -76,6 +74,16 @@ const TipoDocumento = computed(() => {
   }
 })
 
+const isDisabled = computed(() => {
+  return carregando.value
+    || (TipoDocumento.value === '')
+    || (TipoDocumento.value === 'MINIMUNDO' && origemAudio.value === '')
+    || (TipoDocumento.value === 'REQUISITOS' && minimundo_origem.value === '') 
+    || (TipoDocumento.value === 'CASO_USO' && (minimundo_origem.value === '' || requisito_origem.value === '')) 
+    || (TipoDocumento.value === 'DIAGRAMA_CLASSE' && (minimundo_origem.value === '' || requisito_origem.value === '' || casoDeUso_origem.value === '')) 
+    || (TipoDocumento.value === 'PROTOTIPO_INTERFACE' && (requisito_origem.value === '' || casoDeUso_origem.value === '' || diagramaDeClasse_origem.value === '' ))
+})
+
 // Recarrega a lista de documentos ao abrir o modal
 watch(
   () => props.modelValue,
@@ -128,6 +136,8 @@ const carregarDocumentos = async () => {
 
 const salvar = async () => {
   if (carregando.value) return
+
+  console.log('passei aqui')
 
   carregando.value = true
 
@@ -249,23 +259,23 @@ const salvar = async () => {
       </select>
     </div>
 
-    <div class="flex justify-end gap-3">
-      <p-button class="bg-red-700" color="secondary" @click="close">
+    <div class="mt-4 flex justify-end gap-3">
+      <button 
+        class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white 
+        transition cursor-pointer" 
+        @click="close"
+      >
         Cancelar
-      </p-button>
+      </button>
 
-      <p-button 
-        :disabled="carregando
-        || TipoDocumento === ''
-        || TipoDocumento === 'MINIMUNDO' && origemAudio === '' 
-        || (TipoDocumento === 'REQUISITOS' && minimundo_origem === '') 
-        || (TipoDocumento === 'CASO_USO' && (minimundo_origem === '' || requisito_origem === '')) 
-        || (TipoDocumento === 'DIAGRAMA_CLASSE' && (minimundo_origem === '' || requisito_origem === '' || casoDeUso_origem === '')) 
-        || (TipoDocumento === 'PROTOTIPO_INTERFACE' && (requisito_origem === '' || casoDeUso_origem === '' || diagramaDeClasse_origem === '' ))" 
+      <button
+        class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition cursor-pointer
+        disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
+        :disabled="isDisabled" 
         @click="salvar"
       >
-        Registrar
-      </p-button>
+        Criar
+      </button>
     </div>
   </modal>
 </template>
