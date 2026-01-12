@@ -9,7 +9,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 # Mantenha o nome esperado: llm_model
 llm_model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
+    model="gemini-3-flash-preview",
     temperature=0,
     api_key=GEMINI_API_KEY
 )
