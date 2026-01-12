@@ -34,5 +34,5 @@ export const atualizarProjeto = async (projeto: Projeto) => {
 }
 
 export const excluirProjeto = async (id: string) => {
-  return await adminApi.delete<ProjetoDeleteRes>('/' + id, projetoReqConf)
+  return await adminApi.delete<ProjetoDeleteRes>('/' + id + '/', projetoReqConf)
 }    

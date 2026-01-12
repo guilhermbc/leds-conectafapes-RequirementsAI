@@ -5,6 +5,7 @@ import { useUiStore } from '@/stores/ui'
 import { obterProjeto } from '../controllers/projeto'
 import type { Projeto } from '../types/projeto'
 import Criar from './Criar.vue'
+import Excluir from './Excluir.vue'
 
 // Importa o componente de listagem de módulos
 import ListarModulo from '../../Modulo/views/Listar.vue'
@@ -49,10 +50,19 @@ watch(() => route.params.id, (newId) => {
   }
 })
 
-const mostrarModal = ref(false)
+const mostrarModalEditar = ref(false)
+const mostrarModalExcluir = ref(false)
 
-function abrirModal(){
-  mostrarModal.value = true
+function abrirModalEditar(){
+  mostrarModalEditar.value = true
+}
+
+function abrirModalExcluir(){
+  mostrarModalExcluir.value = true
+}
+
+const handleExcluido = () => {
+  router.push({ name: 'projeto-home' })
 }
 
 onBeforeMount(carregarProjeto)
@@ -80,7 +90,7 @@ onBeforeMount(carregarProjeto)
           <button
             class="px-4 py-2 border border-gray-700 bg-white text-gray-700 rounded-md
                   hover:bg-gray-700 hover:text-white transition cursor-pointer"
-            @click="abrirModal()"
+            @click="abrirModalEditar()"
           >
             Editar
           </button>
@@ -89,12 +99,16 @@ onBeforeMount(carregarProjeto)
           <button
             class="px-4 py-2 border rounded-md text-white bg-red-700 
             hover:bg-red-800 transition cursor-pointer"
+            @click="abrirModalExcluir()"
           >
             Excluir
           </button>
         </div>
 
-        <Criar v-model="mostrarModal" @salvo="carregarProjeto" :projeto="projeto"/>
+        <!-- Editar Projeto (usa a mesma página de Criar) -->
+        <Criar v-model="mostrarModalEditar" @salvo="carregarProjeto" :projeto="projeto"/>
+
+        <Excluir v-model="mostrarModalExcluir" @excluido="handleExcluido" :projeto="projeto"/>
       </div>
 
       <div class="flex items-center justify-between mb-4">
