@@ -25,7 +25,6 @@ export const listarUltimosDocumentos = async (id: string) => {
 }
 
 export const criarModulo = async (modulo: ModuloCreateReq) => {
-  console.log("modulo no api:", modulo)
   return await adminApi.post<ModuloCreateRes>('/', modulo, moduloReqConf)
 }
 

@@ -137,8 +137,6 @@ const carregarDocumentos = async () => {
 const salvar = async () => {
   if (carregando.value) return
 
-  console.log('passei aqui')
-
   carregando.value = true
 
   try{

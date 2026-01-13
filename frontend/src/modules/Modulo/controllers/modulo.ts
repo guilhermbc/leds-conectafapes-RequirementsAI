@@ -26,21 +26,17 @@ export const listarModulo = async () => {
 export const listarUltimosDocumentos = async (id: string) => {
   try {
     const { data } = await _listarUltimosDocumentos(id)
-    // O return é data.data mesmo
-    return data.data
+    return data
   } catch (error) {
     throw error
   }
 }
-
 
 export const criarModulo = async (modulo: ModuloCreateReq) => {
   const ui = useUiStore()
 
   try {
     const { data } = await _criarModulo(modulo)
-    console.log("data:", data)
-
     ui.exibirAlerta({
       text: data.message,
       color: 'success'
