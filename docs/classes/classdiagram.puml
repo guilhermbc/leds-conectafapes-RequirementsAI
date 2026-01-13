@@ -1,16 +1,15 @@
 @startuml Classes
     enum DOCS {
-         Minimundo
+        Minimundo
         Requisitos
         CasoUso
         DiagramaClasse
         PrototipoInterface
     }
-    class Projeto {
-    string: nome
-    string: descricao
 
-    Modulo: projeto
+    class Projeto {
+    nome : string
+    descricao : string
     }
 
 
@@ -19,19 +18,22 @@
     class Modulo {
     string: nome
     string: descricao
-
-    Documento: modulo
     }
 
 
     Modulo "1" -- "0..*" Documento : modulo >
 
     class Documento {
-    string: versao
-    string: arquivo
+    vMajor : int
+    vMinor : int
+    arquivo : string
+    geradoIA : boolean
+    origemAudio : string
+    tipo_documento : DOCS
 
     }
 
-    Documento "1" -- "1" DOCS : documento>
+    Documento "0..*" -- "0..1" Documento : é a próxima versão de >
+    Documento "0..*" -- "0..*" Documento : é originado de >
 
 @enduml

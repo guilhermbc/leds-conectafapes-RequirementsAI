@@ -1,29 +1,5 @@
-# How to run: Backend
-
-Ir para a pasta `backend`
-```bash
-cd backend
-```
-
-Criar um .env segundo o template no `.env.example`
-
-Criar as migrações
-```bash
-python manage.py makemigrations
-```
-
-Executar as migrações
-```bash
-python manage.py migrate
-```
-
-Executar servidor de desenvolvimento
-```bash
-python manage.py runserver
-```
-
-## Exemplo de Uso das Rotas
-### Projeto
+# Exemplo de Uso das Rotas (*Example of use of the routes*)
+## Projeto
 ```json
 {
   "nome": "projeto 1",
@@ -31,7 +7,7 @@ python manage.py runserver
 }
 ```
 
-### Modulo
+## Modulo
 ```json
 {
   "nome": "modulo 1",
@@ -40,8 +16,8 @@ python manage.py runserver
 }
 ```
 
-### Documento
-#### Minimundo
+## Documento
+### Minimundo
 ```json
 {
   "versao": "1.0",
@@ -54,7 +30,7 @@ python manage.py runserver
 }
 ```
 
-#### Requisitos
+### Requisitos
 ```json
 {
   "versao": "1.0",
@@ -69,7 +45,7 @@ python manage.py runserver
 }
 ```
 
-#### Caso de Uso
+### Caso de Uso
 ```json
 {
   "versao": "1.0",
@@ -84,7 +60,7 @@ python manage.py runserver
 }
 ```
 
-#### Diagrama de Classe
+### Diagrama de Classe
 ```json
 {
   "versao": "1.0",
@@ -99,7 +75,7 @@ python manage.py runserver
 }
 ```
 
-#### Projeto de Interface
+### Projeto de Interface
 ```json
 {
   "versao": "1.0",

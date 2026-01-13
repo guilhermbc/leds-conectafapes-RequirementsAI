@@ -1,168 +1,116 @@
-# Requirement AssIstant – Intelligent Requirements Extraction Pipeline
+# Requirements AI (RAI)
 
-This repository demonstrates a complete software requirements extraction pipeline from video interviews, utilizing Natural Language Models (LLMs), LangGraph, specialized agents, and a user-friendly Streamlit interface.
+## Introduction
 
-The solution consists of two main services:
+RAI is a tool to help develop and manage software analisis requirements documentation. This tool works with the creation of projects, inside each one, modules and, for each module, multiple documents and versions of documents. The documents can be created manually or using AI.
 
-  - **Streamlit Interface**: allows video uploads and displays results.
-  - **FastAPI Server with LangGraph**: orchestrates LLM agents for transcription, analysis, and generation of structured requirements.
+## Documents
 
------
+The documents created by the RAI can be divided in the following categories:
+* **Miniworld:** A initial description of the problem and the software.
+* **Requirements Tables:** 3 tables for the software requirements. Each table is used for a type of requirement, knowingly, Funcional (FR), Non Funcional (NFR) and Business Rules (BR).
+* **Use Cases:** A use case diagram, a table with a general description of each use case and a complete description of each use case.
+* **Class Diagram:** A class diagram with all the domain classes identified and a data dictionary explaining each class.
+* **Interface Prototype:** A HTML SPA interface prototype and a document explaining the generated prototype.
 
-## Pipeline Overview
+### AI Document Generation
 
-1.  Upload an interview video (MKV, MP4, etc.).
-2.  Automated audio transcription via LLM (Gemini/OpenAI).
-3.  Generation of a miniworld from the transcription.
-4.  Analysis and classification of requirements:
-      - Functional Requirements (FR)
-      - Business Rules (BR)
-      - Non-Functional Requirements (NFR)
-5.  Agents refine, validate, and organize the data.
-6.  Final result: Markdown with three resulting tables.
+The creation of the documents use the following logical order:
+1. Given the audio, then create the **miniworld**;
+2. Given the **miniworld**, then create the **requirements tables**;
+3. Given the **miniworld** and the **requirements tables**, then create the **use cases**;
+4. Given the **miniworld**, the **requirements tables** and the **use cases**, then create the **class diagram**; and
+5. Given the use cases and the class diagram, then create the **interface prototype**
 
-## Graphical Representation
+## How to use RAI?
 
-![alt text](image.png)
+To use the RAI, access its link. If you don't know which link we are talking about, or you want to test your own modification to the code, or you just want to run it locally, click [here](#how-to-run-locally).
 
----
+### First steps
 
-## 📂 Folder Structure
+#### 1. Creating a project
 
-```
-.
-├── streamlit_app/            # User Interface
-│   ├── app_streamlit.py      # Main App
-│   ├── dockerfile            # Interface Dockerfile
-│   └── requirements.txt      # Dependencies
-│
-├── webhook_server/           # Backend with FastAPI + LangGraph
-│   ├── main.py               # Server Entrypoint
-│   ├── webhook_server.py     # Initializes LangGraph via endpoint
-│   ├── graph.py              # Graph node definitions
-│   ├── state.py              # Shared state definition
-│   ├── agents/               # Specialized agents per task
-│   └── dockerfile            # Backend Dockerfile
-│
-├── shared/uploads/           # Video uploads and transcriptions
-├── docker-compose.yml        # Runs Streamlit + FastAPI together
-└── README.md
-```
+When you open and login in the tool, you will be seeing the projects screen. There you can see all the projects created and/or create a new project. When you click in a project, you will go to the next step.
 
------
+#### 2. Creating a module
 
-## Running the Project
+After selecting the desired project, you will see a similar screen, but now with the modules of the selected project. Here, you also can create a new module. To go to the next step, simply click in the module you want to work in.
 
-### Requirements (for local execution):
+#### 3. Creating documents
 
-  - Python 3.12+
-  - [Poetry](https://python-poetry.org/) or `pip`
-  - Gemini API key (`GEMINI_API_KEY`) or OpenAI
+Now, you will see the documents of the selected module. The documents are divided in 2 sections: Últimos Documentos (last documents), where there are only the latest versions of the generated documents; and Todos os Documents (all the documents), where there are all the documents of that module. To create a new document, you also have to select the type of the document (remember the [document types](#documents)). After selecting the type of the document you can create it. Keep in mind that, since it is a generative AI process it might take some time to create the document. It is also possible to edit a document, to do it, you need to download the document, re write what whatever parts you want and send it in the edit menu.
 
-## Configuring the project
+### How to run locally?
 
-1.  **Clone the repository and access the folder:**
+To run the RAI locally you have to parts, the Frontend and the Backend
 
-<!-- end list -->
+#### Requirements
+- Python 3.12
+- Node v22
 
+#### Running the Backend
+
+1. Create a virtual enviroment and activate it with the commands below
 ```bash
-git clone https://github.com/profmoisesomena/RequirementsAI.git
-cd RequirementsAI
+python -m venv .venv
+.venv/bin/activate
 ```
-
-2.  **Set environment variables:**
-
-<!-- end list -->
-
+2. Go to the backend folder
 ```bash
-cp webhook_server/.env.example webhook_server/.env
+cd ./backend
 ```
-
-Edit the `.env` file and provide:
-
-  - `GEMINI_API_KEY` (required)
-  - `LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, `LANGSMITH_TRACING` (optional)
-
-## Creating virtual environment
-
+3. Create the `.env` file using the `.env.example` as a template. If in doubt in how to fill the `.env` file, click [here](#how-to-fill-the-backend-env-file).
+4. Install the backend dependencies
 ```bash
-python3.12 -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
 ```
-
-### Using Docker Compose
-
+5. Create the migrations and use the migrate command
 ```bash
-docker-compose up --build
+python manage.py makemigrations
+python manage.py migrate
 ```
-
-  - Streamlit will be accessible at http://localhost:8501
-  - The FastAPI backend runs internally (port 8001), without direct exposure
-
-### Manual Execution
-
-### Backend (FastAPI):
-
-Access the webhook\_server folder and run the python3 webhook\_server.py command
-
+6. Finally, run the backend local server
 ```bash
-cd webhook_server
-pip install -r requirements.txt 
-pip install -U "langgraph-cli[inmem]" # for langgraph dev
-python3 webhook_server.py
+python manage.py runserver
 ```
 
-### Frontend (Streamlit):
+#### Running the Frontend
 
-Open a new terminal and access the streamlit\_app folder and run the streamlit run app\_streamlit.py command
-
+1. Go to the frontend folder
 ```bash
-cd streamlit_app
-# pip install -r requirements.txt
-pip install -r reduced_requirements.txt
-# Adjust app_streamlit.py to use "http://localhost:8001 or via docker"
-streamlit run app_streamlit.py --server.port=8501
+cd ./frontend
 ```
+2. Create the `.env` file using the `.env.example` as a template. If in doubt in how to fill the `.env` file, click [here](#how-to-fill-the-frontend-env-file).
+3. Install the frontend dependencies
+```bash
+npm install
+```
+4. Run the frontend development server
+```bash
+npm run dev
+```
+5. Access the given `localhost` link.
 
-Now access: http://localhost:8501 and you will see Streamlit running in your local environment.
+#### How to fill the backend `.env` file?
 
-The FastAPI backend will run at http://localhost:8001
+At first glance, the backend `.env` file can look intimidating, but lets breat it down:
 
-The response will come in Markdown format with the extracted requirements. The final Markdown is saved as `report_YYYYMMDD_HHMMSS.md`.
+Firstly, you will need a Gemini API key and put it as `GEMINI_API_KEY`. The next 3 variables, the LangSmith ones, are optional, but recommended if you want to see the execution of the AI processes in the LangSmith. If that is the case, you will need to get a LangSmith API key and put it as `LANGSMITH_API_KEY`, also you will need to give a name to you project and put it on the `LANGSMITH_PROJECT` (it can be any name) and, finally, the `LANGSMITH_TRACING` is always true. Otherwise, if you do not want to see the execution in the LangSmith, you can ignore this 3 variables.
 
------
+Next you will need to put your frontend URL in the `CORS_ORIGIN`.
 
-## Agents and Components
+The other variables are specific to the used Django structure, you do not need to change them, although you might want to change the `SECRET_KEY`, the `HASHIDS_SALT` and the variables for the database in production `DB_*_PRODUCTION`.
 
-| Agent                  | Main Function                                    |
-|------------------------|--------------------------------------------------|
-| `agent_transcricao`    | Transcribe audio/video                           |
-| `agent_minimundo`      | Generate textual context overview (miniworld)    |
-| `agent_analise`        | Analyze the miniworld and generate requirements  |
-| `agent_refinamento`    | Refine and classify requirements (FR, BR, NFR)   |
-| `agent_validacao`      | Validate and structure the final response in Markdown |
+#### How to fill the frontend `.env` file?
 
-All agents are organized via LangGraph in the `graph.py` file, respecting state transitions and allowing traceability with LangSmith's `@traceable`.
+The frontend `.env` file is simpler than the backend file. You just need to put the backend base URL at the `VITE_BACKEND_ADMIN_BASE_URL` variable.
 
------
+## Pull Requests
 
-## Input Files (audio or video)
+Pull requests are welcome! Contributions of any kind are appreciated and help improve the RAI project.
 
-  - `shared/uploads/*.mkv` – Interview videos
-  - `*.wav`, `*.mp3` – Interview audio
+## Extra Information
 
------
-
-## References
-
-  - [LangGraph](https://langchain-ai.github.io/langgraph/)
-  - [Gemini API](https://ai.google.dev/)
-  - [LangSmith Traceable](https://docs.smith.langchain.com/)
-  - [Streamlit](https://streamlit.io/)
-  - [FastAPI](https://fastapi.tiangolo.com/)
-
------
-
-## Contribution
-
-Pull requests are welcome\! For issues or suggestions, please open an *issue*. 
+For more informations about the RAI code, visit the links below:
+* [RAI Architecture](./architecture.md)
+* [Backend Routes Examples for Creating Projects, Modules and Documents](./backend_create_routes.md)
