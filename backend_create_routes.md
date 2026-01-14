@@ -20,7 +20,6 @@
 ### Minimundo
 ```json
 {
-  "versao": "1.0",
   "arquivo": "",
   "origemAudio": "AudioEntrevistaFelipe.mp3",
   "TipoDocumento": "MINIMUNDO",
@@ -33,7 +32,6 @@
 ### Requisitos
 ```json
 {
-  "versao": "1.0",
   "arquivo": "",
   "origemAudio": "",
   "TipoDocumento": "REQUISITOS",
@@ -48,7 +46,6 @@
 ### Caso de Uso
 ```json
 {
-  "versao": "1.0",
   "arquivo": "",
   "origemAudio": "",
   "TipoDocumento": "CASO_USO",
@@ -63,7 +60,6 @@
 ### Diagrama de Classe
 ```json
 {
-  "versao": "1.0",
   "arquivo": "",
   "origemAudio": "",
   "TipoDocumento": "DIAGRAMA_CLASSE",
@@ -78,7 +74,6 @@
 ### Projeto de Interface
 ```json
 {
-  "versao": "1.0",
   "arquivo": "",
   "origemAudio": "",
   "TipoDocumento": "PROTOTIPO_INTERFACE",

@@ -1,6 +1,7 @@
 from hashids import Hashids
 from django.conf import settings
 from django.http import Http404
+from pathlib import Path
 
 from .models import (
     Documento
@@ -82,7 +83,7 @@ def send_to_llm(data: dict) -> str | tuple:
     match (data.get('TipoDocumento')):
         case 'MINIMUNDO':
             try:
-                if data['origemAudio']:
+                if data.get('origemAudio'):
                     path = '../shared/uploads/' + data['origemAudio']
 
                     mw_data = run_mw({ 'video_entrevista': path })

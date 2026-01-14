@@ -4,7 +4,7 @@ ENV DJANGO_SETTINGS_MODULE rai.settings.local
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV DEBUG true
 
-WORKDIR /app
+WORKDIR /app/backend
 
 COPY requirements.txt .
 
