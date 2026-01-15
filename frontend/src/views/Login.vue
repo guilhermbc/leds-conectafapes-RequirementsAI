@@ -75,9 +75,13 @@ const entrar = async () => {
         </text-input>
 
         <div class="flex justify-end">
-          <p-button @click="entrar">
+          <button
+            class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 
+            transition cursor-pointer"
+            @click="entrar"
+          >
             Entrar
-          </p-button>
+          </button>
         </div>
       </card>
     </div>

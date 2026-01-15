@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { ref, watch, computed} from 'vue'
 import type { Documento } from '../types/documento'
-import {
-  criarDocumento,
-  listarDocumento
-} from '../controllers/documento'
-import { formatarVersao} from '@/utils/formatacoesDocumentos';
+import { criarDocumento } from '../controllers/documento'
+import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
+import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
 
 const props = defineProps<{
   modelValue: boolean
-  moduloId?: string | number
+  moduloId: Number | string
 }>()
 
 const emit = defineEmits<{
@@ -41,19 +39,12 @@ const categoriasDropdown = [
 // Tipo de documento (categoria) escolhido na hora de criar
 const categoriaEscolhida = ref('')
 
-// Arrays p/ armazenarem as versões dos documentos p/ escolha nos dropdowns
-const minimundos = ref<Documento[]>([])
-const requisitos = ref<Documento[]>([])
-const casosDeUso = ref<Documento[]>([])
-const diagramasDeClasses = ref<Documento[]>([])
-const prototiposDeInterface = ref<Documento[]>([])
-
 // Refs p/ armazenarem os documentos de origem escolhidos
-const minimundo_origem = ref('')
-const requisito_origem = ref('')
-const casoDeUso_origem = ref('')
-const diagramaDeClasse_origem = ref('')
-// const prototipoDeInterface_origem = ref('')
+const minimundo_origem = ref<Documento | null>(null)
+const requisito_origem = ref<Documento | null>(null)
+const casoDeUso_origem = ref<Documento | null>(null)
+const diagramaDeClasse_origem = ref<Documento | null>(null)
+const prototipoDeInterface_origem = ref<Documento | null>(null)
 
 const carregando = ref(false)
 
@@ -78,58 +69,50 @@ const isDisabled = computed(() => {
   return carregando.value
     || (TipoDocumento.value === '')
     || (TipoDocumento.value === 'MINIMUNDO' && origemAudio.value === '')
-    || (TipoDocumento.value === 'REQUISITOS' && minimundo_origem.value === '') 
-    || (TipoDocumento.value === 'CASO_USO' && (minimundo_origem.value === '' || requisito_origem.value === '')) 
-    || (TipoDocumento.value === 'DIAGRAMA_CLASSE' && (minimundo_origem.value === '' || requisito_origem.value === '' || casoDeUso_origem.value === '')) 
-    || (TipoDocumento.value === 'PROTOTIPO_INTERFACE' && (requisito_origem.value === '' || casoDeUso_origem.value === '' || diagramaDeClasse_origem.value === '' ))
+    || (TipoDocumento.value === 'REQUISITOS' && minimundo_origem.value === null) 
+    || (TipoDocumento.value === 'CASO_USO' && (minimundo_origem.value === null || requisito_origem.value === null)) 
+    || (TipoDocumento.value === 'DIAGRAMA_CLASSE' && (minimundo_origem.value === null || requisito_origem.value === null || casoDeUso_origem.value === null)) 
+    || (TipoDocumento.value === 'PROTOTIPO_INTERFACE' && (requisito_origem.value === null || casoDeUso_origem.value === null || diagramaDeClasse_origem.value === null))
 })
 
 // Recarrega a lista de documentos ao abrir o modal
 watch(
   () => props.modelValue,
   (novoValor) => {
-    if (novoValor) {
-      carregarDocumentos()
-    }
+    if (novoValor) { carregarDocumentos() }
   }
 )
 
 // Reseta os campos ao mudar a categoria
 watch(
   () => categoriaEscolhida.value,
-  () => {
-    origemAudio.value = ''
-    minimundo_origem.value = ''
-    requisito_origem.value = ''
-    casoDeUso_origem.value = ''
-    diagramaDeClasse_origem.value = ''
-  }
+  () => { carregarDocumentos() }
 )
 
 // Métodos ------------------------------------------------------
 
 const carregarDocumentos = async () => {
-  const documentos = await listarDocumento()
+  // Reseta os campos
+  origemAudio.value = ''
+  minimundo_origem.value = null
+  requisito_origem.value = null
+  casoDeUso_origem.value = null
+  diagramaDeClasse_origem.value = null
+  prototipoDeInterface_origem.value = null
 
-  minimundos.value = []
-  requisitos.value = []
-  casosDeUso.value = []
-  diagramasDeClasses.value = []
-  prototiposDeInterface.value = []
+  const ultimosDocumentos = await listarUltimosDocumentos(props.moduloId as string)
 
-  for (const documento of documentos) {
-    if (documento.Modulo.id === props.moduloId) {
-      if (documento.TipoDocumento === 'MINIMUNDO') {
-        minimundos.value.unshift(documento)
-      } else if (documento.TipoDocumento === 'REQUISITOS') {
-        requisitos.value.unshift(documento)
-      } else if (documento.TipoDocumento === 'CASO_USO') {
-        casosDeUso.value.unshift(documento)
-      } else if (documento.TipoDocumento === 'DIAGRAMA_CLASSE') {
-        diagramasDeClasses.value.unshift(documento)
-      } else if (documento.TipoDocumento === 'PROTOTIPO_INTERFACE') {
-        prototiposDeInterface.value.unshift(documento)
-      }
+  for (const documento of ultimosDocumentos) {
+     if (documento.TipoDocumento === 'MINIMUNDO') {
+      minimundo_origem.value = documento
+    } else if (documento.TipoDocumento === 'REQUISITOS') {
+      requisito_origem.value = documento
+    } else if (documento.TipoDocumento === 'CASO_USO') {
+      casoDeUso_origem.value = documento
+    } else if (documento.TipoDocumento === 'DIAGRAMA_CLASSE') {
+      diagramaDeClasse_origem.value = documento
+    } else if (documento.TipoDocumento === 'PROTOTIPO_INTERFACE') {
+      prototipoDeInterface_origem.value = documento
     }
   }
 }
@@ -142,17 +125,17 @@ const salvar = async () => {
   try{
     let sucesso = false
 
-    if (minimundo_origem.value !== '') {
-      DocumentoOrigem.value.push(Number(minimundo_origem.value))
+    if (minimundo_origem.value !== null) {
+      DocumentoOrigem.value.push(Number(minimundo_origem.value.id))
     }
-    if (requisito_origem.value !== '') {
-      DocumentoOrigem.value.push(Number(requisito_origem.value))
+    if (requisito_origem.value !== null) {
+      DocumentoOrigem.value.push(Number(requisito_origem.value.id))
     }
-    if (casoDeUso_origem.value !== '') {
-      DocumentoOrigem.value.push(Number(casoDeUso_origem.value))
+    if (casoDeUso_origem.value !== null) {
+      DocumentoOrigem.value.push(Number(casoDeUso_origem.value.id))
     }
-    if (diagramaDeClasse_origem.value !== '') {
-      DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value))
+    if (diagramaDeClasse_origem.value !== null) {
+      DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value.id))
     }
 
     sucesso = await criarDocumento({
@@ -204,57 +187,53 @@ const salvar = async () => {
     <!-- Seleção de Minimundo -->
     <div v-if="TipoDocumento === 'REQUISITOS' || TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'">
       <h3 class="font-semibold">Minimundo de origem:</h3>
-      <select
-        v-model="minimundo_origem"
-        class="block w-full p-2 border rounded my-1 mb-3"
-      >
-        <option disabled value="">Selecione um tipo...</option>
-        <option v-for="minimundo in minimundos" :key="minimundo.id" :value="minimundo.id">
-          Minimundo (v{{ formatarVersao(minimundo.vMajor, minimundo.vMinor) }})
-        </option>
-      </select>
+      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+        <div v-if="minimundo_origem !== null">
+          {{ formatarTipoDocumento(minimundo_origem?.TipoDocumento) }} (v{{ formatarVersao(minimundo_origem?.vMajor, minimundo_origem?.vMinor) }})
+        </div>
+        <div v-else class="text-gray-500 italic">
+          Nenhum documento disponível.
+        </div>
+      </div>
     </div>
 
     <!-- Seleção de Requisitos -->
     <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
       <h3 class="font-semibold">Requisitos de origem:</h3>
-      <select
-        v-model="requisito_origem"
-        class="block w-full p-2 border rounded my-1 mb-3"
-      >
-        <option disabled value="">Selecione um tipo...</option>
-        <option v-for="requisito in requisitos" :key="requisito.id" :value="requisito.id">
-          Requisitos (v{{ formatarVersao(requisito.vMajor, requisito.vMinor) }})
-        </option>
-      </select>
+      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+        <div v-if="requisito_origem !== null">
+          {{ formatarTipoDocumento(requisito_origem?.TipoDocumento) }} (v{{ formatarVersao(requisito_origem?.vMajor, requisito_origem?.vMinor) }})
+        </div>
+        <div v-else class="text-gray-500 italic">
+          Nenhum documento disponível.
+        </div>
+      </div>
     </div>
 
     <!-- Seleção de Casos de Uso -->
     <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
       <h3 class="font-semibold">Casos de uso de origem:</h3>
-      <select
-        v-model="casoDeUso_origem"
-        class="block w-full p-2 border rounded my-1 mb-3"
-      >
-        <option disabled value="">Selecione um tipo...</option>
-        <option v-for="casoDeUso in casosDeUso" :key="casoDeUso.id" :value="casoDeUso.id">
-          Casos de Uso (v{{ formatarVersao(casoDeUso.vMajor, casoDeUso.vMinor) }})
-        </option>
-      </select>
+      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+        <div v-if="casoDeUso_origem !== null">
+          {{ formatarTipoDocumento(casoDeUso_origem?.TipoDocumento) }} (v{{ formatarVersao(casoDeUso_origem?.vMajor, casoDeUso_origem?.vMinor) }})
+        </div>
+        <div v-else class="text-gray-500 italic">
+          Nenhum documento disponível.
+        </div>
+      </div>
     </div>
 
     <!-- Seleção de Diagrama de Classe -->
     <div v-if="TipoDocumento === 'PROTOTIPO_INTERFACE'">
       <h3 class="font-semibold">Diagrama de classe de origem:</h3>
-      <select
-        v-model="diagramaDeClasse_origem"
-        class="block w-full p-2 border rounded my-1 mb-3"
-      >
-        <option disabled value="">Selecione um tipo...</option>
-        <option v-for="diagramaDeClasse in diagramasDeClasses" :key="diagramaDeClasse.id" :value="diagramaDeClasse.id">
-          Diagrama de Classes (v{{ formatarVersao(diagramaDeClasse.vMajor, diagramaDeClasse.vMinor) }})
-        </option>
-      </select>
+      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+        <div v-if="diagramaDeClasse_origem !== null">
+          {{ formatarTipoDocumento(diagramaDeClasse_origem?.TipoDocumento) }} (v{{ formatarVersao(diagramaDeClasse_origem?.vMajor, diagramaDeClasse_origem?.vMinor) }})
+        </div>
+        <div v-else class="text-gray-500 italic">
+          Nenhum documento disponível.
+        </div>
+      </div>
     </div>
 
     <div class="mt-4 flex justify-end gap-3">

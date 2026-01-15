@@ -142,13 +142,22 @@ const salvar = async () => {
     </div>
 
     <div class="flex justify-end gap-3">
-      <p-button class="bg-red-700" color="secondary" @click="close">
+      <button 
+        class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white 
+        transition cursor-pointer" 
+        @click="close"
+      >
         Cancelar
-      </p-button>
+      </button>
 
-      <p-button :disabled="carregando" @click="salvar">
+       <button
+        class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 
+        transition cursor-pointer"
+        :disabled="carregando" 
+        @click="salvar"
+      >
         Confirmar
-      </p-button>
+      </button>
     </div>
     
   </modal>

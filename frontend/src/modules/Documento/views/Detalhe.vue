@@ -55,7 +55,6 @@ const carregarDocumentosSeguintes = async () => {
   try {
     documentoId.value = route.params.id as string
     const documentosData = await listarDocumento()
-    console.log('Documentos data:', documentosData)
     documentosSeguintes.value = []
     // Lista de documentos seguintes
     for (const doc of documentosData){
@@ -63,8 +62,6 @@ const carregarDocumentosSeguintes = async () => {
         documentosSeguintes.value.push(doc)
       }
     }
-    console.log('Documentos seguintes:', documentosSeguintes.value)
-
   }
   catch (error){
     console.error('Error loading documentos seguintes:', error)
