@@ -1,27 +1,33 @@
 <script setup lang="ts">
-import VMdEditor from '@kangc/v-md-editor'
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js'
-import '@kangc/v-md-editor/lib/style/base-editor.css'
-import '@kangc/v-md-editor/lib/theme/style/github.css'
-import Prism from 'prismjs'
 import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
+
+import { MdEditor, config }from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
+import pt_BR from '@vavt/cm-extension/dist/locale/pt-BR'
+import '@vavt/cm-extension/dist/previewTheme/arknights.css'
+
 import { listarDocumento, obterDocumento } from '../controllers/documento'
 import type { Documento } from '../types/documento'
 import NovaVersao from './NovaVersaoIA.vue'
 import Editar from './NovaVersaoManual.vue'
 import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
 
-// Configura o editor Markdown
-VMdEditor.use(githubTheme, { Prism })
+config({
+  editorConfig: {
+    languageUserDefined: {
+      'pt-BR': pt_BR
+    }
+  }
+});
 
 const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
 
 const documentoId = ref(route.params.id as string)
-const documento = ref<Documento[]>([])
+const documento = ref<Documento | null>(null)
 const documentosSeguintes = ref<Documento[]>([])
 
 const loading = ref(true)
@@ -41,7 +47,7 @@ const carregarDocumento = async () => {
     documentoId.value = route.params.id as string
     const data = await obterDocumento(documentoId.value)
     // Para obter o 'dado' desejado, use documento.value.dado
-    documento.value = data
+    documento.value = Array.isArray(data) ? data[0] : data
   } catch (error) {
     console.error('Error loading documento:', error)
     ui.exibirAlerta({ message: 'Erro ao carregar documento', color: 'error' })
@@ -216,12 +222,17 @@ audio {
         <!-- Editor Markdown -->
         <div class="w-full">
           <p class="text-gray-600 font-medium mb-2">Conteúdo do Documento:</p>
-          <div class="border border-1 border-gray-500 rounded-md pr-2 py-2">
-            <v-md-editor
+          <div class="pr-2 py-2">
+            <MdEditor
               v-model="documento.arquivo"
-              mode="preview"
+              language="pt-BR"
+              :preview="true"
+              preview-theme="default"
+              :read-only="true"
+              :toolbars="['previewOnly', 'pageFullscreen']"
+              :footers="[]"
               height="500px"
-          />
+            />         
           </div>
         </div>
       </div>
@@ -237,26 +248,27 @@ audio {
       <div class="mb-4">
         <p class="text-gray-600 font-medium mb-1">Documentos de Origem:</p>
         <!-- Se o documento for um minimundo -->
-        <p v-if="documento.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2">
-          {{documento.origemAudio}}
+        <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2">
+          {{ documento?.origemAudio }}
         </p>
-        <ul v-else="documento.TipoDocumento !== 'MINIMUNDO'" class="list-disc ml-6 text-blue-600">
+        <ul v-else-if="documento?.TipoDocumento !== 'MINIMUNDO' && documento?.DocumentoOrigem?.length" class="list-disc ml-6 text-blue-600">
           <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">
             <RouterLink :to="`/Documento/${origem.id}`" class="hover:underline">
               {{ formatarTipoDocumento(origem.TipoDocumento) }} (v{{ formatarVersao(origem.vMajor, origem.vMinor) }})
             </RouterLink>
           </li>
         </ul>
+        <p v-else class="text-gray-500 italic ml-2">Sem documentos de origem.</p>
       </div>
 
       <!-- Documento Anterior -->
       <div class="mb-4">
         <p class="text-gray-600 font-medium mb-1">Versão Anterior:</p>
         <!-- Se não houver nenhuma versão anterior-->
-        <p v-if="documento.DocumentoAnterior === null" class="text-gray-500 italic ml-2">
+        <p v-if="!documento?.DocumentoAnterior" class="text-gray-500 italic ml-2">
           Não há versões anteriores.
         </p>
-        <ul v-else="documento.DocumentoAnterior !== null" class="list-disc ml-6 text-blue-600">
+        <ul v-else class="list-disc ml-6 text-blue-600">
           <li>
             <RouterLink
               :to="`/Documento/${documento.DocumentoAnterior.id}`"
@@ -275,7 +287,7 @@ audio {
         <p v-if="!documentosSeguintes || documentosSeguintes.length === 0" class="text-gray-500 italic ml-2">
           Não há novas versões.
         </p>
-        <ul v-else="documentosSeguintes.length > 0"class="list-disc ml-6 text-blue-600">
+        <ul v-else-if="documentosSeguintes.length > 0"class="list-disc ml-6 text-blue-600">
           <li v-for="seguinte in documentosSeguintes" :key="seguinte.id">
             <RouterLink :to="{ name: 'documento-detalhe', params: { id: seguinte.id }}" class="text-blue-600 hover:underline">
               {{ formatarTipoDocumento(seguinte.TipoDocumento) }} (v{{formatarVersao(seguinte.vMajor, seguinte.vMinor)}})
