@@ -1,0 +1,42 @@
+/* Base do markdown */
+.markdown-body {
+  background-color: #ffffff;
+  color: #24292f;
+}
+
+/* TABELAS — força fundo claro em tudo */
+.markdown-body table {
+  background-color: #ffffff;
+  border-collapse: collapse;
+}
+
+.markdown-body thead,
+.markdown-body tbody,
+.markdown-body tr,
+.markdown-body th,
+.markdown-body td {
+  background-color: #ffffff !important;
+  color: #24292f;
+}
+
+/* Linhas alternadas (remove zebra escura) */
+.markdown-body tr:nth-child(2n) {
+  background-color: #ffffff !important;
+}
+
+/* Bordas */
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid #d0d7de;
+  padding: 6px 10px;
+}
+
+/* Código em bloco */
+.markdown-body pre {
+  background-color: #f6f8fa;
+}
+
+/* Código inline */
+.markdown-body code {
+  background-color: rgba(175, 184, 193, 0.2);
+}

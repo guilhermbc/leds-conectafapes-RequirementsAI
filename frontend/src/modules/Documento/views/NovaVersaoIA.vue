@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed} from 'vue'
-import type { Documento } from '../types/documento'
+import { ref, watch} from 'vue'
 import {
   criarDocumento,
   obterDocumento,

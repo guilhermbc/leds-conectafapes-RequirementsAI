@@ -15,6 +15,7 @@
     "@vavt/cm-extension": "^1.11.2",
     "@vueuse/integrations": "^13.1.0",
     "axios": "^1.8.4",
+    "markdown-it": "^14.1.0",
     "markdown-it-plantuml": "^1.4.1",
     "pinia": "^3.0.2",
     "plantuml-encoder": "^1.4.0",

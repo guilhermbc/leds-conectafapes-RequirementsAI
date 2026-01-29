@@ -3,24 +3,14 @@ import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 
-import { MdEditor, config }from 'md-editor-v3'
-import 'md-editor-v3/lib/style.css'
-import pt_BR from '@vavt/cm-extension/dist/locale/pt-BR'
-import '@vavt/cm-extension/dist/previewTheme/arknights.css'
+import MarkdownEditor from '@/components/MarkdownEditor.vue'
+import MarkdownViewer from '@/components/MarkdownViewer.vue'
 
 import { listarDocumento, obterDocumento } from '../controllers/documento'
 import type { Documento } from '../types/documento'
 import NovaVersao from './NovaVersaoIA.vue'
 import Editar from './NovaVersaoManual.vue'
 import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
-
-config({
-  editorConfig: {
-    languageUserDefined: {
-      'pt-BR': pt_BR
-    }
-  }
-});
 
 const route = useRoute()
 const router = useRouter()
@@ -149,7 +139,7 @@ audio {
 
 <template>
   <div class="flex my-auto mt-20 w-11/12 gap-6 items-start">
-    <div class="w-11/12 mb-0 p-4 border border-1 border-gray-500 rounded-lg">
+    <div class="w-10/12 mb-0 p-4 border border-1 border-gray-500 rounded-lg">
       <!-- Cabeçalho com alinhamento correto -->
       <div class="flex items-start justify-between mb-6 w-full">
 
@@ -222,17 +212,8 @@ audio {
         <!-- Editor Markdown -->
         <div class="w-full">
           <p class="text-gray-600 font-medium mb-2">Conteúdo do Documento:</p>
-          <div class="pr-2 py-2">
-            <MdEditor
-              v-model="documento.arquivo"
-              language="pt-BR"
-              :preview="true"
-              preview-theme="default"
-              :read-only="true"
-              :toolbars="['previewOnly', 'pageFullscreen']"
-              :footers="[]"
-              height="500px"
-            />         
+          <div class="border border-gray-700 rounded-lg px-4 py-4">
+            <MarkdownViewer :source="documento.arquivo"/>      
           </div>
         </div>
       </div>
