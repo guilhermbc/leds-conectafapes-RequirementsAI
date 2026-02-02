@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:modelValue", value:boolean): void
-  (e: "excluido"): void
+  (e: "salvo"): void
 }>()
 
 const close = () => emit("update:modelValue", false)
@@ -101,7 +101,7 @@ const salvar = async () => {
       DocumentoOrigem: DocumentoOrigem.value,
     })
 
-    emit("excluido")
+    emit("salvo")
     close()
     
   } finally {

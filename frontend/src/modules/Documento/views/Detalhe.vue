@@ -7,6 +7,7 @@ import MarkdownEditor from '@/components/MarkdownEditor.vue'
 import MarkdownViewer from '@/components/MarkdownViewer.vue'
 
 import { listarDocumento, obterDocumento } from '../controllers/documento'
+import { obterModulo } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 import NovaVersao from './NovaVersaoIA.vue'
 import Editar from './NovaVersaoManual.vue'
@@ -35,14 +36,18 @@ const carregarDocumento = async () => {
   try {
     loading.value = true
     documentoId.value = route.params.id as string
+
     const data = await obterDocumento(documentoId.value)
-    // Para obter o 'dado' desejado, use documento.value.dado
     documento.value = Array.isArray(data) ? data[0] : data
-  } catch (error) {
-    console.error('Error loading documento:', error)
+
+    await carregarDocumentosSeguintes()
+  }
+  catch (error) {
+    console.error(error)
     ui.exibirAlerta({ message: 'Erro ao carregar documento', color: 'error' })
     router.push({ name: 'projeto-home' })
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -50,11 +55,13 @@ const carregarDocumento = async () => {
 const carregarDocumentosSeguintes = async () => {
   try {
     documentoId.value = route.params.id as string
-    const documentosData = await listarDocumento()
+    const moduloId = documento.value?.Modulo?.id
+    const modulo = await obterModulo(moduloId as string)
+    const documentos = modulo.modulo_documento as Documento[]
     documentosSeguintes.value = []
     // Lista de documentos seguintes
-    for (const doc of documentosData){
-      if (String(doc.DocumentoAnterior?.id) === documentoId.value && String(doc.id) !== documentoId.value) {
+    for (const doc of documentos){
+      if (String(doc.DocumentoAnterior?.id) === documentoId.value){
         documentosSeguintes.value.push(doc)
       }
     }
@@ -68,10 +75,32 @@ const carregarDocumentosSeguintes = async () => {
   }
 }
 
+const irParaSeguinte = async () => {
+  try {
+    loading.value = true
+    await carregarDocumento()
+
+    const proximo = documentosSeguintes.value[0]
+    if (!proximo) {
+      ui.exibirAlerta({ message: 'Nenhuma versão seguinte encontrada', color: 'info' })
+      return
+    }
+
+    console.log('Navegando para documento seguinte:', proximo)
+    await router.push({ name: 'documento-detalhe', params: { id: proximo.id } })
+  }
+  catch (error) {
+    console.error('Erro ao navegar para documento seguinte:', error)
+    ui.exibirAlerta({ message: 'Erro ao navegar para próximo documento', color: 'error' })
+  }
+  finally {
+    loading.value = false
+  }
+}
+
 onBeforeMount(
   () => {
     carregarDocumento()
-    carregarDocumentosSeguintes()
   }
 )
 
@@ -79,7 +108,6 @@ watch(
   () => route.params.id,
   () => {
     carregarDocumento()
-    carregarDocumentosSeguintes()
   }
 )
 
@@ -166,7 +194,7 @@ audio {
 
             <Editar
               v-model="mostrarModalEditar"
-              @salvo="carregarDocumentosSeguintes"
+              @salvo="irParaSeguinte()"
               :documentoId="route.params.id as string"
             />
 
@@ -180,8 +208,8 @@ audio {
 
             <NovaVersao
               v-model="mostrarModalNV"
-              @salvo="carregarDocumentosSeguintes"
-              :documentoId="documentoId"
+              @salvo="irParaSeguinte()"
+              :documentoId="route.params.id as string"
             />
           </div>
 

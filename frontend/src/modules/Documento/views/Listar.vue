@@ -20,12 +20,6 @@ const carregarDocumentos = async () => {
   documentos.value = modulo.modulo_documento
 }
 
-// const excluirdocumento = async (cls: Documento[]) => {
-//   const ids = cls.map((a) => a.id)
-//   await excluirDocumentos(ids)
-//   await carregarDocumentos()
-// }
-
 const mostrarModal = ref(false)
 
 onBeforeMount(carregarDocumentos)
@@ -60,7 +54,7 @@ function abrirModal(){
       <router-link
         v-for="documento in ultimosDocumentos"
         :key="documento.id"
-        :to="{ name: 'documento-detalhe', params: { id: documento.id }}"
+        :to="{ name: 'documento-detalhe', params: { id: documento.id } }"
         class="block group h-48"
       >
         <article
@@ -88,7 +82,7 @@ function abrirModal(){
       <router-link
         v-for="documento in documentos"
         :key="documento.id"
-        :to="{ name: 'documento-detalhe', params: { id: documento.id }}"
+        :to="{ name: 'documento-detalhe', params: { id: documento.id} }"
         class="block group h-48"
       >
         <article
