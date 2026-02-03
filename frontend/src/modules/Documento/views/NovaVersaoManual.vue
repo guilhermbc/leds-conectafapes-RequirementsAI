@@ -58,8 +58,6 @@ const carregarDocumento = async () => {
   for (const docOrigem of documento.DocumentoOrigem) {
     DocumentoOrigem.value.push(docOrigem.id)
   }
-
-  console.log('DocumentoOrigem:', DocumentoOrigem.value)
 }
 
 function onFileSelected(event: Event) {
@@ -84,10 +82,6 @@ const salvar = async () => {
 
   try{
     let sucesso = false
-
-    if (TipoDocumento.value === 'MINIMUNDO'){
-      
-    }
 
     sucesso = await criarDocumento({
       vMajor: vMajor.value,

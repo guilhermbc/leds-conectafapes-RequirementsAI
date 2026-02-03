@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch} from 'vue'
+import { computed, ref, watch} from 'vue'
 import {
   criarDocumento,
   obterDocumento,
@@ -29,6 +29,11 @@ const DocumentoOrigem = ref<number[]>([])
 
 const carregando = ref(false)
 
+const isDisabled = computed(() => {
+  return carregando.value
+    || (origemAudio.value == '' && TipoDocumento.value == 'MINIMUNDO')
+})
+
 // Recarrega a lista de documentos ao abrir o modal
 watch(
   () => props.modelValue,
@@ -51,7 +56,10 @@ const carregarDocumento = async () => {
   origemAudio.value = documento.origemAudio
   TipoDocumento.value = documento.TipoDocumento
   Modulo.value = documento.Modulo.id
-  DocumentoOrigem.value = documento.DocumentoOrigem
+
+  for (const docOrigem of documento.DocumentoOrigem) {
+    DocumentoOrigem.value.push(docOrigem.id)
+  }
 }
 
 const salvar = async () => {
@@ -103,13 +111,22 @@ const salvar = async () => {
     </div>
 
     <div class="flex justify-end gap-3">
-      <p-button class="bg-red-700" color="secondary" @click="close">
+      <button 
+        class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white 
+        transition cursor-pointer" 
+        @click="close"
+      >
         Cancelar
-      </p-button>
+      </button>
 
-      <p-button :disabled="carregando" @click="salvar">
+      <button
+        class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition cursor-pointer
+        disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
+        :disabled="isDisabled"  
+        @click="salvar"
+      >
         Confirmar
-      </p-button>
+      </button>
     </div>
     
   </modal>
