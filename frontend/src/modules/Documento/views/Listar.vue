@@ -55,7 +55,7 @@ function abrirModal(){
         v-for="documento in ultimosDocumentos"
         :key="documento.id"
         :to="{ name: 'documento-detalhe', params: { id: documento.id } }"
-        class="block group h-48"
+        class="block group h-25"
       >
         <article
           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
@@ -83,7 +83,7 @@ function abrirModal(){
         v-for="documento in documentos"
         :key="documento.id"
         :to="{ name: 'documento-detalhe', params: { id: documento.id} }"
-        class="block group h-48"
+        class="block group h-25"
       >
         <article
           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
