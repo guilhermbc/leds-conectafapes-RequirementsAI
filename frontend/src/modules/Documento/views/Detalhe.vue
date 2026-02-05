@@ -86,7 +86,6 @@ const irParaSeguinte = async () => {
       return
     }
 
-    console.log('Navegando para documento seguinte:', proximo)
     await router.push({ name: 'documento-detalhe', params: { id: proximo.id } })
   }
   catch (error) {
@@ -153,6 +152,20 @@ function baixarMarkdown() {
   a.click();
 
   URL.revokeObjectURL(url);
+}
+
+// Extrai os comentários do protótipo de interface após o fechamento do HTML
+function textoAposHtml(conteudo: string): string {
+  const fechamento = '</html>'
+  const index = conteudo.toLowerCase().lastIndexOf(fechamento)
+
+  if (index === -1) {
+    return ''
+  }
+
+  const retorno = conteudo.slice(index + fechamento.length).trim()
+  console.log('Conteúdo extraído após </html>:', retorno)
+  return retorno
 }
 
 </script>
@@ -241,7 +254,8 @@ audio {
         <div class="w-full">
           <p class="text-gray-600 font-medium mb-2">Conteúdo do Documento:</p>
           <div class="border border-gray-700 rounded-lg px-4 py-4">
-            <MarkdownViewer :source="documento.arquivo"/>      
+            <MarkdownViewer v-if="documento.TipoDocumento === 'PROTOTIPO_INTERFACE'" :source="textoAposHtml(documento.arquivo)"/>
+            <MarkdownViewer v-else :source="documento.arquivo"/>      
           </div>
         </div>
       </div>
