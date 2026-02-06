@@ -19,7 +19,8 @@ persona_message_diagramuc = SystemMessage(
     - Actors
 
     **Output Format**:
-    - A single `@startuml` to `@enduml` PlantUML diagram;
+    - First, start with a PlantUML code block using triple backticks and `plantuml`;
+    - After, use `@startuml` to `@enduml` and finish the PlantUML diagram with triple backticks;
     - One `actor` declaration for each actor;
     - One `(Code)` declaration for each use case, optionally using `as "Name"` for clarity;
     - Use `Actor --> (UseCase)` to show relationships;
@@ -60,7 +61,8 @@ diagramuc_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **Output Instructions**:
-    - Generate a **PlantUML** diagram using the `@startuml` and `@enduml` tags.
+    - First, start with a PlantUML code block using triple backticks and `plantuml`;
+    - After, use `@startuml` to `@enduml` and finish the PlantUML diagram with triple backticks;
     - Represent each actor using the `actor` keyword.
     - Represent each use case using its `Code` in parentheses (e.g., `(UC01)`).
     - Connect each actor to their respective use cases using `ActorName --> (UseCaseCode)`.
@@ -70,6 +72,7 @@ diagramuc_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **Example Output**:
+    ```plantuml
     @startuml
 
     actor Cliente
@@ -82,6 +85,7 @@ diagramuc_prompt = ChatPromptTemplate.from_messages([
     Bibliotecário --> (UC02)
 
     @enduml
+    ```
 
     ---
     **Final Output Format**:
