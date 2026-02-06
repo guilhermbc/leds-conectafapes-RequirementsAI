@@ -18,9 +18,8 @@ export const useAuthStore = defineStore('auth', () => {
     return cookies.set('token', newToken,
       {
         path: '/',
-        // 10 minutos, para que seja possivel ver a expiracao de sessao
-        // em funcionamento
-        maxAge:  1800
+        // Sessão sem expiração (autenticação desabilitada temporariamente)
+        maxAge: 365 * 24 * 60 * 60 // 1 ano
       })
   }
 
@@ -37,7 +36,8 @@ export const useAuthStore = defineStore('auth', () => {
     return await router.push({ name: 'login' })
   }
   const estaLogado = () => {
-    return getSessionToken()
+    // Autenticação desabilitada - sempre retorna true
+    return true
   }
 
   return {

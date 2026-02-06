@@ -23,16 +23,17 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to) => {
-  const auth = useAuthStore()
-  if (to.meta?.requiresAuth) {
-    if (auth.estaLogado()) {
-      return true
-    } else {
-      return { name: 'login' }
-    }
-  } else {
-    return true
-  }
-})
+// Autenticação desabilitada temporariamente
+// router.beforeEach((to) => {
+//   const auth = useAuthStore()
+//   if (to.meta?.requiresAuth) {
+//     if (auth.estaLogado()) {
+//       return true
+//     } else {
+//       return { name: 'login' }
+//     }
+//   } else {
+//     return true
+//   }
+// })
 export default router
