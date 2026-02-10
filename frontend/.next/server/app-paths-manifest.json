@@ -1,0 +1,8 @@
+{
+  "/page": "app/page.js",
+  "/requirements-ai/new/page": "app/requirements-ai/new/page.js",
+  "/requirements-ai/[projectId]/page": "app/requirements-ai/[projectId]/page.js",
+  "/requirements-ai/[projectId]/module/new/page": "app/requirements-ai/[projectId]/module/new/page.js",
+  "/requirements-ai/[projectId]/module/[moduleId]/page": "app/requirements-ai/[projectId]/module/[moduleId]/page.js",
+  "/settings/page": "app/settings/page.js"
+}
