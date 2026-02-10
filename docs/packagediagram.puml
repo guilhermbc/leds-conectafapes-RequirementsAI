@@ -1,0 +1,3 @@
+@startuml RAI
+namespace Classes{}
+@enduml

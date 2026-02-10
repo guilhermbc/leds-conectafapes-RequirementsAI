@@ -1,0 +1,36 @@
+Configuration {
+    software_name: "RAI"
+    language: python
+    database_name: "RAI" 
+}
+
+module Classes {
+    enum DOCS {
+        Minimundo
+        Requisitos
+        CasoUso
+        DiagramaClasse
+        PrototipoInterface
+    }
+
+    entity Projeto {
+        nome: string
+        descricao: string
+
+        Projeto OneToMany Modulo
+    }
+
+    entity Modulo {
+        nome: string
+        descricao: string
+
+        Modulo OneToMany Documento
+    }
+
+    entity Documento {
+        versao: string
+        arquivo: string
+
+        Documento uses DOCS
+    }
+}
