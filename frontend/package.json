@@ -11,10 +11,10 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
-    "@kangc/v-md-editor": "^2.3.18",
     "@vavt/cm-extension": "^1.11.2",
     "@vueuse/integrations": "^13.1.0",
     "axios": "^1.8.4",
+    "github-markdown-css": "^5.9.0",
     "markdown-it": "^14.1.0",
     "markdown-it-plantuml": "^1.4.1",
     "pinia": "^3.0.2",
@@ -29,6 +29,7 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/vite": "^4.1.4",
     "@tsconfig/node22": "^22.0.0",
+    "@types/codemirror": "^5.60.17",
     "@types/markdown-it": "^14.1.2",
     "@types/markdown-it-plantuml": "^1.4.5",
     "@types/node": "^22.9.0",
