@@ -42,7 +42,7 @@ function abrirModal(){
       </button>
 
       <!-- Modal -->
-      <Criar v-model="mostrarModal" @salvo="carregarDocumentos" :moduloId="moduloId"/>
+      <Criar v-model="mostrarModal" @salvo="carregarDocumentos" :moduloId="moduloId ?? ''"/>
     </div>
 
     <!-- Últimos Documentos -->

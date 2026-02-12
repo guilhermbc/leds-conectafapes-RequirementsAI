@@ -47,12 +47,14 @@ const carregarDocumento = async () => {
   const documento = await obterDocumento(props.documentoId as string)
 
   // Campos necessários para a nova versão
-  id.value = documento.id
+  id.value = documento.id ?? ''
   vMajor.value = documento.vMajor
   vMinor.value = documento.vMinor
   origemAudio.value = documento.origemAudio
   TipoDocumento.value = documento.TipoDocumento
-  Modulo.value = documento.Modulo.id
+  Modulo.value = typeof documento.Modulo === 'object' && documento.Modulo !== null 
+    ? documento.Modulo.id 
+    : documento.Modulo
   DocumentoAnterior.value = documento.DocumentoAnterior
 
   for (const docOrigem of documento.DocumentoOrigem) {

@@ -14,7 +14,7 @@ export type ModuloCreateReq = Pick<Modulo, "nome" | "descricao" | "Projeto">
 
 export type ModuloListRes = {
   "@odata.context": string
-  value: Modulo[]
+  data: Modulo[]
 }
 
 export type ModuloCreateRes = {

@@ -1,4 +1,4 @@
-<script lang="ts" setup>
+<!-- <script lang="ts" setup>
 defineProps<{
   label: string
 }>()
@@ -11,4 +11,4 @@ defineProps<{
   >
     {{ label }}
   </router-link>
-</template>
+</template> -->

@@ -16,14 +16,17 @@
     "axios": "^1.8.4",
     "github-markdown-css": "^5.9.0",
     "markdown-it": "^14.1.0",
+    "markdown-it-multimd-table": "^4.2.3",
     "markdown-it-plantuml": "^1.4.1",
+    "mermaid": "^11.12.2",
     "pinia": "^3.0.2",
     "plantuml-encoder": "^1.4.0",
     "prismjs": "^1.30.0",
     "roboto-fontface": "*",
     "universal-cookie": "^7.2.2",
     "vue": "^3.4.31",
-    "vue-router": "^4.5.0"
+    "vue-router": "^4.5.0",
+    "vuetify": "^3.11.8"
   },
   "devDependencies": {
     "@tailwindcss/line-clamp": "^0.4.4",
