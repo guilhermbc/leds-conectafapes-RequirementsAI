@@ -7,7 +7,7 @@ import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocume
 
 const props = defineProps<{
   modelValue: boolean
-  moduloId: Number | string
+  moduloId: number | string
 }>()
 
 const emit = defineEmits<{

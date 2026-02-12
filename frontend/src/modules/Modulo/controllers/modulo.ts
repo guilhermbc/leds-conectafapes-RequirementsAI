@@ -10,6 +10,7 @@ import {
   excluirModulo as _excluirModulo,
 } from '../api/modulo'
 import type { Modulo, ModuloCreateReq } from '../types/modulo'
+import type { Documento } from '@/modules/Documento/types/documento'
 import { useUiStore } from '@/stores/ui'
 import { AxiosError } from 'axios'
 
@@ -26,7 +27,7 @@ export const listarModulo = async () => {
 export const listarUltimosDocumentos = async (id: string) => {
   try {
     const { data } = await _listarUltimosDocumentos(id)
-    return data
+    return data as unknown as Documento[]
   } catch (error) {
     throw error
   }
@@ -66,7 +67,7 @@ export const criarModulo = async (modulo: ModuloCreateReq) => {
 export const obterModulo = async (id: string) => {
   try {
     const { data } = await _obterModulo(id)
-    return data
+    return data as unknown as Modulo
   } catch (error) {
     throw error
   }

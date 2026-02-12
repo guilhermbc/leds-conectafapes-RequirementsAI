@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, watch, defineProps } from 'vue'
+import { ref, onBeforeMount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   excluirModulos,

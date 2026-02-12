@@ -28,7 +28,7 @@ export type DocumentoCreateReq = Pick<Documento,
 
 export type DocumentoListRes = {
   "@odata.context": string
-  value: Documento[]
+  data: Documento[]
 }
 
 export type DocumentoCreateRes = {

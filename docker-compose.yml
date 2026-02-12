@@ -15,6 +15,15 @@ services:
   #   networks:
   #     - lang_net
 
+  rai_frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./shared/uploads:/app/shared/uploads
+    networks:
+      - lang_net
+
   rai_backend:
     build: ./backend
     ports:

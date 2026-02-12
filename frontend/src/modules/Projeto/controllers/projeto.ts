@@ -119,7 +119,7 @@ export const criarProjeto = async (projeto: ProjetoCreateReq) => {
 export const obterProjeto = async (id: string) => {
   try {
     const { data } = await _obterProjeto(id)
-    return data
+    return data as unknown as Projeto
   } catch (error) {
     throw error
   }

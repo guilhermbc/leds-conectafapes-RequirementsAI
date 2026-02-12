@@ -3,10 +3,11 @@ import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 
-import MarkdownEditor from '@/components/MarkdownEditor.vue'
+// Tentativa de integrar um editor markdown, está em stand by por enquanto
+// import MarkdownEditor from '@/components/MarkdownEditor.vue'
 import MarkdownViewer from '@/components/MarkdownViewer.vue'
 
-import { listarDocumento, obterDocumento } from '../controllers/documento'
+import { obterDocumento } from '../controllers/documento'
 import { obterModulo } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 import NovaVersao from './NovaVersaoIA.vue'
@@ -55,7 +56,9 @@ const carregarDocumento = async () => {
 const carregarDocumentosSeguintes = async () => {
   try {
     documentoId.value = route.params.id as string
-    const moduloId = documento.value?.Modulo?.id
+    const moduloId = typeof documento.value?.Modulo === 'object' && documento.value?.Modulo !== null
+      ? (documento.value.Modulo as { id: string }).id
+      : documento.value?.Modulo as string
     const modulo = await obterModulo(moduloId as string)
     const documentos = modulo.modulo_documento as Documento[]
     documentosSeguintes.value = []

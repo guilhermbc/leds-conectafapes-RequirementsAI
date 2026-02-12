@@ -56,7 +56,7 @@ export const criarDocumento = async (documento: DocumentoCreateReq) => {
 export const obterDocumento = async (id: string) => {
   try {
     const { data } = await _obterDocumento(id)
-    return data
+    return data as unknown as Documento
   } catch (error) {
     throw error
   }
