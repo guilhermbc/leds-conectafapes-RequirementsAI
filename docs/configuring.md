@@ -3,8 +3,8 @@
 <!-- end list -->
 
 ```bash
-git clone https://github.com/profmoisesomena/RequirementsAI.git
-cd RequirementsAI
+git clone https://github.com/leds-conectafapes/leds-conectafapes-RequirementsAI.git
+cd leds-conectafapes-RequirementsAI
 ```
 
 2.  **Set environment variables:**
