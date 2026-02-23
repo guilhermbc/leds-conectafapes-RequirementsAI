@@ -83,9 +83,7 @@ const salvar = async () => {
   carregando.value = true
 
   try{
-    let sucesso = false
-
-    sucesso = await criarDocumento({
+    const response = await criarDocumento({
       vMajor: vMajor.value,
       vMinor: vMinor.value,
       geradoIA: false,
@@ -99,7 +97,7 @@ const salvar = async () => {
 
     emit("salvo")
     close()
-    
+
   } finally {
     carregando.value = false
   }

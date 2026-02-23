@@ -8,7 +8,7 @@ import {
   atualizarDocumento as _atualizarDocumento,
   excluirDocumento as _excluirDocumento,
 } from '../api/documento'
-import type { Documento, DocumentoCreateReq } from '../types/documento'
+import type { Documento, DocumentoCreateReq, DocumentoCreateRes } from '../types/documento'
 import { useUiStore } from '@/stores/ui'
 import { AxiosError } from 'axios'
 
@@ -25,14 +25,15 @@ export const criarDocumento = async (documento: DocumentoCreateReq) => {
   const ui = useUiStore()
 
   try {
-    const { data } = await _criarDocumento(documento)
+    // Retorno da response com status
+    const data = await _criarDocumento(documento)
 
     ui.exibirAlerta({
-      text: data.message,
+      text: data.statusText,
       color: 'success'
     })
 
-    return true
+    return data as unknown as DocumentoCreateRes
 
   } catch (error) {
     if (
