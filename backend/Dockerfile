@@ -14,9 +14,9 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN python manage.py makemigrations
-RUN python manage.py migrate
-RUN python manage.py collectstatic --noinput
-RUN python manage.py createsuperuser --noinput
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "--timeout=8000", "--workers=2", "rai.wsgi:application"]
+ENTRYPOINT ["/entrypoint.sh"]
+
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "--timeout=8000", "--workers=2", "rai.wsgi:application"]
