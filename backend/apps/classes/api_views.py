@@ -31,6 +31,8 @@ from .utils import is_empty_or_null, send_to_llm, version_from_another_doc, vers
 
 class HealthViewSet(ViewSet):
 
+    permission_classes = [AllowAny]
+
     @action(detail='', url_path='')
     def check(self, request):
         response_data = {'content': 'OK'}
@@ -40,10 +42,10 @@ class HealthViewSet(ViewSet):
 class ProjetoViewSet(ModelViewSet):
     queryset = Projeto.objects.all()
     pagination_class = CustomPagination
-    # authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    # permission_classes = permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
+    authentication_classes = [OAuth2Authentication, SessionAuthentication]
+    permission_classes = permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     filter_backends = (
         filters.SearchFilter,
@@ -78,10 +80,10 @@ class ProjetoViewSet(ModelViewSet):
 class ModuloViewSet(ModelViewSet):
     queryset = Modulo.objects.all()
     pagination_class = CustomPagination
-    # authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    # permission_classes = permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
+    authentication_classes = [OAuth2Authentication, SessionAuthentication]
+    permission_classes = permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
 
     filter_backends = (
         filters.SearchFilter,
@@ -156,10 +158,10 @@ class ModuloViewSet(ModelViewSet):
 class DocumentoViewSet(ModelViewSet):
     queryset = Documento.objects.all()
     pagination_class = CustomPagination
-    # authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    # permission_classes = permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
+    authentication_classes = [OAuth2Authentication, SessionAuthentication]
+    permission_classes = permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
 
-    permission_classes = [AllowAny]
+    # permission_classes = [AllowAny]
     
     filter_backends = (
         filters.SearchFilter,
