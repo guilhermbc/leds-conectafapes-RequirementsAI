@@ -15,8 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE_APP: ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai
-  IMAGE_HOOK: ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-hook
+  IMAGE_FRONTEND: ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-frontend
+  IMAGE_BACKEND: ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-backend
   INFRA_REPO: leds-conectafapes/leds-conectafapes-infra
   BRANCH_NAME: ${{ github.ref_name }}
 
@@ -34,19 +34,9 @@ jobs:
       - name: Preflight Docker
         run: docker info
 
-      - name: Build Streamlit App (sanity check)
-        working-directory: streamlit_app
-        run: docker build -t app-temp:${BRANCH_NAME} -f dockerfile .
-
-      - name: Build Webhook Server (sanity check)
-        working-directory: webhook_server  
-        run: docker build -t hook-temp:${BRANCH_NAME} -f dockerfile .
-
       - name: Fix workspace permissions
         if: always()
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
-
-
 
   publish:
     name: Publish (GHCR)
@@ -54,8 +44,8 @@ jobs:
     needs: build
 
     outputs:
-      app_digest: ${{ steps.digest.outputs.app_digest }}
-      hook_digest: ${{ steps.digest.outputs.hook_digest }}
+      frontend_digest: ${{ steps.digest.outputs.frontend_digest }}
+      backend_digest: ${{ steps.digest.outputs.backend_digest }}
 
     steps:
       - name: Pre-clean workspace
@@ -73,35 +63,36 @@ jobs:
       - name: Setup buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build & Push Streamlit App
+      # --- BUILD DO FRONTEND ---
+      - name: Build & Push Frontend
         uses: docker/build-push-action@v6
         with:
-          context: ./streamlit_app
-          file: ./streamlit_app/dockerfile
+          context: ./frontend
+          file: ./frontend/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_APP }}:${{ env.BRANCH_NAME }}
+          tags: ${{ env.IMAGE_FRONTEND }}:${{ env.BRANCH_NAME }}
 
-      - name: Build & Push Webhook Server
+      # --- BUILD DO BACKEND ---
+      - name: Build & Push Backend
         uses: docker/build-push-action@v6
         with:
-          context: ./webhook_server  
-          file: ./webhook_server/dockerfile
+          context: ./backend  
+          file: ./backend/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_HOOK }}:${{ env.BRANCH_NAME }}
+          tags: ${{ env.IMAGE_BACKEND }}:${{ env.BRANCH_NAME }}
 
       - name: Resolve image digests
         id: digest
         run: |
-          DIGEST_APP=$(docker buildx imagetools inspect ${{ env.IMAGE_APP }}:${{ env.BRANCH_NAME }} | awk '/Digest:/ { print $2; exit }')
-          DIGEST_HOOK=$(docker buildx imagetools inspect ${{ env.IMAGE_HOOK }}:${{ env.BRANCH_NAME }} | awk '/Digest:/ { print $2; exit }')
+          DIGEST_FRONTEND=$(docker buildx imagetools inspect ${{ env.IMAGE_FRONTEND }}:${{ env.BRANCH_NAME }} | awk '/Digest:/ { print $2; exit }')
+          DIGEST_BACKEND=$(docker buildx imagetools inspect ${{ env.IMAGE_BACKEND }}:${{ env.BRANCH_NAME }} | awk '/Digest:/ { print $2; exit }')
           
-          echo "app_digest=${DIGEST_APP}" >> $GITHUB_OUTPUT
-          echo "hook_digest=${DIGEST_HOOK}" >> $GITHUB_OUTPUT
+          echo "frontend_digest=${DIGEST_FRONTEND}" >> $GITHUB_OUTPUT
+          echo "backend_digest=${DIGEST_BACKEND}" >> $GITHUB_OUTPUT
 
       - name: Fix workspace permissions
         if: always()
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
-
 
   deploy:
     name: Deploy (Infra repo)
@@ -123,7 +114,6 @@ jobs:
           esac
 
           echo "env_path=${ENV_PATH}" >> $GITHUB_OUTPUT
-          # Assumindo que o deploy é sempre comitando na branch develop da infra
           echo "target_branch=develop" >> $GITHUB_OUTPUT 
 
       - name: Checkout infra repository
@@ -137,15 +127,15 @@ jobs:
       - name: Update deployment.yaml
         working-directory: infra/${{ steps.envpath.outputs.env_path }}
         env:
-          APP_DIGEST: ${{ needs.publish.outputs.app_digest }}
-          HOOK_DIGEST: ${{ needs.publish.outputs.hook_digest }}
-          IMAGE_APP: ${{ env.IMAGE_APP }}
-          IMAGE_HOOK: ${{ env.IMAGE_HOOK }}
+          FRONTEND_DIGEST: ${{ needs.publish.outputs.frontend_digest }}
+          BACKEND_DIGEST: ${{ needs.publish.outputs.backend_digest }}
+          IMAGE_FRONTEND: ${{ env.IMAGE_FRONTEND }}
+          IMAGE_BACKEND: ${{ env.IMAGE_BACKEND }}
         run: |
-      
-          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_APP}@${APP_DIGEST}|" streamlit/deployment.yaml
+        
+          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_FRONTEND}@${FRONTEND_DIGEST}|" frontend/deployment.yaml
 
-          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_HOOK}@${HOOK_DIGEST}|" webhook/deployment.yaml
+          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_BACKEND}@${BACKEND_DIGEST}|" backend/deployment.yaml
 
       - name: Commit and push changes
         working-directory: infra
