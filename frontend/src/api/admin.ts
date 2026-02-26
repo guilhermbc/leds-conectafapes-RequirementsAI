@@ -33,3 +33,34 @@ adminApi.interceptors.response.use((config) => {
 })
 
 export default adminApi
+
+import { useAuthStore } from '@/stores/auth'
+
+export async function apiFetch(url: string, options: RequestInit = {}) {
+  const auth = useAuthStore()
+
+  options.headers = {
+    ...(options.headers || {}),
+    Authorization: `Bearer ${auth.accessToken}`
+  }
+
+  let response = await fetch(url, options)
+
+  if (response.status === 401) {
+    try {
+      await auth.refresh()
+
+      options.headers = {
+        ...(options.headers || {}),
+        Authorization: `Bearer ${auth.accessToken}`
+      }
+
+      response = await fetch(url, options)
+    } catch {
+      auth.logout()
+      window.location.href = '/login'
+    }
+  }
+
+  return response
+}

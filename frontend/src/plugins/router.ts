@@ -15,12 +15,27 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     component: DefaultLayout,
     children: moduleRoutes,
+    meta: { requiresAuth: true },
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
+
+  if (to.meta.requiresAuth && !auth.accessToken) {
+    if (to.name !== 'login') {
+      next({ name: 'login' })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
 
 // Autenticação desabilitada temporariamente

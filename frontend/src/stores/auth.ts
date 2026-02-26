@@ -1,49 +1,40 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useCookies } from '@vueuse/integrations/useCookies'
+import { login as loginService, refreshToken } from '@/api/authservice'
 
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    accessToken: localStorage.getItem('access_token'),
+    refreshToken: localStorage.getItem('refresh_token'),
+  }),
 
+  actions: {
+    async login(username: string, password: string) {
+      const data = await loginService(username, password)
 
-export const useAuthStore = defineStore('auth', () => {
-  const router = useRouter()
+      this.accessToken = data.access_token
+      this.refreshToken = data.refresh_token
 
-  const usuario = ref('')
+      localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem('refresh_token', data.refresh_token)
+    },
 
-  const cookies = useCookies(['token'])
-  const getSessionToken = () => {
-    return cookies.get('token')
-  }
-  const setSessionToken = (newToken: boolean) => {
-    return cookies.set('token', newToken,
-      {
-        path: '/',
-        // Sessão sem expiração (autenticação desabilitada temporariamente)
-        maxAge: 365 * 24 * 60 * 60 // 1 ano
-      })
-  }
+    logout() {
+      this.accessToken = null
+      this.refreshToken = null
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+    },
 
-  const login = async (novoUsuario: string, senha: string) => {
-    // requisicao a api vai aqui
-    // talvez validar de novo?
-    usuario.value = novoUsuario
-    setSessionToken(true)
-    return await router.push({ name: 'projeto-home' })
-  }
-  const logout = async () => {
-    usuario.value = ''
-    setSessionToken(false)
-    return await router.push({ name: 'login' })
-  }
-  const estaLogado = () => {
-    // Autenticação desabilitada - sempre retorna true
-    return true
-  }
+    async refresh() {
+      if (!this.refreshToken) throw new Error('Sem refresh token')
 
-  return {
-    usuario,
-    login,
-    logout,
-    estaLogado,
+      const data = await refreshToken(this.refreshToken)
+
+      this.accessToken = data.access_token
+      this.refreshToken = data.refresh_token
+
+      localStorage.setItem('access_token', data.access_token)
+      localStorage.setItem('refresh_token', data.refresh_token)
+    }
   }
 })
