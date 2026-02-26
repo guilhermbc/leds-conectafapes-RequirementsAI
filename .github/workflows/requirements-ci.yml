@@ -60,17 +60,22 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_TOKEN }}
 
+      - name: Sanitize Branch Name
+        run: |
+          SAFE_BRANCH=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
+          echo "SAFE_BRANCH=${SAFE_BRANCH}" >> $GITHUB_ENV    
+
       - name: Setup buildx
         uses: docker/setup-buildx-action@v3
 
-      # --- BUILD DO FRONTEND ---
+    # --- BUILD DO FRONTEND ---
       - name: Build & Push Frontend
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_FRONTEND }}:${{ env.BRANCH_NAME }}
+          tags: ${{ env.IMAGE_FRONTEND }}:${{ env.SAFE_BRANCH }} # <-- AQUI
 
       # --- BUILD DO BACKEND ---
       - name: Build & Push Backend
@@ -79,13 +84,14 @@ jobs:
           context: ./backend  
           file: ./backend/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_BACKEND }}:${{ env.BRANCH_NAME }}
+          tags: ${{ env.IMAGE_BACKEND }}:${{ env.SAFE_BRANCH }} # <-- AQUI
 
       - name: Resolve image digests
         id: digest
         run: |
-          DIGEST_FRONTEND=$(docker buildx imagetools inspect ${{ env.IMAGE_FRONTEND }}:${{ env.BRANCH_NAME }} | awk '/Digest:/ { print $2; exit }')
-          DIGEST_BACKEND=$(docker buildx imagetools inspect ${{ env.IMAGE_BACKEND }}:${{ env.BRANCH_NAME }} | awk '/Digest:/ { print $2; exit }')
+          # <-- E AQUI TAMBÉM NAS DUAS LINHAS ABAIXO
+          DIGEST_FRONTEND=$(docker buildx imagetools inspect ${{ env.IMAGE_FRONTEND }}:${{ env.SAFE_BRANCH }} | awk '/Digest:/ { print $2; exit }')
+          DIGEST_BACKEND=$(docker buildx imagetools inspect ${{ env.IMAGE_BACKEND }}:${{ env.SAFE_BRANCH }} | awk '/Digest:/ { print $2; exit }')
           
           echo "frontend_digest=${DIGEST_FRONTEND}" >> $GITHUB_OUTPUT
           echo "backend_digest=${DIGEST_BACKEND}" >> $GITHUB_OUTPUT
