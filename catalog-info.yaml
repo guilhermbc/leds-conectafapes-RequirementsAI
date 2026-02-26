@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: leds-conectafapes-requirementsai
+  title: Requirements AI
+  description: Repositório de produtos internos relacionado a geração de análise de requisitos gerados por agentes de IA 
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: service
+  lifecycle: develop
+  owner: ia
