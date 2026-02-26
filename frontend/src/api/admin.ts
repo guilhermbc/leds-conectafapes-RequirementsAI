@@ -2,15 +2,19 @@ import axios from 'axios'
 import { useUiStore } from '@/stores/ui'
 
 
-// api para backend-admin, por isso adminApi.
-export const adminApiConfig = {
+export const adminApi = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_ADMIN_BASE_URL,
-  headers: {
-    'Authorization': `Bearer ${import.meta.env.VITE_BACKEND_ADMIN_AUTH_TOKEN}`
-  }
-}
+})
 
-const adminApi = axios.create(adminApiConfig)
+// Interceptor para adicionar access token automaticamente
+adminApi.interceptors.request.use((config) => {
+  const auth = useAuthStore()
+
+  if (auth.accessToken) {
+    config.headers.Authorization = `Bearer ${auth.accessToken}`
+  }
+  return config
+})
 
 adminApi.interceptors.request.use((config) => {
   const ui = useUiStore()
@@ -22,15 +26,22 @@ adminApi.interceptors.request.use((config) => {
   throw error
 })
 
-adminApi.interceptors.response.use((config) => {
-  const ui = useUiStore()
-  ui.carregando = false
-  return config
-}, (error) => {
-  const ui = useUiStore()
-  ui.carregando = false
-  throw error
-})
+// Refresh automático em caso de 401
+adminApi.interceptors.response.use(
+  response => response,
+  async (error) => {
+    const auth = useAuthStore()
+
+    if (error.response?.status === 401 && auth.refreshToken) {
+      await auth.refresh()
+
+      error.config.headers.Authorization = `Bearer ${auth.accessToken}`
+      return adminApi(error.config)
+    }
+
+    return Promise.reject(error)
+  }
+)
 
 export default adminApi
 

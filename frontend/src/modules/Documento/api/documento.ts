@@ -1,7 +1,7 @@
 /**
  * arquivo de api trata da parte de requisicao e suas configuracoes
  */
-import adminApi, { adminApiConfig } from '@/api/admin'
+import adminApi from '@/api/admin'
 import type {
   Documento,
   DocumentoCreateReq,
@@ -13,27 +13,37 @@ import type {
 } from '../types/documento.d.ts'
 
 const documentoReqConf = {
-  baseURL: adminApiConfig.baseURL + 'documento',
+  url: 'classes/documento/',
 }
 
 export const listarDocumento = async () => {
-  return await adminApi.get<DocumentoListRes>('/', documentoReqConf)
+  return await adminApi.get<DocumentoListRes>(documentoReqConf.url)
 }
 
 export const criarDocumento = async (documento: DocumentoCreateReq) => {
-  return await adminApi.post<DocumentoCreateRes>('/', documento, documentoReqConf)
+  return await adminApi.post<DocumentoCreateRes>(
+    documentoReqConf.url,
+    documento
+  )
 }
 
 export const obterDocumento = async (id: string) => {
-  return await adminApi.get<DocumentoGetRes>('/' + id, documentoReqConf)
+  return await adminApi.get<DocumentoGetRes>(
+    `${documentoReqConf.url}${id}/`
+  )
 }
 
 export const atualizarDocumento = async (documento: Documento) => {
   const { id, ...payload } = documento; // remove o id
 
-  return await adminApi.put<DocumentoUpdateRes>('/' + id + '/', payload, documentoReqConf)
+  return await adminApi.put<DocumentoUpdateRes>(
+    `${documentoReqConf.url}${id}/`,
+    payload
+  )
 }
 
 export const excluirDocumento = async (id: string) => {
-  return await adminApi.delete<DocumentoDeleteRes>('/' + id + '/', documentoReqConf)
+  return await adminApi.delete<DocumentoDeleteRes>(
+    `${documentoReqConf.url}${id}/`
+  )
 }    

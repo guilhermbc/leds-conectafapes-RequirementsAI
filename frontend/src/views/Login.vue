@@ -46,8 +46,6 @@ const podeEntrar = computed(() => {
 
 // Login
 const entrar = async () => {
-  if (!podeEntrar.value) return
-
   try {
     loading.value = true
     erro.value = ''
@@ -55,7 +53,7 @@ const entrar = async () => {
     await auth.login(usuario.value, senha.value)
 
     // Redireciona para página principal
-    router.push({ name: 'home' })
+    router.push({ name: 'projeto-home' })
   } catch (e) {
     erro.value = 'Usuário ou senha inválidos.'
   } finally {
@@ -65,7 +63,7 @@ const entrar = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+  <div class="flex flex-col items-center justify-center min-h-screen">
     
     <!-- Título -->
     <div class="text-[60px] text-blue-800 font-bold mb-10">
@@ -79,8 +77,6 @@ const entrar = async () => {
         class="w-full mb-4"
         placeholder="exemplo123"
         v-model="usuario"
-        :rules="regrasUsuario"
-        @validationUpdate="updateUsuarioValido"
         @keyup-enter="entrar"
       >
         Nome de Usuário
@@ -89,8 +85,6 @@ const entrar = async () => {
       <text-input
         class="w-full mb-4"
         v-model="senha"
-        :rules="regrasSenha"
-        @validationUpdate="updateSenhaValida"
         @keyup-enter="entrar"
         type="password"
       >
@@ -105,7 +99,7 @@ const entrar = async () => {
       <!-- Botão -->
       <div class="flex justify-between items-center">
         <button
-          class="text-sm text-blue-700 hover:underline"
+          class="text-sm text-blue-700 hover:underline transition cursor-pointer"
           @click="esqueciSenha"
         >
           Esqueci a senha
@@ -113,11 +107,7 @@ const entrar = async () => {
 
         <button
           class="px-5 py-2 bg-blue-800 text-white rounded-lg 
-                 hover:bg-blue-900 transition"
-          :class="{
-            'opacity-50 cursor-not-allowed': !podeEntrar
-          }"
-          :disabled="!podeEntrar"
+                 hover:bg-blue-900 transition cursor-pointer"
           @click="entrar"
         >
           <span v-if="!loading">Entrar</span>

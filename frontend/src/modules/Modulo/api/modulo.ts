@@ -1,7 +1,7 @@
 /**
  * arquivo de api trata da parte de requisicao e suas configuracoes
  */
-import adminApi, { adminApiConfig } from '@/api/admin'
+import adminApi from '@/api/admin'
 import type {
   Modulo,
   ModuloCreateReq,
@@ -13,29 +13,38 @@ import type {
 } from '../types/modulo.d.ts'
 
 const moduloReqConf = {
-  baseURL: adminApiConfig.baseURL + 'modulo',
+  url: 'classes/modulo/',
 }
 
 export const listarModulo = async () => {
-  return await adminApi.get<ModuloListRes>('/', moduloReqConf)
+  return await adminApi.get<ModuloListRes>(moduloReqConf.url)
 }
 
 export const listarUltimosDocumentos = async (id: string) => {
-  return await adminApi.get<ModuloGetRes>('/get_last_docs/' + id, moduloReqConf)
+  return await adminApi.get<ModuloGetRes>(
+    `${moduloReqConf.url}get_last_docs/${id}`
+  )
 }
 
 export const criarModulo = async (modulo: ModuloCreateReq) => {
-  return await adminApi.post<ModuloCreateRes>('/', modulo, moduloReqConf)
+  return await adminApi.post<ModuloCreateRes>(moduloReqConf.url, modulo)
 }
 
 export const obterModulo = async (id: string) => {
-  return await adminApi.get<ModuloGetRes>('/' + id, moduloReqConf)
+  return await adminApi.get<ModuloGetRes>(
+    `${moduloReqConf.url}${id}/`
+  )
 }
 
 export const atualizarModulo = async (modulo: Modulo) => {
-  return await adminApi.put<ModuloUpdateRes>('/' + modulo.id + '/', modulo, moduloReqConf)
+  return await adminApi.put<ModuloUpdateRes>(
+    `${moduloReqConf.url}${modulo.id}/`,
+    modulo
+  )
 }
 
 export const excluirModulo = async (id: string) => {
-  return await adminApi.delete<ModuloDeleteRes>('/' + id + '/', moduloReqConf)
-}    
+  return await adminApi.delete<ModuloDeleteRes>(
+    `${moduloReqConf.url}${id}/`
+  )
+}     
