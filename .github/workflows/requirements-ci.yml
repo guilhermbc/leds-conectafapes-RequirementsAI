@@ -75,7 +75,7 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_FRONTEND }}:${{ env.SAFE_BRANCH }} # <-- AQUI
+          tags: ${{ env.IMAGE_FRONTEND }}:${{ env.SAFE_BRANCH }}
 
       # --- BUILD DO BACKEND ---
       - name: Build & Push Backend
@@ -84,12 +84,11 @@ jobs:
           context: ./backend  
           file: ./backend/Dockerfile
           push: true
-          tags: ${{ env.IMAGE_BACKEND }}:${{ env.SAFE_BRANCH }} # <-- AQUI
+          tags: ${{ env.IMAGE_BACKEND }}:${{ env.SAFE_BRANCH }}
 
       - name: Resolve image digests
         id: digest
         run: |
-          # <-- E AQUI TAMBÉM NAS DUAS LINHAS ABAIXO
           DIGEST_FRONTEND=$(docker buildx imagetools inspect ${{ env.IMAGE_FRONTEND }}:${{ env.SAFE_BRANCH }} | awk '/Digest:/ { print $2; exit }')
           DIGEST_BACKEND=$(docker buildx imagetools inspect ${{ env.IMAGE_BACKEND }}:${{ env.SAFE_BRANCH }} | awk '/Digest:/ { print $2; exit }')
           
@@ -101,14 +100,15 @@ jobs:
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
 
   deploy:
+    deploy:
     name: Deploy (Infra repo)
     runs-on: [self-hosted, linux, x64]
     needs: publish
+    
+    if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main')
 
     container:
       image: alpine/git
-      env:
-        BRANCH_NAME: ${{ env.BRANCH_NAME }}
 
     steps:
       - name: Determine target path
