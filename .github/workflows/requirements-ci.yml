@@ -100,15 +100,17 @@ jobs:
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
 
   deploy:
-    deploy:
     name: Deploy (Infra repo)
     runs-on: [self-hosted, linux, x64]
     needs: publish
+    
     
     if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main')
 
     container:
       image: alpine/git
+      env:
+        BRANCH_NAME: ${{ env.BRANCH_NAME }}
 
     steps:
       - name: Determine target path
@@ -138,7 +140,6 @@ jobs:
           IMAGE_FRONTEND: ${{ env.IMAGE_FRONTEND }}
           IMAGE_BACKEND: ${{ env.IMAGE_BACKEND }}
         run: |
-        
           sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_FRONTEND}@${FRONTEND_DIGEST}|" frontend/deployment.yaml
 
           sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_BACKEND}@${BACKEND_DIGEST}|" backend/deployment.yaml
