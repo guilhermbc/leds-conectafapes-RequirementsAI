@@ -2,7 +2,9 @@ name: Requirements AI CI/CD
 
 on:
   push:
-    branches: [develop, test]
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
 
 permissions:
   contents: write
