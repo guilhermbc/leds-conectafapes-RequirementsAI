@@ -65,13 +65,13 @@ jobs:
 
       - name: Build & Push Frontend
         run: |
-          FULL_IMAGE_FRONTEND="${IMAGE_FRONTEND}:${BRANCH_NAME}-${COMMIT_SHA}"
+          FULL_IMAGE_FRONTEND="${IMAGE_FRONTEND}:${BRANCH_NAME}"
           docker build -t $FULL_IMAGE_FRONTEND -f ./frontend/Dockerfile ./frontend
           docker push $FULL_IMAGE_FRONTEND
 
       - name: Build & Push Backend
         run: |
-          FULL_IMAGE_BACKEND="${IMAGE_BACKEND}:${BRANCH_NAME}-${COMMIT_SHA}"
+          FULL_IMAGE_BACKEND="${IMAGE_BACKEND}:${BRANCH_NAME}"
           docker build -t $FULL_IMAGE_BACKEND -f ./backend/Dockerfile ./backend
           docker push $FULL_IMAGE_BACKEND
 
@@ -111,8 +111,8 @@ jobs:
       - name: Update deployment.yaml
         working-directory: infra/${{ steps.envpath.outputs.env_path }}
         run: |
-          FULL_IMAGE_FRONTEND="${IMAGE_FRONTEND}:${BRANCH_NAME}-${COMMIT_SHA}"
-          FULL_IMAGE_BACKEND="${IMAGE_BACKEND}:${BRANCH_NAME}-${COMMIT_SHA}"
+          FULL_IMAGE_FRONTEND="${IMAGE_FRONTEND}:${BRANCH_NAME}"
+          FULL_IMAGE_BACKEND="${IMAGE_BACKEND}:${BRANCH_NAME}"
           
           docker pull $FULL_IMAGE_FRONTEND
           docker pull $FULL_IMAGE_BACKEND
@@ -129,5 +129,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "[DEPLOY] Requirements AI atualizado para ${BRANCH_NAME}-${COMMIT_SHA}" || echo "Nenhuma mudança"
+          git commit -m "[DEPLOY] Requirements AI atualizado para branch ${BRANCH_NAME} (Commit: ${COMMIT_SHA})" || echo "Nenhuma mudança"
           git push origin ${{ steps.envpath.outputs.target_branch }}
