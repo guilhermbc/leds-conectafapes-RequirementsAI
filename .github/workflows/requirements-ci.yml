@@ -19,10 +19,11 @@ env:
   IMAGE_BACKEND: ghcr.io/leds-conectafapes/leds-conectafapes-requirementsai-backend
   INFRA_REPO: leds-conectafapes/leds-conectafapes-infra
   BRANCH_NAME: ${{ github.ref_name }}
+  COMMIT_SHA: ${{ github.sha }}
 
 jobs:
   build:
-    name: Build
+    name: Build Check
     runs-on: [self-hosted, linux, x64]
 
     steps:
@@ -31,27 +32,29 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - name: Preflight Docker
-        run: docker info
-
       - name: Fix workspace permissions
-        if: always()
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
+
+      - name: Build Frontend Docker image check
+        run: docker build -f ./frontend/Dockerfile ./frontend 
+
+      - name: Build Backend Docker image check
+        run: docker build -f ./backend/Dockerfile ./backend 
 
   publish:
     name: Publish (GHCR)
     runs-on: [self-hosted, linux, x64]
     needs: build
-
-    outputs:
-      frontend_digest: ${{ steps.digest.outputs.frontend_digest }}
-      backend_digest: ${{ steps.digest.outputs.backend_digest }}
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Pre-clean workspace
         run: sudo rm -rf "$GITHUB_WORKSPACE"/.??* "$GITHUB_WORKSPACE"/* || true
 
       - uses: actions/checkout@v4
+
+      - name: Fix workspace permissions
+        run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -60,57 +63,23 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: Sanitize Branch Name
-        run: |
-          SAFE_BRANCH=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
-          echo "SAFE_BRANCH=${SAFE_BRANCH}" >> $GITHUB_ENV    
-
-      - name: Setup buildx
-        uses: docker/setup-buildx-action@v3
-
-    # --- BUILD DO FRONTEND ---
       - name: Build & Push Frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
-          push: true
-          tags: ${{ env.IMAGE_FRONTEND }}:${{ env.SAFE_BRANCH }}
-
-      # --- BUILD DO BACKEND ---
-      - name: Build & Push Backend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./backend  
-          file: ./backend/Dockerfile
-          push: true
-          tags: ${{ env.IMAGE_BACKEND }}:${{ env.SAFE_BRANCH }}
-
-      - name: Resolve image digests
-        id: digest
         run: |
-          DIGEST_FRONTEND=$(docker buildx imagetools inspect ${{ env.IMAGE_FRONTEND }}:${{ env.SAFE_BRANCH }} | awk '/Digest:/ { print $2; exit }')
-          DIGEST_BACKEND=$(docker buildx imagetools inspect ${{ env.IMAGE_BACKEND }}:${{ env.SAFE_BRANCH }} | awk '/Digest:/ { print $2; exit }')
-          
-          echo "frontend_digest=${DIGEST_FRONTEND}" >> $GITHUB_OUTPUT
-          echo "backend_digest=${DIGEST_BACKEND}" >> $GITHUB_OUTPUT
+          FULL_IMAGE_FRONTEND="${IMAGE_FRONTEND}:${BRANCH_NAME}-${COMMIT_SHA}"
+          docker build -t $FULL_IMAGE_FRONTEND -f ./frontend/Dockerfile ./frontend
+          docker push $FULL_IMAGE_FRONTEND
 
-      - name: Fix workspace permissions
-        if: always()
-        run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
+      - name: Build & Push Backend
+        run: |
+          FULL_IMAGE_BACKEND="${IMAGE_BACKEND}:${BRANCH_NAME}-${COMMIT_SHA}"
+          docker build -t $FULL_IMAGE_BACKEND -f ./backend/Dockerfile ./backend
+          docker push $FULL_IMAGE_BACKEND
 
   deploy:
     name: Deploy (Infra repo)
     runs-on: [self-hosted, linux, x64]
     needs: publish
-    
-    
     if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main')
-
-    container:
-      image: alpine/git
-      env:
-        BRANCH_NAME: ${{ env.BRANCH_NAME }}
 
     steps:
       - name: Determine target path
@@ -132,17 +101,27 @@ jobs:
           ref: ${{ steps.envpath.outputs.target_branch }}
           path: infra
 
+      - name: Login to GHCR
+        uses: docker/login-action@v3 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
       - name: Update deployment.yaml
         working-directory: infra/${{ steps.envpath.outputs.env_path }}
-        env:
-          FRONTEND_DIGEST: ${{ needs.publish.outputs.frontend_digest }}
-          BACKEND_DIGEST: ${{ needs.publish.outputs.backend_digest }}
-          IMAGE_FRONTEND: ${{ env.IMAGE_FRONTEND }}
-          IMAGE_BACKEND: ${{ env.IMAGE_BACKEND }}
         run: |
-          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_FRONTEND}@${FRONTEND_DIGEST}|" frontend/deployment.yaml
-
-          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_BACKEND}@${BACKEND_DIGEST}|" backend/deployment.yaml
+          FULL_IMAGE_FRONTEND="${IMAGE_FRONTEND}:${BRANCH_NAME}-${COMMIT_SHA}"
+          FULL_IMAGE_BACKEND="${IMAGE_BACKEND}:${BRANCH_NAME}-${COMMIT_SHA}"
+          
+          docker pull $FULL_IMAGE_FRONTEND
+          docker pull $FULL_IMAGE_BACKEND
+          
+          DIGEST_FRONTEND=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_FRONTEND | cut -d'@' -f2)
+          DIGEST_BACKEND=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_BACKEND | cut -d'@' -f2)
+          
+          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_FRONTEND}@${DIGEST_FRONTEND}|" frontend/deployment.yaml
+          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_BACKEND}@${DIGEST_BACKEND}|" backend/deployment.yaml
 
       - name: Commit and push changes
         working-directory: infra
@@ -150,5 +129,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "[DEPLOY] Requirements AI atualizado para ${BRANCH_NAME}" || echo "Nenhuma mudança"
+          git commit -m "[DEPLOY] Requirements AI atualizado para ${BRANCH_NAME}-${COMMIT_SHA}" || echo "Nenhuma mudança"
           git push origin ${{ steps.envpath.outputs.target_branch }}
