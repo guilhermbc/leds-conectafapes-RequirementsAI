@@ -31,13 +31,13 @@ const origemAudio = ref('')
 // const Modulo = ref(props.moduloId as string)
 const DocumentoOrigem = ref<number[]>([])
 
-const categoriasDropdown = [
+const categoriasDropdown = ref<string[]>([
   "Minimundo",
   "Requisitos",
   "Casos de Uso",
   "Diagrama de Classes",
   "Protótipo de Interface"
-]
+])
 
 // Tipo de documento (categoria) escolhido na hora de criar
 const categoriaEscolhida = ref('')
@@ -106,19 +106,32 @@ const carregarDocumentos = async () => {
   diagramaDeClasse_origem.value = null
   prototipoDeInterface_origem.value = null
 
+  categoriasDropdown.value = [
+    "Minimundo",
+    "Requisitos",
+    "Casos de Uso",
+    "Diagrama de Classes",
+    "Protótipo de Interface"
+  ]
+
   const ultimosDocumentos = await listarUltimosDocumentos(props.moduloId as string)
 
   for (const documento of ultimosDocumentos) {
      if (documento.TipoDocumento === 'MINIMUNDO') {
       minimundo_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'REQUISITOS') {
       requisito_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'CASO_USO') {
       casoDeUso_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'DIAGRAMA_CLASSE') {
       diagramaDeClasse_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'PROTOTIPO_INTERFACE') {
       prototipoDeInterface_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     }
   }
 }
@@ -267,13 +280,19 @@ const salvar = async () => {
       <!-- Dropdown com os tipos de documento -->
       <select
         v-model="categoriaEscolhida"
+        :disabled="categoriasDropdown.length === 0"
         class="block w-full p-2 border rounded my-1 mb-3"
+        :class="{ 'bg-gray-100 cursor-not-allowed': categoriasDropdown.length === 0 }"
       >
         <option disabled value="">Selecione um tipo...</option>
         <option v-for="item in categoriasDropdown" :key="item" :value="item">
           {{ item }}
         </option>
       </select>
+
+      <p v-if="categoriasDropdown.length === 0" class="text-red-500 text-sm italic">
+        Todos os documentos já foram criados.
+      </p>
 
       <!-- Escolha de áudio de origem para Minimundo -->
       <div v-if="TipoDocumento === 'MINIMUNDO'">
@@ -339,12 +358,23 @@ const salvar = async () => {
     </div>
 
     <div v-else>
-      <h3 class="font-semibold">Áudio de origem:</h3>
-      <text-input
-      class="w-full"
-      placeholder="Áudio de origem"
-      v-model="origemAudio"
-      />
+
+      <!-- Oferece a opção de criar todos apenas quando ainda não tem nenhum documento -->
+      <div v-if="categoriasDropdown.length === 5">
+        <h3 class="font-semibold">Áudio de origem:</h3>
+          <text-input
+          class="w-full"
+          placeholder="Áudio de origem"
+          v-model="origemAudio"
+        />
+      </div>
+
+      <div v-else>
+        <p class="text-red-500 text-sm italic">
+          Opção disponível apenas quando ainda não existe nenhum documento criado.
+        </p>
+      </div>
+      
     </div>
 
 
