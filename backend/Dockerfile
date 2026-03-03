@@ -22,9 +22,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia projeto
 COPY . .
 
-# Dá permissão ao entrypoint
-RUN chmod +x /app/backend/entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-EXPOSE 8000
+ENTRYPOINT ["/entrypoint.sh"]
 
-CMD ["/app/backend/entrypoint.sh"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--reload", "--timeout=8000", "--workers=2", "rai.wsgi:application"]

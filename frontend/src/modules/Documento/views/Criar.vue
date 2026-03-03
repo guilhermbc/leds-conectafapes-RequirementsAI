@@ -17,6 +17,9 @@ const emit = defineEmits<{
 
 const close = () => emit("update:modelValue", false)
 
+// Modo de criação
+const modoCriacao = ref('individual')
+
 // Campos do documento
 // const id = ref('')
 // const versao = ref('1.0')
@@ -28,13 +31,13 @@ const origemAudio = ref('')
 // const Modulo = ref(props.moduloId as string)
 const DocumentoOrigem = ref<number[]>([])
 
-const categoriasDropdown = [
+const categoriasDropdown = ref<string[]>([
   "Minimundo",
   "Requisitos",
   "Casos de Uso",
   "Diagrama de Classes",
   "Protótipo de Interface"
-]
+])
 
 // Tipo de documento (categoria) escolhido na hora de criar
 const categoriaEscolhida = ref('')
@@ -66,6 +69,9 @@ const TipoDocumento = computed(() => {
 })
 
 const isDisabled = computed(() => {
+  if (modoCriacao.value === 'todos') {
+    return carregando.value
+  }
   return carregando.value
     || (TipoDocumento.value === '')
     || (TipoDocumento.value === 'MINIMUNDO' && origemAudio.value === '')
@@ -100,19 +106,32 @@ const carregarDocumentos = async () => {
   diagramaDeClasse_origem.value = null
   prototipoDeInterface_origem.value = null
 
+  categoriasDropdown.value = [
+    "Minimundo",
+    "Requisitos",
+    "Casos de Uso",
+    "Diagrama de Classes",
+    "Protótipo de Interface"
+  ]
+
   const ultimosDocumentos = await listarUltimosDocumentos(props.moduloId as string)
 
   for (const documento of ultimosDocumentos) {
      if (documento.TipoDocumento === 'MINIMUNDO') {
       minimundo_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'REQUISITOS') {
       requisito_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'CASO_USO') {
       casoDeUso_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'DIAGRAMA_CLASSE') {
       diagramaDeClasse_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     } else if (documento.TipoDocumento === 'PROTOTIPO_INTERFACE') {
       prototipoDeInterface_origem.value = documento
+      categoriasDropdown.value.splice(0, 1)
     }
   }
 }
@@ -122,35 +141,118 @@ const salvar = async () => {
 
   carregando.value = true
 
-  try{
-    let sucesso = false
+  try {
+    if (modoCriacao.value === 'individual') {
+      if (minimundo_origem.value !== null) {
+        DocumentoOrigem.value.push(Number(minimundo_origem.value.id))
+      }
+      if (requisito_origem.value !== null) {
+        DocumentoOrigem.value.push(Number(requisito_origem.value.id))
+      }
+      if (casoDeUso_origem.value !== null) {
+        DocumentoOrigem.value.push(Number(casoDeUso_origem.value.id))
+      }
+      if (diagramaDeClasse_origem.value !== null) {
+        DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value.id))
+      }
 
-    if (minimundo_origem.value !== null) {
-      DocumentoOrigem.value.push(Number(minimundo_origem.value.id))
-    }
-    if (requisito_origem.value !== null) {
-      DocumentoOrigem.value.push(Number(requisito_origem.value.id))
-    }
-    if (casoDeUso_origem.value !== null) {
-      DocumentoOrigem.value.push(Number(casoDeUso_origem.value.id))
-    }
-    if (diagramaDeClasse_origem.value !== null) {
-      DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value.id))
-    }
+      const response = await criarDocumento({
+        vMajor: 1,
+        vMinor: 0,
+        geradoIA: true,
+        arquivo: '',
+        origemAudio: origemAudio.value,
+        TipoDocumento: TipoDocumento.value,
+        DocumentoAnterior: null,
+        Modulo: props.moduloId as string,
+        DocumentoOrigem: DocumentoOrigem.value,
+      })
+      
+      if (response && response.status === 201) {
+        emit('salvo')
+        close()
+      }
+    } else {
+      // Criar todos os documentos
 
-    sucesso = await criarDocumento({
-      vMajor: 1,
-      vMinor: 0,
-      geradoIA: true,
-      arquivo: '',
-      origemAudio: origemAudio.value,
-      TipoDocumento: TipoDocumento.value,
-      DocumentoAnterior: null,
-      Modulo: props.moduloId as string,
-      DocumentoOrigem: DocumentoOrigem.value,
-    })
-    emit('salvo')
-    close()
+      const idsDocumentosCriados: number[] = []
+      
+      let response = await criarDocumento({
+        vMajor: 1,
+        vMinor: 0,
+        geradoIA: true,
+        arquivo: '',
+        origemAudio: origemAudio.value,
+        TipoDocumento: 'MINIMUNDO',
+        DocumentoAnterior: null,
+        Modulo: props.moduloId as string,
+        DocumentoOrigem: [],
+      })
+
+      if (response) {
+        idsDocumentosCriados.push(Number(response.data.id))
+        response = await criarDocumento({
+          vMajor: 1,
+          vMinor: 0,
+          geradoIA: true,
+          arquivo: '',
+          origemAudio: '',
+          TipoDocumento: 'REQUISITOS',
+          DocumentoAnterior: null,
+          Modulo: props.moduloId as string,
+          DocumentoOrigem: idsDocumentosCriados,
+        })
+      }
+
+      if (response) {
+        idsDocumentosCriados.push(Number(response.data.id))
+        response = await criarDocumento({
+          vMajor: 1,
+          vMinor: 0,
+          geradoIA: true,
+          arquivo: '',
+          origemAudio: '',
+          TipoDocumento: 'CASO_USO',
+          DocumentoAnterior: null,
+          Modulo: props.moduloId as string,
+          DocumentoOrigem: idsDocumentosCriados,
+        })
+      }
+
+      if (response) {
+        idsDocumentosCriados.push(Number(response.data.id))
+        response = await criarDocumento({
+          vMajor: 1,
+          vMinor: 0,
+          geradoIA: true,
+          arquivo: '',
+          origemAudio: '',
+          TipoDocumento: 'DIAGRAMA_CLASSE',
+          DocumentoAnterior: null,
+          Modulo: props.moduloId as string,
+          DocumentoOrigem: idsDocumentosCriados,
+        })
+      }
+
+      if (response) {
+        idsDocumentosCriados.push(Number(response.data.id))
+        idsDocumentosCriados.shift()
+        response = await criarDocumento({
+          vMajor: 1,
+          vMinor: 0,
+          geradoIA: true,
+          arquivo: '',
+          origemAudio: '',
+          TipoDocumento: 'PROTOTIPO_INTERFACE',
+          DocumentoAnterior: null,
+          Modulo: props.moduloId as string,
+          DocumentoOrigem: idsDocumentosCriados,
+        })
+      }
+
+      emit('salvo')
+      close()
+    }
   } finally {
     carregando.value = false
   }
@@ -161,80 +263,120 @@ const salvar = async () => {
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4"> Criar Documento </h2>
 
-    <h3 class="font-semibold">Tipo do documento:</h3>
-
-    <!-- Dropdown com os tipos de documento -->
-    <select
-      v-model="categoriaEscolhida"
-      class="block w-full p-2 border rounded my-1 mb-3"
-    >
-      <option disabled value="">Selecione um tipo...</option>
-      <option v-for="item in categoriasDropdown" :key="item" :value="item">
-        {{ item }}
-      </option>
-    </select>
-
-    <!-- Escolha de áudio de origem para Minimundo -->
-    <div v-if="TipoDocumento === 'MINIMUNDO'">
-      <h3 class="font-semibold">Áudio de origem:</h3>
-      <text-input
-      class="w-full"
-      placeholder="Áudio de origem"
-      v-model="origemAudio"
-      />
+    <div class="mb-4 font-semibold">
+      <label class="mr-4">
+        <input type="radio" v-model="modoCriacao" value="individual" />
+        Criar individualmente
+      </label>
+      <label>
+        <input type="radio" v-model="modoCriacao" value="todos" />
+        Criar todos
+      </label>
     </div>
 
-    <!-- Seleção de Minimundo -->
-    <div v-if="TipoDocumento === 'REQUISITOS' || TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'">
-      <h3 class="font-semibold">Minimundo de origem:</h3>
-      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
-        <div v-if="minimundo_origem !== null">
-          {{ formatarTipoDocumento(minimundo_origem?.TipoDocumento) }} (v{{ formatarVersao(minimundo_origem?.vMajor, minimundo_origem?.vMinor) }})
+    <div v-if="modoCriacao === 'individual'">
+      <h3 class="font-semibold">Tipo do documento:</h3>
+
+      <!-- Dropdown com os tipos de documento -->
+      <select
+        v-model="categoriaEscolhida"
+        :disabled="categoriasDropdown.length === 0"
+        class="block w-full p-2 border rounded my-1 mb-3"
+        :class="{ 'bg-gray-100 cursor-not-allowed': categoriasDropdown.length === 0 }"
+      >
+        <option disabled value="">Selecione um tipo...</option>
+        <option v-for="item in categoriasDropdown" :key="item" :value="item">
+          {{ item }}
+        </option>
+      </select>
+
+      <p v-if="categoriasDropdown.length === 0" class="text-red-500 text-sm italic">
+        Todos os documentos já foram criados.
+      </p>
+
+      <!-- Escolha de áudio de origem para Minimundo -->
+      <div v-if="TipoDocumento === 'MINIMUNDO'">
+        <h3 class="font-semibold">Áudio de origem:</h3>
+        <text-input
+        class="w-full"
+        placeholder="Áudio de origem"
+        v-model="origemAudio"
+        />
+      </div>
+
+      <!-- Seleção de Minimundo -->
+      <div v-if="TipoDocumento === 'REQUISITOS' || TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'">
+        <h3 class="font-semibold">Minimundo de origem:</h3>
+        <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+          <div v-if="minimundo_origem !== null">
+            {{ formatarTipoDocumento(minimundo_origem?.TipoDocumento) }} (v{{ formatarVersao(minimundo_origem?.vMajor, minimundo_origem?.vMinor) }})
+          </div>
+          <div v-else class="text-gray-500 italic">
+            Nenhum documento disponível.
+          </div>
         </div>
-        <div v-else class="text-gray-500 italic">
-          Nenhum documento disponível.
+      </div>
+
+      <!-- Seleção de Requisitos -->
+      <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
+        <h3 class="font-semibold">Requisitos de origem:</h3>
+        <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+          <div v-if="requisito_origem !== null">
+            {{ formatarTipoDocumento(requisito_origem?.TipoDocumento) }} (v{{ formatarVersao(requisito_origem?.vMajor, requisito_origem?.vMinor) }})
+          </div>
+          <div v-else class="text-gray-500 italic">
+            Nenhum documento disponível.
+          </div>
+        </div>
+      </div>
+
+      <!-- Seleção de Casos de Uso -->
+      <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
+        <h3 class="font-semibold">Casos de uso de origem:</h3>
+        <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+          <div v-if="casoDeUso_origem !== null">
+            {{ formatarTipoDocumento(casoDeUso_origem?.TipoDocumento) }} (v{{ formatarVersao(casoDeUso_origem?.vMajor, casoDeUso_origem?.vMinor) }})
+          </div>
+          <div v-else class="text-gray-500 italic">
+            Nenhum documento disponível.
+          </div>
+        </div>
+      </div>
+
+      <!-- Seleção de Diagrama de Classe -->
+      <div v-if="TipoDocumento === 'PROTOTIPO_INTERFACE'">
+        <h3 class="font-semibold">Diagrama de classe de origem:</h3>
+        <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
+          <div v-if="diagramaDeClasse_origem !== null">
+            {{ formatarTipoDocumento(diagramaDeClasse_origem?.TipoDocumento) }} (v{{ formatarVersao(diagramaDeClasse_origem?.vMajor, diagramaDeClasse_origem?.vMinor) }})
+          </div>
+          <div v-else class="text-gray-500 italic">
+            Nenhum documento disponível.
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Seleção de Requisitos -->
-    <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
-      <h3 class="font-semibold">Requisitos de origem:</h3>
-      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
-        <div v-if="requisito_origem !== null">
-          {{ formatarTipoDocumento(requisito_origem?.TipoDocumento) }} (v{{ formatarVersao(requisito_origem?.vMajor, requisito_origem?.vMinor) }})
-        </div>
-        <div v-else class="text-gray-500 italic">
-          Nenhum documento disponível.
-        </div>
+    <div v-else>
+
+      <!-- Oferece a opção de criar todos apenas quando ainda não tem nenhum documento -->
+      <div v-if="categoriasDropdown.length === 5">
+        <h3 class="font-semibold">Áudio de origem:</h3>
+          <text-input
+          class="w-full"
+          placeholder="Áudio de origem"
+          v-model="origemAudio"
+        />
       </div>
+
+      <div v-else>
+        <p class="text-red-500 text-sm italic">
+          Opção disponível apenas quando ainda não existe nenhum documento criado.
+        </p>
+      </div>
+      
     </div>
 
-    <!-- Seleção de Casos de Uso -->
-    <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
-      <h3 class="font-semibold">Casos de uso de origem:</h3>
-      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
-        <div v-if="casoDeUso_origem !== null">
-          {{ formatarTipoDocumento(casoDeUso_origem?.TipoDocumento) }} (v{{ formatarVersao(casoDeUso_origem?.vMajor, casoDeUso_origem?.vMinor) }})
-        </div>
-        <div v-else class="text-gray-500 italic">
-          Nenhum documento disponível.
-        </div>
-      </div>
-    </div>
-
-    <!-- Seleção de Diagrama de Classe -->
-    <div v-if="TipoDocumento === 'PROTOTIPO_INTERFACE'">
-      <h3 class="font-semibold">Diagrama de classe de origem:</h3>
-      <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
-        <div v-if="diagramaDeClasse_origem !== null">
-          {{ formatarTipoDocumento(diagramaDeClasse_origem?.TipoDocumento) }} (v{{ formatarVersao(diagramaDeClasse_origem?.vMajor, diagramaDeClasse_origem?.vMinor) }})
-        </div>
-        <div v-else class="text-gray-500 italic">
-          Nenhum documento disponível.
-        </div>
-      </div>
-    </div>
 
     <div class="mt-4 flex justify-end gap-3">
       <button 

@@ -32,9 +32,10 @@ export type DocumentoListRes = {
 }
 
 export type DocumentoCreateRes = {
-  statusCode: number
+  data : Documento
+  status: number
   uri: string
-  message: string
+  statusText: string
 }
 
 export type DocumentoGetRes = DocumentoListRes

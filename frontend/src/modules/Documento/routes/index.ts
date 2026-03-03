@@ -8,15 +8,18 @@ export const routes: RouteRecordRaw[] = [
     name: 'documento-home',
     path: 'home',
     component: Listar,
+    meta: { requiresAuth: true }
   },
   {
     name: 'documento-criar',
     path: 'criar/:id?',
     component: Criar,
+    meta: { requiresAuth: true }
   },
   {
     name: 'documento-detalhe',
     path: ':id',
-    component: Detalhes
+    component: Detalhes,
+    meta: { requiresAuth: true }
   }
 ]

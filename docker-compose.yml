@@ -17,6 +17,8 @@ services:
 
   rai_frontend:
     build: ./frontend
+    env_file: 
+      - ./frontend/.env
     ports:
       - "80:80"
     volumes:
@@ -26,6 +28,8 @@ services:
 
   rai_backend:
     build: ./backend
+    env_file:
+      - ./backend/.env
     ports:
       - "8000:8000"
     volumes:
