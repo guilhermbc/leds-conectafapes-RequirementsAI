@@ -1,17 +1,25 @@
-FROM python:3.12-slim as python
+FROM python:3.12-slim
 
-ENV DJANGO_SETTINGS_MODULE rai.settings.local
-ENV PIP_DISABLE_PIP_VERSION_CHECK 1
-ENV DEBUG true
+# Variáveis seguras e não sensíveis
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app/backend
 
+# Dependências do sistema
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    libpq-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instala dependências Python
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies
-RUN apt-get update && apt-get install build-essential gcc python3-dev musl-dev libpq-dev python3-dev libpq-dev libffi-dev -y
-RUN pip install -r requirements.txt
-
+# Copia projeto
 COPY . .
 
 COPY entrypoint.sh /entrypoint.sh
