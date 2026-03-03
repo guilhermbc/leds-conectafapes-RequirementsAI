@@ -39,4 +39,4 @@ else:
 EOF
 
 echo "Starting server..."
-python manage.py runserver 0.0.0.0:8000
+exec gunicorn --bind 0.0.0.0:8000 --workers=2 rai.wsgi:application
