@@ -2,9 +2,9 @@ name: Requirements AI CI/CD
 
 on:
   push:
-    branches: [ "develop", "main" ]
+    branches: [ "develop"]
   pull_request:
-    branches: [ "develop", "main" ]
+    branches: [ "develop"]
 
 permissions:
   contents: write
@@ -25,7 +25,6 @@ jobs:
   build:
     name: Build Check
     runs-on: [self-hosted, linux, x64]
-
     steps:
       - name: Pre-clean workspace
         run: sudo rm -rf "$GITHUB_WORKSPACE"/.??* "$GITHUB_WORKSPACE"/* || true
@@ -34,6 +33,17 @@ jobs:
 
       - name: Fix workspace permissions
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
+
+      - name: Prepare Frontend .env
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+          else
+             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+          fi
+          
+          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/api" >> ./frontend/.env.dev
+
 
       - name: Build Frontend Docker image check
         run: docker build -f ./frontend/Dockerfile ./frontend 
@@ -46,7 +56,6 @@ jobs:
     runs-on: [self-hosted, linux, x64]
     needs: build
     if: ${{ github.event_name == 'push' }}
-
     steps:
       - name: Pre-clean workspace
         run: sudo rm -rf "$GITHUB_WORKSPACE"/.??* "$GITHUB_WORKSPACE"/* || true
@@ -55,6 +64,17 @@ jobs:
 
       - name: Fix workspace permissions
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
+
+      - name: Prepare Frontend .env
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+          else
+             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+          fi
+          
+          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/classes/" >> ./frontend/.env.dev
+
 
       - name: Login to GHCR
         uses: docker/login-action@v3
@@ -80,7 +100,6 @@ jobs:
     runs-on: [self-hosted, linux, x64]
     needs: publish
     if: github.event_name == 'push' && (github.ref_name == 'develop' || github.ref_name == 'main')
-
     steps:
       - name: Determine target path
         id: envpath
@@ -91,7 +110,7 @@ jobs:
           esac
 
           echo "env_path=${ENV_PATH}" >> $GITHUB_OUTPUT
-          echo "target_branch=develop" >> $GITHUB_OUTPUT 
+          echo "target_branch=develop" >> $GITHUB_OUTPUT  
 
       - name: Checkout infra repository
         uses: actions/checkout@v4
@@ -120,8 +139,8 @@ jobs:
           DIGEST_FRONTEND=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_FRONTEND | cut -d'@' -f2)
           DIGEST_BACKEND=$(docker inspect --format='{{index .RepoDigests 0}}' $FULL_IMAGE_BACKEND | cut -d'@' -f2)
           
-          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_FRONTEND}@${DIGEST_FRONTEND}|" frontend/deployment.yaml
-          sed -i -E "s|^([[:space:]]*)image:.*|\1image: ${IMAGE_BACKEND}@${DIGEST_BACKEND}|" backend/deployment.yaml
+          sed -i -E "s|^([[:space:]]*)image:.*frontend.*|\1image: ${IMAGE_FRONTEND}@${DIGEST_FRONTEND}|" frontend/deployment.yaml
+          sed -i -E "s|^([[:space:]]*)image:.*backend.*|\1image: ${IMAGE_BACKEND}@${DIGEST_BACKEND}|" backend/deployment.yaml
 
       - name: Commit and push changes
         working-directory: infra
@@ -129,5 +148,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "[DEPLOY] Requirements AI atualizado para branch ${BRANCH_NAME} (Commit: ${COMMIT_SHA})" || echo "Nenhuma mudança"
+          git commit -m "[DEPLOY] Requirements AI (${BRANCH_NAME}) - SHA: ${COMMIT_SHA:0:7}" || echo "Nenhuma mudança"
           git push origin ${{ steps.envpath.outputs.target_branch }}
