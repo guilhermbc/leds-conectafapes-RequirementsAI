@@ -149,7 +149,7 @@ class ModuloViewSet(ModelViewSet):
             except:
                 pass
 
-        major = max(d.vMajor for d in latest_docs)
+        major = max((d.vMajor for d in latest_docs), default=None)
 
         result = [d for d in latest_docs if d.vMajor == major]
 

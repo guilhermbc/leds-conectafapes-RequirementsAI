@@ -39,4 +39,4 @@ else:
 EOF
 
 echo "Starting server..."
-exec gunicorn --bind 0.0.0.0:8000 --workers=2 rai.wsgi:application
+exec gunicorn --bind 0.0.0.0:8000 --workers=2 rai.wsgi:application --timeout 120
