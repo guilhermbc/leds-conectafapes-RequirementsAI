@@ -44,7 +44,7 @@ jobs:
           
           OAUTH_CLIENT_ID="HEY, LISTEN!"
 
-          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/api" >> ./frontend/.env
+          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/classes" >> ./frontend/.env
           echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
 
 
@@ -78,9 +78,9 @@ jobs:
           
           OAUTH_CLIENT_ID="HEY, LISTEN!"
 
-          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/api" >> ./frontend/.env
+          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/classes" >> ./frontend/.env
           echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
-          
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
