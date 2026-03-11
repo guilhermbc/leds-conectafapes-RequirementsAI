@@ -42,7 +42,10 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
+          OAUTH_CLIENT_ID="HEY, LISTEN!"
+
           echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/api" >> ./frontend/.env
+          echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
 
 
       - name: Build Frontend Docker image check
@@ -73,9 +76,11 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
-          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/classes/" >> ./frontend/.env
+          OAUTH_CLIENT_ID="HEY, LISTEN!"
 
-
+          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/api" >> ./frontend/.env
+          echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
+          
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
