@@ -42,7 +42,7 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
-          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/api" >> ./frontend/.env.dev
+          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/api" >> ./frontend/.env
 
 
       - name: Build Frontend Docker image check
@@ -73,7 +73,7 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
-          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/classes/" >> ./frontend/.env.dev
+          echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/classes/" >> ./frontend/.env
 
 
       - name: Login to GHCR
