@@ -45,6 +45,7 @@ minimundo_prompt = ChatPromptTemplate.from_messages([
     - The domain narrative based on the transcription should be reviewed to ensure clarity and accuracy.
     - The domain narrative based on the transcription should be presented in a way that facilitates reading and understanding.
     - The domain narrative based on the transcription should be written in Portuguese.
+    - Do not include any additional commentaries before the presentation of the domain narrative.
     """)
 ])
 
