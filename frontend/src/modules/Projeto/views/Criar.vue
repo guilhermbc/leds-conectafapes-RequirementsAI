@@ -70,15 +70,6 @@ const salvar = async () => {
   carregando.value = true
 
   try{
-    if (!nomeValido.value) {
-      console.log("Passei aqui")
-      ui.exibirAlerta({
-        color: "error",
-        text: "Por favor corrija os campos inválidos."
-      })
-      return
-    }
-
     let sucesso = false
 
     if (modo.value === "criar") {
@@ -117,8 +108,6 @@ const salvar = async () => {
       class="w-full"
       placeholder="Nome"
       v-model="nome"
-      :rules="regrasNome"
-      @validationUpdate="updateNomeValido"
     />
 
     <h3 class="font-semibold">Descrição:</h3>
