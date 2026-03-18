@@ -37,6 +37,11 @@ CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "").split(",")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+
+# Avisa o Django que o Ingress está recebendo HTTPS e mandando HTTP pro Pod
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 
 INSTALLED_APPS = [
