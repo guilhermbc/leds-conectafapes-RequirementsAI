@@ -1,7 +1,10 @@
 #!/bin/sh
 
-echo "Running migrations..."
-python manage.py makemigrations --noinput
+set -e
+
+echo "Preparing database..."
+touch /app/backend/db.sqlite3
+chmod 664 /app/backend/db.sqlite3
 
 echo "Applying migrations..."
 python manage.py migrate --noinput

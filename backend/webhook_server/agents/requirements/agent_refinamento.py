@@ -51,8 +51,11 @@ refinamento_prompt = ChatPromptTemplate.from_messages([
 
     Generate only this. Avoid repetitions.
                                               
-    **Important**: Translate all your final output into **Portuguese**.
-    Your answer must be entirely in **Portuguese**.
+    **Important**: 
+    - Translate all your final output into **Portuguese**.
+    - Your answer must be entirely in **Portuguese**.
+    - Do not include any additional commentaries before the presentation of the requirements.
+    - The only other content allowed is the "Questions and validations" section at the end.
     """
     )
 ])
