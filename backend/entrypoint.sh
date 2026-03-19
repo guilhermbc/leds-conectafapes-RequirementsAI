@@ -2,9 +2,14 @@
 
 set -e
 
-echo "Preparing database..."
-touch /app/backend/db.sqlite3
-chmod 664 /app/backend/db.sqlite3
+echo "Waiting for PostgreSQL..."
+
+# Espera o banco subir
+while ! nc -z $DB_HOST_PRODUCTION $DB_PORT_PRODUCTION; do
+  sleep 1
+done
+
+echo "PostgreSQL started"
 
 echo "Applying migrations..."
 python manage.py migrate --noinput
@@ -12,33 +17,61 @@ python manage.py migrate --noinput
 echo "Collecting static..."
 python manage.py collectstatic --noinput
 
-echo "Creating superuser..."
-python manage.py createsuperuser --noinput || true
-
-echo "Creating OAuth application..."
+echo "Creating Superuser e OAuth Application..."
 
 python manage.py shell <<EOF
 from django.contrib.auth import get_user_model
 from oauth2_provider.models import Application
+import os
 
 User = get_user_model()
 
-username = "$DJANGO_SUPERUSER_USERNAME"
-client_id = "$OAUTH_CLIENT_ID"
+username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
+email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@admin.com")
+password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "admin123")
+client_id = os.environ.get("OAUTH_CLIENT_ID", "HEY, LISTEN!")
 
-user = User.objects.get(username=username)
+# Criar ou atualizar usuário
+user, created = User.objects.get_or_create(
+    username=username,
+    defaults={'email': email}
+)
 
-if not Application.objects.filter(client_id=client_id).exists():
-    Application.objects.create(
-        name="Frontend",
-        user=user,
-        client_id=client_id,
-        client_type=Application.CLIENT_PUBLIC,
-        authorization_grant_type=Application.GRANT_PASSWORD,
-    )
-    print("OAuth application created.")
+# Garante que o usuário esteja sempre válido
+user.email = email
+user.is_superuser = True
+user.is_staff = True
+user.is_active = True
+user.set_password(password)
+user.save()
+
+if created:
+    print(f"-> Superusuario '{username}' criado com sucesso!")
 else:
-    print("OAuth application already exists.")
+    print(f"-> Superusuario '{username}' atualizado!")
+
+# Criar ou atualizar aplicação OAuth
+app, app_created = Application.objects.get_or_create(
+    client_id=client_id,
+    defaults={
+        "name": "Frontend",
+        "user": user,
+        "client_type": Application.CLIENT_PUBLIC,
+        "authorization_grant_type": Application.GRANT_PASSWORD,
+    }
+)
+
+# Garante consistência mesmo se já existir
+app.user = user
+app.client_type = Application.CLIENT_PUBLIC
+app.authorization_grant_type = Application.GRANT_PASSWORD
+app.name = "Frontend"
+app.save()
+
+if app_created:
+    print("-> Aplicacao OAuth criada com sucesso!")
+else:
+    print("-> Aplicacao OAuth atualizada!")
 EOF
 
 echo "Starting server..."
