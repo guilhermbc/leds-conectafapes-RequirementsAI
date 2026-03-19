@@ -2,6 +2,7 @@
 import { ref, inject, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 import { chaveModal } from '@/types/ui'
 import {
   campoNecessario,
@@ -11,6 +12,12 @@ import {
 
 const router = useRouter()
 const auth = useAuthStore()
+const { locale } = useI18n()
+
+function changeLanguage(lang: string) {
+  locale.value = lang
+  localStorage.setItem('language', lang)
+}
 
 // Modal
 const modal = inject(chaveModal)
@@ -55,7 +62,8 @@ const entrar = async () => {
     // Redireciona para página principal
     router.push({ name: 'projeto-home' })
   } catch (e) {
-    erro.value = 'Usuário ou senha inválidos.'
+    erro.value = 'Invalid username or password.'
+
   } finally {
     loading.value = false
   }
@@ -63,6 +71,23 @@ const entrar = async () => {
 </script>
 
 <template>
+  <div class="absolute top-4 right-4">
+    <button 
+      class="px-5 py-2 mr-2 bg-blue-800 text-white rounded-lg 
+                  hover:bg-blue-900 transition cursor-pointer"
+      @click="changeLanguage('en')"
+    >
+      EN
+    </button>
+    <button
+      class="px-5 py-2 bg-blue-800 text-white rounded-lg 
+                  hover:bg-blue-900 transition cursor-pointer"
+      @click="changeLanguage('pt')"
+    >
+      PT
+    </button>
+  </div>
+
   <div class="flex flex-col items-center justify-center min-h-screen">
     
     <!-- Título -->
@@ -79,7 +104,7 @@ const entrar = async () => {
         v-model="usuario"
         @keyup-enter="entrar"
       >
-        Nome de Usuário
+        {{ $t('message.login.username')}}
       </text-input>
 
       <text-input
@@ -88,7 +113,7 @@ const entrar = async () => {
         @keyup-enter="entrar"
         type="password"
       >
-        Senha
+        {{ $t('message.login.password')}}
       </text-input>
 
       <!-- Erro -->
@@ -102,7 +127,7 @@ const entrar = async () => {
           class="text-sm text-blue-700 hover:underline transition cursor-pointer"
           @click="esqueciSenha"
         >
-          Esqueci a senha
+        {{ $t('message.login.forgot')}}
         </button>
 
         <button
@@ -110,7 +135,7 @@ const entrar = async () => {
                  hover:bg-blue-900 transition cursor-pointer"
           @click="entrar"
         >
-          <span v-if="!loading">Entrar</span>
+          <span v-if="!loading">{{ $t('message.login.button')}}</span>
           <span v-else>Entrando...</span>
         </button>
       </div>

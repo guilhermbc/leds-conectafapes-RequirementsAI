@@ -1,0 +1,11 @@
+{
+  "message": {
+    "login": {
+      "username": "Usuário",
+      "password": "Senha",
+      "button": "Entrar",
+      "forgot": "Esqueci minha senha",
+      "error": "Usuário ou senha inválidos."
+    }
+  }
+}

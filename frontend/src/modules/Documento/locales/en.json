@@ -1,0 +1,11 @@
+{
+  "message": {
+    "login": {
+      "username": "Username",
+      "password": "Password",
+      "button": "Login",
+      "forgot": "Forgot password",
+      "error": "Invalid username or password."
+    }
+  }
+}

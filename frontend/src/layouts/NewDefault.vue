@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
+import { useI18n } from 'vue-i18n';
+
+const { locale } = useI18n() 
+
+function changeLanguage(lang: string) {
+  locale.value = lang
+  localStorage.setItem('language', lang)
+}
 
 const sair = async () => {
   const auth = useAuthStore()
@@ -14,7 +22,13 @@ const sair = async () => {
       <span class="text-lg font-semibold">
         RequirementsAI
       </span>
-      <p-button class="bg-blue-950" @click="sair">SAIR</p-button>
+      <div>
+        <div>
+          <p-button class="bg-blue-950 mr-2 hover:bg-blue-900 transition cursor-pointer" @click="changeLanguage('en')">EN</p-button>
+          <p-button class="bg-blue-950 mr-4 hover:bg-blue-900 transition cursor-pointer" @click="changeLanguage('pt')">PT</p-button>
+        </div>
+        <p-button class="bg-blue-950" @click="sair">SAIR</p-button>
+      </div>
     </nav>
     <main class="flex justify-center items-center w-full">
       <router-view />
