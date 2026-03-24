@@ -8,6 +8,7 @@ from .serializers import (
     ProjetoReadSerializer, ProjetoWriteSerializer,
     ModuloReadSerializer, ModuloWriteSerializer,
     DocumentoReadSerializer, DocumentoWriteSerializer,
+    UserRegisterSerializer
 )
 
 from django.shortcuts import get_object_or_404
@@ -15,7 +16,7 @@ from django.http import JsonResponse
 from rest_framework.decorators import action
 from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_condition import And, Or
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, OAuth2Authentication
 from rest_framework.authentication import SessionAuthentication
@@ -43,7 +44,7 @@ class ProjetoViewSet(ModelViewSet):
     queryset = Projeto.objects.all()
     pagination_class = CustomPagination
     authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    permission_classes = permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
+    permission_classes = [Or(IsAdminUser, IsAuthenticated, TokenHasReadWriteScope)]
 
     # permission_classes = [AllowAny]
 
@@ -76,6 +77,12 @@ class ProjetoViewSet(ModelViewSet):
         
         self.check_object_permissions(self.request, obj)
         return obj
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return Projeto.objects.filter(user=self.request.user)
 
 class ModuloViewSet(ModelViewSet):
     queryset = Modulo.objects.all()
@@ -154,6 +161,12 @@ class ModuloViewSet(ModelViewSet):
         result = [d for d in latest_docs if d.vMajor == major]
 
         return Response(DocumentoReadSerializer(result, many=True).data)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return Projeto.objects.filter(user=self.request.user)
 
 class DocumentoViewSet(ModelViewSet):
     queryset = Documento.objects.all()
@@ -241,3 +254,13 @@ class DocumentoViewSet(ModelViewSet):
         request.data['geradoIA'] = generated_by_ai
 
         return super().create(request, *args, **kwargs)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return Projeto.objects.filter(user=self.request.user)
+    
+class UserViewSet(generics.CreateAPIView):
+    serializer_class = UserRegisterSerializer
+    permissions_classes = [AllowAny]

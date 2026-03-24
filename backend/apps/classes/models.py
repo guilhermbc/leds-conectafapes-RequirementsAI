@@ -1,6 +1,9 @@
 from django.db import models
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
+
+User = get_user_model()
 
 class DOCS(models.TextChoices):
     """"""
@@ -16,6 +19,7 @@ class Projeto(PolymorphicModel, models.Model):
 
     nome = models.CharField(max_length=300, null=True, blank=True)
     descricao = models.TextField(null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projetos')
 
     class Meta:
         db_table = 'projeto'
@@ -27,6 +31,9 @@ class Modulo(PolymorphicModel, models.Model):
     descricao = models.TextField(null=True, blank=True)
 
     Projeto = models.ForeignKey('Projeto', blank=True, null=True, on_delete=models.CASCADE, related_name="projeto_%(class)s")
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='modulos')
+
 
     class Meta:
         db_table = 'modulo'
@@ -57,6 +64,8 @@ class Documento(PolymorphicModel, models.Model):
     
     # tipo do documento
     TipoDocumento = models.CharField(max_length=20, choices=DOCS.choices, default=DOCS.MINIMUNDO)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documentos')
 
     class Meta:
         db_table = 'documento'
