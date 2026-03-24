@@ -104,7 +104,7 @@ const entrar = async () => {
         v-model="usuario"
         @keyup-enter="entrar"
       >
-        {{ $t('message.login.username')}}
+        {{ $t('login.username')}}
       </text-input>
 
       <text-input
@@ -113,7 +113,7 @@ const entrar = async () => {
         @keyup-enter="entrar"
         type="password"
       >
-        {{ $t('message.login.password')}}
+        {{ $t('login.password')}}
       </text-input>
 
       <!-- Erro -->
@@ -127,7 +127,7 @@ const entrar = async () => {
           class="text-sm text-blue-700 hover:underline transition cursor-pointer"
           @click="esqueciSenha"
         >
-        {{ $t('message.login.forgot')}}
+        {{ $t('login.forgot')}}
         </button>
 
         <button
@@ -135,7 +135,7 @@ const entrar = async () => {
                  hover:bg-blue-900 transition cursor-pointer"
           @click="entrar"
         >
-          <span v-if="!loading">{{ $t('message.login.button')}}</span>
+          <span v-if="!loading">{{ $t('login.button')}}</span>
           <span v-else>Entrando...</span>
         </button>
       </div>

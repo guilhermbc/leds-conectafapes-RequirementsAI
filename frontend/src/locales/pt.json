@@ -1,11 +1,13 @@
 {
-  "message": {
-    "login": {
-      "username": "Usuário",
-      "password": "Senha",
-      "button": "Entrar",
-      "forgot": "Esqueci minha senha",
-      "error": "Usuário ou senha inválidos."
-    }
+  "login": {
+    "username": "Usuário",
+    "password": "Senha",
+    "button": "Entrar",
+    "forgot": "Esqueci minha senha",
+    "error": "Usuário ou senha inválidos."
+  },
+  "navigation": {
+    "logout": "SAIR",
+    "back": "← Voltar"
   }
 }

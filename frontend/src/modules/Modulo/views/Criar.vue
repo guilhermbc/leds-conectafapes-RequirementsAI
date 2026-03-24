@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue"
+import { useI18n } from "vue-i18n"
 import { criarModulo, atualizarModulo } from "../controllers/modulo"
 import type { Modulo } from "../types/modulo"
 import type { Documento } from "@/modules/Documento/types/documento"
@@ -105,20 +106,20 @@ const salvar = async () => {
 <template>
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4">
-      {{ modo === "criar" ? "Criar Módulo" : "Editar Módulo" }}
+      {{ modo === "criar" ? $t('module.createModal.title') : $t('module.editModal.title') }}
     </h2>
 
-    <h3 class="font-semibold">Nome:</h3>
+    <h3 class="font-semibold">{{ $t('module.createModal.name') }}:</h3>
     <text-input
       class="w-full"
-      placeholder="Nome"
+      :placeholder="$t('module.createModal.name')"
       v-model="nome"
     />
 
-    <h3 class="font-semibold">Descrição:</h3>
+    <h3 class="font-semibold">{{ $t('module.createModal.description') }}:</h3>
     <text-input
       class="w-full"
-      placeholder="Descrição"
+      :placeholder="$t('module.createModal.description')"
       v-model="descricao"
     />
 
@@ -128,7 +129,7 @@ const salvar = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        Cancelar
+        {{ $t('module.cancel') }}
       </button>
 
       <button
@@ -137,7 +138,7 @@ const salvar = async () => {
         :disabled="carregando" 
         @click="salvar"
       >
-        {{ modo === "criar" ? "Criar" : "Atualizar" }}
+        {{ modo === "criar" ? $t('module.createModal.createButton') : $t('module.editModal.editButton') }}
       </button>
     </div>
   </modal>

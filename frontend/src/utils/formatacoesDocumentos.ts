@@ -86,15 +86,15 @@ export function formatarVersao(vMajor: number, vMinor: number): string {
  */
 export function formatarTipoDocumento(tipo: string): string {
     if (tipo === 'MINIMUNDO') {
-        return 'Minimundo'
+        return 'document.domainStorytelling'
     } else if (tipo === 'REQUISITOS') {
-        return 'Requisitos'
+        return 'document.requirements'
     } else if (tipo === 'CASO_USO') {
-        return 'Casos de Uso'
+        return 'document.useCases'
     } else if (tipo === 'DIAGRAMA_CLASSE') {
-        return 'Diagrama de Classes'
+        return 'document.classDiagram'
     } else if (tipo === 'PROTOTIPO_INTERFACE') {
-        return 'Protótipo de Interface'
+        return 'document.InterfacePrototype'
     } else {
         return ''
     }

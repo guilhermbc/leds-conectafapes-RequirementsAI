@@ -32,11 +32,10 @@ const origemAudio = ref('')
 const DocumentoOrigem = ref<number[]>([])
 
 const categoriasDropdown = ref<string[]>([
-  "Minimundo",
-  "Requisitos",
-  "Casos de Uso",
-  "Diagrama de Classes",
-  "Protótipo de Interface"
+  "document.domainStorytelling",
+  "document.requirements",
+  "document.useCases",
+  "document.classDiagram",
 ])
 
 // Tipo de documento (categoria) escolhido na hora de criar
@@ -53,24 +52,31 @@ const carregando = ref(false)
 
 const TipoDocumento = computed(() => {
   switch (categoriaEscolhida.value) {
-    case 'Minimundo':
+    case 'document.domainStorytelling':
       return 'MINIMUNDO'
-    case 'Requisitos':
+    case 'document.requirements':
       return 'REQUISITOS'
-    case 'Casos de Uso':
+    case 'document.useCases':
       return 'CASO_USO'
-    case 'Diagrama de Classes':
+    case 'document.classDiagram':
       return 'DIAGRAMA_CLASSE'
-    case 'Protótipo de Interface':
-      return 'PROTOTIPO_INTERFACE'
+    // case 'Protótipo de Interface':
+    //   return 'PROTOTIPO_INTERFACE'
     default:
       return ''
   }
 })
 
 const isDisabled = computed(() => {
-  if (modoCriacao.value === 'todos') {
-    return carregando.value
+  if (modoCriacao.value === 'todos' && categoriasDropdown.value.length < 4) {
+    return true
+  }
+  else if (modoCriacao.value === 'todos' && categoriasDropdown.value.length === 4) {
+    return carregando.value || origemAudio.value === '' 
+  }
+
+  if (modoCriacao.value === 'individual' && categoriasDropdown.value.length === 0) {
+    return true
   }
   return carregando.value
     || (TipoDocumento.value === '')
@@ -78,7 +84,7 @@ const isDisabled = computed(() => {
     || (TipoDocumento.value === 'REQUISITOS' && minimundo_origem.value === null) 
     || (TipoDocumento.value === 'CASO_USO' && (minimundo_origem.value === null || requisito_origem.value === null)) 
     || (TipoDocumento.value === 'DIAGRAMA_CLASSE' && (minimundo_origem.value === null || requisito_origem.value === null || casoDeUso_origem.value === null)) 
-    || (TipoDocumento.value === 'PROTOTIPO_INTERFACE' && (requisito_origem.value === null || casoDeUso_origem.value === null || diagramaDeClasse_origem.value === null))
+    // || (TipoDocumento.value === 'PROTOTIPO_INTERFACE' && (requisito_origem.value === null || casoDeUso_origem.value === null || diagramaDeClasse_origem.value === null))
 })
 
 // Recarrega a lista de documentos ao abrir o modal
@@ -104,14 +110,14 @@ const carregarDocumentos = async () => {
   requisito_origem.value = null
   casoDeUso_origem.value = null
   diagramaDeClasse_origem.value = null
-  prototipoDeInterface_origem.value = null
+  // prototipoDeInterface_origem.value = null
 
   categoriasDropdown.value = [
-    "Minimundo",
-    "Requisitos",
-    "Casos de Uso",
-    "Diagrama de Classes",
-    "Protótipo de Interface"
+    "document.domainStorytelling",
+    "document.requirements",
+    "document.useCases",
+    "document.classDiagram",
+    // "document.prototypeInterface"
   ]
 
   const ultimosDocumentos = await listarUltimosDocumentos(props.moduloId as string)
@@ -234,22 +240,21 @@ const salvar = async () => {
         })
       }
 
-      if (response) {
-        idsDocumentosCriados.push(Number(response.data.id))
-        idsDocumentosCriados.shift()
-        response = await criarDocumento({
-          vMajor: 1,
-          vMinor: 0,
-          geradoIA: true,
-          arquivo: '',
-          origemAudio: '',
-          TipoDocumento: 'PROTOTIPO_INTERFACE',
-          DocumentoAnterior: null,
-          Modulo: props.moduloId as string,
-          DocumentoOrigem: idsDocumentosCriados,
-        })
-      }
-
+      // if (response) {
+      //   idsDocumentosCriados.push(Number(response.data.id))
+      //   idsDocumentosCriados.shift()
+      //   response = await criarDocumento({
+      //     vMajor: 1,
+      //     vMinor: 0,
+      //     geradoIA: true,
+      //     arquivo: '',
+      //     origemAudio: '',
+      //     TipoDocumento: 'PROTOTIPO_INTERFACE',
+      //     DocumentoAnterior: null,
+      //     Modulo: props.moduloId as string,
+      //     DocumentoOrigem: idsDocumentosCriados,
+      //   })
+      // }
       emit('salvo')
       close()
     }
@@ -261,21 +266,21 @@ const salvar = async () => {
 
 <template>
   <modal v-model="props.modelValue" @close="close">
-    <h2 class="text-xl font-bold mb-4"> Criar Documento </h2>
+    <h2 class="text-xl font-bold mb-4"> {{ $t('document.createModal.title') }} </h2>
 
     <div class="mb-4 font-semibold">
       <label class="mr-4">
         <input type="radio" v-model="modoCriacao" value="individual" />
-        Criar individualmente
+        {{ $t('document.createModal.specificOption') }}
       </label>
       <label>
         <input type="radio" v-model="modoCriacao" value="todos" />
-        Criar todos
+        {{ $t('document.createModal.allOption') }}
       </label>
     </div>
 
     <div v-if="modoCriacao === 'individual'">
-      <h3 class="font-semibold">Tipo do documento:</h3>
+      <h3 class="font-semibold"> {{ $t('document.createModal.dropdownTitle') }}:</h3>
 
       <!-- Dropdown com os tipos de documento -->
       <select
@@ -284,67 +289,69 @@ const salvar = async () => {
         class="block w-full p-2 border rounded my-1 mb-3"
         :class="{ 'bg-gray-100 cursor-not-allowed': categoriasDropdown.length === 0 }"
       >
-        <option disabled value="">Selecione um tipo...</option>
+        <option disabled value="">
+          {{ $t('document.createModal.dropdownLabel') }}...
+        </option>
         <option v-for="item in categoriasDropdown" :key="item" :value="item">
-          {{ item }}
+          {{ $t(item) }}
         </option>
       </select>
 
-      <p v-if="categoriasDropdown.length === 0" class="text-red-500 text-sm italic">
-        Todos os documentos já foram criados.
+      <p v-if="categoriasDropdown.length === 0" class="text-red-500 text-center text-sm italic">
+        {{ $t('document.createModal.allDocumentsCreatedIndividual') }}
       </p>
 
       <!-- Escolha de áudio de origem para Minimundo -->
       <div v-if="TipoDocumento === 'MINIMUNDO'">
-        <h3 class="font-semibold">Áudio de origem:</h3>
+        <h3 class="font-semibold">{{ $t('document.createModal.audioOrigin') }}:</h3>
         <text-input
         class="w-full"
-        placeholder="Áudio de origem"
+        :placeholder="$t('document.createModal.audioOrigin')"
         v-model="origemAudio"
         />
       </div>
 
       <!-- Seleção de Minimundo -->
       <div v-if="TipoDocumento === 'REQUISITOS' || TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'">
-        <h3 class="font-semibold">Minimundo de origem:</h3>
+        <h3 class="font-semibold">{{ $t('document.createModal.origindDomainStorytelling') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="minimundo_origem !== null">
             {{ formatarTipoDocumento(minimundo_origem?.TipoDocumento) }} (v{{ formatarVersao(minimundo_origem?.vMajor, minimundo_origem?.vMinor) }})
           </div>
           <div v-else class="text-gray-500 italic">
-            Nenhum documento disponível.
+            {{ $t('document.createModal.noDocument') }}
           </div>
         </div>
       </div>
 
       <!-- Seleção de Requisitos -->
-      <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
-        <h3 class="font-semibold">Requisitos de origem:</h3>
+      <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'">
+        <h3 class="font-semibold">{{ $t('document.createModal.originRequirements') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="requisito_origem !== null">
             {{ formatarTipoDocumento(requisito_origem?.TipoDocumento) }} (v{{ formatarVersao(requisito_origem?.vMajor, requisito_origem?.vMinor) }})
           </div>
           <div v-else class="text-gray-500 italic">
-            Nenhum documento disponível.
+            {{ $t('document.createModal.noDocument') }}
           </div>
         </div>
       </div>
 
       <!-- Seleção de Casos de Uso -->
-      <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE' || TipoDocumento === 'PROTOTIPO_INTERFACE'">
-        <h3 class="font-semibold">Casos de uso de origem:</h3>
+      <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE'">
+        <h3 class="font-semibold">{{ $t('document.createModal.originUseCases') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="casoDeUso_origem !== null">
             {{ formatarTipoDocumento(casoDeUso_origem?.TipoDocumento) }} (v{{ formatarVersao(casoDeUso_origem?.vMajor, casoDeUso_origem?.vMinor) }})
           </div>
           <div v-else class="text-gray-500 italic">
-            Nenhum documento disponível.
+            {{ $t('document.createModal.noDocument') }}
           </div>
         </div>
       </div>
 
       <!-- Seleção de Diagrama de Classe -->
-      <div v-if="TipoDocumento === 'PROTOTIPO_INTERFACE'">
+      <!-- <div v-if="TipoDocumento === 'PROTOTIPO_INTERFACE'">
         <h3 class="font-semibold">Diagrama de classe de origem:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="diagramaDeClasse_origem !== null">
@@ -354,24 +361,25 @@ const salvar = async () => {
             Nenhum documento disponível.
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
+    <!-- Criação de todos os documentos -->
     <div v-else>
 
       <!-- Oferece a opção de criar todos apenas quando ainda não tem nenhum documento -->
-      <div v-if="categoriasDropdown.length === 5">
-        <h3 class="font-semibold">Áudio de origem:</h3>
+      <div v-if="categoriasDropdown.length === 4">
+        <h3 class="font-semibold">{{ $t('document.createModal.audioOrigin') }}:</h3>
           <text-input
           class="w-full"
-          placeholder="Áudio de origem"
+          :placeholder="$t('document.createModal.audioOrigin')"
           v-model="origemAudio"
         />
       </div>
 
-      <div v-else>
+      <div v-else-if="categoriasDropdown.length === 0 && modoCriacao === 'todos'" class="text-center">
         <p class="text-red-500 text-sm italic">
-          Opção disponível apenas quando ainda não existe nenhum documento criado.
+          {{ $t('document.createModal.allDocumentsCreatedAll') }}
         </p>
       </div>
       
@@ -384,7 +392,7 @@ const salvar = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        Cancelar
+        {{ $t('document.cancel')}}
       </button>
 
       <button
@@ -393,7 +401,7 @@ const salvar = async () => {
         :disabled="isDisabled" 
         @click="salvar"
       >
-        Criar
+        {{ $t('document.createModal.createButton') }}
       </button>
     </div>
   </modal>

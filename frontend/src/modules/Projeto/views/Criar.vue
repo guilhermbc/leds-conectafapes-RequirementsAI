@@ -100,20 +100,20 @@ const salvar = async () => {
 <template>
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4">
-      {{ modo === "criar" ? "Criar Projeto" : "Editar Projeto" }}
+      {{ modo === "criar" ? $t('project.createModal.title') : $t('project.editModal.title') }}
     </h2>
 
-    <h3 class="font-semibold">Nome:</h3>
+    <h3 class="font-semibold">{{ $t('project.createModal.name') }}:</h3>
     <text-input
       class="w-full"
-      placeholder="Nome"
+      :placeholder="$t('project.createModal.name')"
       v-model="nome"
     />
 
-    <h3 class="font-semibold">Descrição:</h3>
+    <h3 class="font-semibold">{{ $t('project.createModal.description') }}:</h3>
     <text-input
       class="w-full"
-      placeholder="Descrição"
+      :placeholder="$t('project.createModal.description')"
       v-model="descricao"
     />
 
@@ -123,7 +123,7 @@ const salvar = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        Cancelar
+        {{ $t('project.cancel') }}
       </button>
 
       <button
@@ -132,7 +132,7 @@ const salvar = async () => {
         :disabled="carregando" 
         @click="salvar"
       >
-        {{ modo === "criar" ? "Criar" : "Atualizar" }}
+        {{ modo === "criar" ? $t('project.createModal.createButton') : $t('project.editModal.editButton') }}
       </button>
     </div>
   </modal>

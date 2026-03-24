@@ -1,11 +1,44 @@
 {
-  "message": {
-    "login": {
-      "username": "Usuário",
-      "password": "Senha",
-      "button": "Entrar",
-      "forgot": "Esqueci minha senha",
-      "error": "Usuário ou senha inválidos."
-    }
+  "document": {
+    "currentDocumentsTitle": "Versões Atuais dos Documentos",
+    "allDocumentsTitle": "Todos os Documentos",
+    "new": "Novo Documento",
+    "none": "Nenhum documento encontrado.",
+    "uploadNewVersion": "Upload de Nova Versão",
+    "generateNewAIVersion": "Gerar Nova Versão com IA",
+    "download": "Download",
+    "contentText": "Conteúdo do Documento",
+    "domainStorytelling": "Narrativa de Domínio",
+    "requirements": "Requisitos",
+    "useCases": "Casos de Uso",
+    "classDiagram": "Diagrama de Classes",
+    "sidebar": {
+      "originDocuments": "Documentos de Origem",
+      "previousVersion": "Versão Anterior",
+      "noPreviousVersion": "Nenhuma versão anterior",
+      "nextVersion": "Próxima Versão",
+      "noNextVersion": "Nenhuma próxima versão"
+    },
+    "createModal": {
+      "title": "Criar Documento",
+      "specificOption": "Criar documento específico",
+      "allOption": "Criar todos os documentos",
+      "dropdownTitle": "Tipo de Documento",
+      "dropdownLabel": "Selecionar tipo de documento",
+      "audioOrigin": "Origem de Áudio",
+      "origindDomainStorytelling": "Narrativa de Domínio de Origem",
+      "originRequirements": "Requisitos de Origem",
+      "originUseCases": "Casos de Uso de Origem",
+      "originClassDiagram": "Diagrama de Classes de Origem",
+      "noDocument": "Nenhum documento disponível.",
+      "allDocumentsCreatedIndividual": "Todos os documentos foram criados. Crie novas versões fazendo upload de uma nova versão do documento ou gerando uma nova versão com IA.",
+      "allDocumentsCreatedAll": "Esta opção só está disponível se nenhum documento tiver sido criado ainda.",
+      "createButton": "Criar"
+    },
+    "editModal": {
+      "title": "Edit Document",
+      "editButton": "Save Changes"
+    },
+    "cancel": "Cancel"
   }
 }
