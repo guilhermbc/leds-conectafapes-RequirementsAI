@@ -93,20 +93,20 @@ const salvar = async () => {
 
 <template>
   <modal v-model="props.modelValue" @close="close">
-    <h2 class="text-xl font-bold mb-4">Gerar Nova Versão do Documento</h2>
+    <h2 class="text-xl font-bold mb-4">{{ $t('document.newAIVersionModal.title') }}</h2>
 
     <div v-if="TipoDocumento == 'MINIMUNDO'" class="">
-      <h3 class="font-semibold">Áudio de origem (mudança opcional):</h3>
+      <h3 class="font-semibold">{{ $t('document.newAIVersionModal.originAudioTitle') }}</h3>
       <generic-text-input
       class="w-full mt-1"
-      placeholder="Áudio de origem"
+      :placeholder="$t('document.newAIVersionModal.originAudio')"
       v-model="origemAudio"
       />
     </div>
 
     <div>
       <h3 class="text-lg text-center font-semibold my-4"> 
-        Deseja mesmo gerar uma nova versão de {{ formatarTipoDocumento(TipoDocumento) }}?
+        {{ $t('document.newAIVersionModal.confirmationMessage') }} {{ $t(formatarTipoDocumento(TipoDocumento)) }}?
       </h3>
     </div>
 
@@ -116,7 +116,7 @@ const salvar = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        Cancelar
+        {{ $t('document.cancel') }}
       </button>
 
       <button
@@ -125,7 +125,7 @@ const salvar = async () => {
         :disabled="isDisabled"  
         @click="salvar"
       >
-        Confirmar
+        {{ $t('document.newAIVersionModal.generateButton') }}
       </button>
     </div>
     

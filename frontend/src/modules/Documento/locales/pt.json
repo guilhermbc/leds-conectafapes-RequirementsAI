@@ -36,9 +36,20 @@
       "createButton": "Criar"
     },
     "editModal": {
-      "title": "Edit Document",
-      "editButton": "Save Changes"
+      "title": "Upload de Nova Versão",
+      "subtitle": "Faça upload de uma nova versão do documento",
+      "contentLabel": "Clique para selecionar um arquivo markdown ou arraste e solte aqui",
+      "contentLabel2": ".md ou .markdown",
+      "confirmationMessage": "Tem certeza que deseja fazer upload desta nova versão de",
+      "editButton": "Salvar Alterações"
     },
-    "cancel": "Cancel"
+    "newAIVersionModal": {
+      "title": "Gerar Nova Versão com IA",
+      "originAudioTitle": "Áudio de Origem (mudança opcional)",
+      "originAudio": "Áudio de Origem",
+      "confirmationMessage": "Tem certeza que deseja gerar uma nova versão de",
+      "generateButton": "Gerar"
+    },
+    "cancel": "Cancelar"
   }
 }

@@ -36,8 +36,19 @@
       "createButton": "Create"
     },
     "editModal": {
-      "title": "Edit Document",
+      "title": "Upload New Version",
+      "subtitle": "Upload a new version of the document",
+      "contentLabel": "Click to select a markdown file or drag and drop it here",
+      "contentLabel2": ".md or .markdown",
+      "confirmationMessage": "Are you sure you want to upload this new version of",
       "editButton": "Save Changes"
+    },
+    "newAIVersionModal": {
+      "title": "Generate New Version with AI",
+      "originAudioTitle": "Origin Audio (optional change)",
+      "originAudio": "Origin Audio",
+      "confirmationMessage": "Are you sure you want to generate a new version of",
+      "generateButton": "Generate"
     },
     "cancel": "Cancel"
   }

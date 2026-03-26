@@ -106,10 +106,10 @@ const salvar = async () => {
 
 <template>
   <modal v-model="props.modelValue" @close="close">
-    <h2 class="text-xl font-bold mb-4"> Editar Documento </h2>
+    <h2 class="text-xl font-bold mb-4"> {{ $t('document.editModal.title') }} </h2>
 
     <h3 class="font-semibold">
-      Novo conteúdo do documento: 
+      {{ $t('document.editModal.subtitle') }}: 
     </h3>
 
     <!-- INPUT ESTILIZADO -->
@@ -118,8 +118,8 @@ const salvar = async () => {
              border-2 border-dashed border-gray-400 rounded-xl cursor-pointer 
              hover:bg-gray-100 transition"
     >
-      <span class="text-gray-700 font-medium">Clique para selecionar um arquivo Markdown</span>
-      <span class="text-xs text-gray-500">(.md ou .markdown)</span>
+      <span class="text-gray-700 font-medium"> {{ $t('document.editModal.contentLabel') }} </span>
+      <span class="text-xs text-gray-500">({{ $t('document.editModal.contentLabel2') }})</span>
 
       <input
         type="file"
@@ -131,7 +131,7 @@ const salvar = async () => {
 
     <div>
       <h3 class="text-lg text-center font-semibold my-4"> 
-        Deseja mesmo gerar uma nova versão de {{ formatarTipoDocumento(TipoDocumento) }}?
+        {{ $t('document.editModal.confirmationMessage') }} {{ $t(formatarTipoDocumento(TipoDocumento)) }}?
       </h3>
     </div>
 
@@ -141,7 +141,7 @@ const salvar = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        Cancelar
+        {{ $t('document.cancel') }}
       </button>
 
        <button
@@ -150,7 +150,7 @@ const salvar = async () => {
         :disabled="carregando" 
         @click="salvar"
       >
-        Confirmar
+        {{ $t('document.editModal.editButton') }}
       </button>
     </div>
     
