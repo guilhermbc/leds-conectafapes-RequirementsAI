@@ -166,7 +166,7 @@ class ModuloViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        return Projeto.objects.filter(user=self.request.user)
+        return Modulo.objects.filter(user=self.request.user)
 
 class DocumentoViewSet(ModelViewSet):
     queryset = Documento.objects.all()
@@ -259,7 +259,7 @@ class DocumentoViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        return Projeto.objects.filter(user=self.request.user)
+        return Documento.objects.filter(user=self.request.user)
     
 class UserViewSet(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer

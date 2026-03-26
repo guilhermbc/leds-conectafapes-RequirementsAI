@@ -11,6 +11,7 @@ class DocumentoWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Documento
         exclude = ("polymorphic_ctype",)
+        read_only_fields = ("user",)
 
 class DocumentoReadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,6 +23,7 @@ class ModuloWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Modulo
         exclude = ("polymorphic_ctype",)
+        read_only_fields = ("user",)
 
 class ModuloReadSerializer(serializers.ModelSerializer):
     modulo_documento = DocumentoReadSerializer(many=True, read_only=True)
@@ -35,6 +37,8 @@ class ProjetoWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Projeto
         exclude = ("polymorphic_ctype",)
+        read_only_fields = ("user",)
+
 
 class ProjetoReadSerializer(serializers.ModelSerializer):
     projeto_modulo = ModuloReadSerializer(many=True, read_only=True)
