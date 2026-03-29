@@ -51,3 +51,39 @@ export async function refreshToken(refreshToken: string) {
 
   return response.json() as Promise<TokenResponse>
 }
+
+export async function register(username: string, email: string, password: string) {
+  const response = await fetch(`${BASE_URL}register/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, password }),
+  })
+
+  console.log('Register response:', response)
+
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => null)
+
+    // Tratar erros de validação do Django (formato: {field: ["message"]})
+    if (errorBody && typeof errorBody === 'object') {
+      // Verificar se é erro de username já existente
+      if (errorBody.username && Array.isArray(errorBody.username)) {
+        throw new Error('validation.usernameExists')
+      }
+      // Verificar se é erro de email já existente
+      if (errorBody.email && Array.isArray(errorBody.email)) {
+        throw new Error('validation.emailExists')
+      }
+      // Outros erros de campo
+      const firstField = Object.keys(errorBody)[0]
+      if (firstField && Array.isArray(errorBody[firstField])) {
+        throw new Error(errorBody[firstField][0])
+      }
+    }
+
+    const message = errorBody?.detail || JSON.stringify(errorBody) || 'Erro ao registrar usuário'
+    throw new Error(message)
+  }
+
+  return response.json()
+}

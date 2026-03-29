@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 const { locale } = useI18n() 
+const router = useRouter()
 
 function changeLanguage(lang: string) {
   locale.value = lang
@@ -12,6 +14,7 @@ function changeLanguage(lang: string) {
 const sair = async () => {
   const auth = useAuthStore()
   await auth.logout()
+  router.push('/')
 }
 </script>
 

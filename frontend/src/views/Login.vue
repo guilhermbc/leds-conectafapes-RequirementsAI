@@ -100,7 +100,7 @@ const entrar = async () => {
       
       <text-input
         class="w-full mb-4"
-        placeholder="exemplo123"
+        placeholder=""
         v-model="usuario"
         @keyup-enter="entrar"
       >
@@ -123,12 +123,21 @@ const entrar = async () => {
 
       <!-- Botão -->
       <div class="flex justify-between items-center">
-        <button
-          class="text-sm text-blue-700 hover:underline transition cursor-pointer"
-          @click="esqueciSenha"
-        >
-        {{ $t('login.forgot')}}
-        </button>
+        <div>
+          <button
+            class="text-sm text-blue-700 hover:underline transition cursor-pointer mr-4"
+            @click="$router.push({ name: 'register' })"
+          >
+            {{ $t('register.button') }}
+          </button>
+
+          <button
+            class="text-sm text-blue-700 hover:underline transition cursor-pointer"
+            @click="esqueciSenha"
+          >
+            {{ $t('login.forgot')}}
+          </button>
+        </div>
 
         <button
           class="px-5 py-2 bg-blue-800 text-white rounded-lg 
