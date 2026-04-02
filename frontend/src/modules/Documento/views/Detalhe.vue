@@ -12,7 +12,7 @@ import { obterModulo } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 import NovaVersaoIA from './NovaVersaoIA.vue'
 import UploadNovaVersao from './UploadNovaVersao.vue'
-import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
+import { formatarTipoDocumento, formatarVersao, getNomeArquivo } from '@/utils/formatacoesDocumentos';
 
 const route = useRoute()
 const router = useRouter()
@@ -275,7 +275,7 @@ audio {
         <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.originDocuments') }}:</p>
         <!-- Se o documento for um minimundo -->
         <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2">
-          {{ documento?.origemAudio }}
+          {{ getNomeArquivo(documento?.arquivoAudio) }}
         </p>
         <ul v-else-if="documento?.TipoDocumento !== 'MINIMUNDO' && documento?.DocumentoOrigem?.length" class="list-disc ml-6 text-blue-600">
           <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">

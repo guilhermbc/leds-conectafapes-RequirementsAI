@@ -26,6 +26,8 @@
       "dropdownTitle": "Tipo de Documento",
       "dropdownLabel": "Selecionar tipo de documento",
       "audioOrigin": "Origem de Áudio",
+      "audioLabel": "Clique para selecionar um arquivo de áudio ou arraste e solte aqui",
+      "audioLabel2": ".mp3 ou .wav",
       "origindDomainStorytelling": "Narrativa de Domínio de Origem",
       "originRequirements": "Requisitos de Origem",
       "originUseCases": "Casos de Uso de Origem",

@@ -21,7 +21,7 @@ export const listarDocumento = async () => {
   }
 }
 
-export const criarDocumento = async (documento: DocumentoCreateReq) => {
+export const criarDocumento = async (documento: DocumentoCreateReq | FormData) => {
   const ui = useUiStore()
 
   try {

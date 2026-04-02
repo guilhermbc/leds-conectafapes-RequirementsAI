@@ -4,7 +4,7 @@ import {
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
-import { formatarTipoDocumento, formatarVersao} from '@/utils/formatacoesDocumentos';
+import { criarFormDataDocumento, formatarTipoDocumento} from '@/utils/formatacoesDocumentos';
 
 const props = defineProps<{
   modelValue: boolean
@@ -22,7 +22,7 @@ const close = () => emit("update:modelValue", false)
 const id = ref('')
 const vMajor = ref()
 const vMinor = ref()
-const origemAudio = ref('')
+const arquivoAudio = ref<File | null>(null)
 const TipoDocumento = ref('')
 const Modulo = ref('')
 const DocumentoAnterior = ref('')
@@ -50,7 +50,7 @@ const carregarDocumento = async () => {
   id.value = documento.id ?? ''
   vMajor.value = documento.vMajor
   vMinor.value = documento.vMinor
-  origemAudio.value = documento.origemAudio
+  arquivoAudio.value = documento.arquivoAudio
   TipoDocumento.value = documento.TipoDocumento
   Modulo.value = typeof documento.Modulo === 'object' && documento.Modulo !== null 
     ? documento.Modulo.id 
@@ -83,17 +83,19 @@ const salvar = async () => {
   carregando.value = true
 
   try{
-    const response = await criarDocumento({
+    const formDataToSend = criarFormDataDocumento({
       vMajor: vMajor.value,
       vMinor: vMinor.value,
       geradoIA: false,
       arquivo: conteudoMarkdown.value,
-      origemAudio: origemAudio.value,
+      // arquivoAudio: arquivoAudio.value,
       TipoDocumento: TipoDocumento.value,
       DocumentoAnterior: id.value,
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
+    
+    const response = await criarDocumento(formDataToSend)
 
     emit("salvo")
     close()

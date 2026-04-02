@@ -4,7 +4,7 @@ import {
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
-import { formatarTipoDocumento } from '@/utils/formatacoesDocumentos'
+import { formatarTipoDocumento, getNomeArquivo, criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
 
 const props = defineProps<{
   modelValue: boolean
@@ -18,11 +18,13 @@ const emit = defineEmits<{
 
 const close = () => emit("update:modelValue", false)
 
+const fileInput = ref<HTMLInputElement | null>(null)
+
 // Campos do documento
 const id = ref('')
 const vMajor = ref()
 const vMinor = ref()
-const origemAudio = ref('')
+const arquivoAudio = ref<File | null>(null)
 const TipoDocumento = ref('')
 const Modulo = ref('')
 const DocumentoOrigem = ref<number[]>([])
@@ -31,7 +33,7 @@ const carregando = ref(false)
 
 const isDisabled = computed(() => {
   return carregando.value
-    || (origemAudio.value == '' && TipoDocumento.value == 'MINIMUNDO')
+    || (arquivoAudio.value === null && TipoDocumento.value === 'MINIMUNDO')
 })
 
 // Recarrega a lista de documentos ao abrir o modal
@@ -53,7 +55,7 @@ const carregarDocumento = async () => {
   id.value = documento.id ?? ''
   vMajor.value = documento.vMajor
   vMinor.value = documento.vMinor
-  origemAudio.value = documento.origemAudio
+  arquivoAudio.value = documento.arquivoAudio
   TipoDocumento.value = documento.TipoDocumento
   Modulo.value = typeof documento.Modulo === 'object' && documento.Modulo !== null
     ? documento.Modulo.id
@@ -70,23 +72,45 @@ const salvar = async () => {
   carregando.value = true
 
   try{
-    const response = await criarDocumento({
+    const formDataToSend = criarFormDataDocumento({
       vMajor: vMajor.value,
       vMinor: vMinor.value,
       geradoIA: true,
       arquivo: '',
-      origemAudio: origemAudio.value,
+      // arquivoAudio: arquivoAudio.value,
       TipoDocumento: TipoDocumento.value,
       DocumentoAnterior: id.value,
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
+    const response = await criarDocumento(formDataToSend)
 
     emit("salvo")
     close()
     
   } finally {
     carregando.value = false
+  }
+}
+
+
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput?.value.click()
+  }
+}
+
+const onFileChange = (event: any) => {
+  const file = event.target.files[0]
+  if (file) {
+    arquivoAudio.value = file
+  }
+}
+
+const onDrop = (event: any) => {
+  const file = event.dataTransfer.files[0]
+  if (file) {
+    arquivoAudio.value = file
   }
 }
 </script>
@@ -97,11 +121,31 @@ const salvar = async () => {
 
     <div v-if="TipoDocumento == 'MINIMUNDO'" class="">
       <h3 class="font-semibold">{{ $t('document.newAIVersionModal.originAudioTitle') }}</h3>
-      <generic-text-input
-      class="w-full mt-1"
-      :placeholder="$t('document.newAIVersionModal.originAudio')"
-      v-model="origemAudio"
-      />
+      <!-- Drag & Drop de áudio -->
+        <div
+          class="drop-zone"
+          @click="triggerFileInput"
+          @dragover.prevent
+          @drop.prevent="onDrop"
+        >
+          <div v-if="!arquivoAudio">
+            <p class="text-gray-700 font-medium"> {{ $t('document.createModal.audioLabel') }}</p>
+            <p class="text-xs text-gray-500"> {{ $t('document.createModal.audioLabel2') }}</p>
+          </div>
+          
+          <div v-else>
+            <p class="text-gray-700 font-medium">{{ getNomeArquivo(arquivoAudio) }}</p>
+          </div>
+
+          <input
+            type="file"
+            accept="audio/*"
+            ref="fileInput"
+            @change="onFileChange"
+            hidden
+          />
+        </div>
+      
     </div>
 
     <div>
@@ -131,3 +175,24 @@ const salvar = async () => {
     
   </modal>
 </template>
+
+<style>
+.drop-zone {
+  border: 2px dashed #aaa;
+  margin-top: 8px;
+  padding: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  min-width: 200px;
+  min-height: 100px;
+
+  display: flex;
+  justify-content: center;   /* horizontal */
+  align-items: center;       /* vertical */
+  text-align: center;
+}
+
+.drop-zone:hover {
+  border-color: #666;
+}
+</style>

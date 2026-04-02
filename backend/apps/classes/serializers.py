@@ -10,7 +10,7 @@ from .models import (
 class DocumentoWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Documento
-        exclude = ("polymorphic_ctype",)
+        fields = '__all__'
         read_only_fields = ("user",)
 
 class DocumentoReadSerializer(serializers.ModelSerializer):

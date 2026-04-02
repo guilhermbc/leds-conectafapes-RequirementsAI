@@ -3,7 +3,7 @@ import { ref, watch, computed} from 'vue'
 import type { Documento } from '../types/documento'
 import { criarDocumento } from '../controllers/documento'
 import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
-import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
+import { formatarTipoDocumento, formatarVersao, criarFormDataDocumento } from '@/utils/formatacoesDocumentos';
 
 const props = defineProps<{
   modelValue: boolean
@@ -20,12 +20,14 @@ const close = () => emit("update:modelValue", false)
 // Modo de criação
 const modoCriacao = ref('individual')
 
+const fileInput = ref<HTMLInputElement | null>(null)
+
 // Campos do documento
 // const id = ref('')
 // const versao = ref('1.0')
 // const geradoIA = ref<boolean>(true)
 // const arquivo = ref('')
-const origemAudio = ref('')
+const arquivoAudio = ref<File | null>(null)
 // TipoDocumento será computed
 // const DocumentoAnterior = ref('')
 // const Modulo = ref(props.moduloId as string)
@@ -72,7 +74,7 @@ const isDisabled = computed(() => {
     return true
   }
   else if (modoCriacao.value === 'todos' && categoriasDropdown.value.length === 4) {
-    return carregando.value || origemAudio.value === '' 
+    return carregando.value || arquivoAudio.value === null 
   }
 
   if (modoCriacao.value === 'individual' && categoriasDropdown.value.length === 0) {
@@ -80,7 +82,7 @@ const isDisabled = computed(() => {
   }
   return carregando.value
     || (TipoDocumento.value === '')
-    || (TipoDocumento.value === 'MINIMUNDO' && origemAudio.value === '')
+    || (TipoDocumento.value === 'MINIMUNDO' && arquivoAudio.value === null)
     || (TipoDocumento.value === 'REQUISITOS' && minimundo_origem.value === null) 
     || (TipoDocumento.value === 'CASO_USO' && (minimundo_origem.value === null || requisito_origem.value === null)) 
     || (TipoDocumento.value === 'DIAGRAMA_CLASSE' && (minimundo_origem.value === null || requisito_origem.value === null || casoDeUso_origem.value === null)) 
@@ -105,7 +107,7 @@ watch(
 
 const carregarDocumentos = async () => {
   // Reseta os campos
-  origemAudio.value = ''
+  arquivoAudio.value = null
   minimundo_origem.value = null
   requisito_origem.value = null
   casoDeUso_origem.value = null
@@ -162,17 +164,19 @@ const salvar = async () => {
         DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value.id))
       }
 
-      const response = await criarDocumento({
+      const formDataToSend = criarFormDataDocumento({
         vMajor: 1,
         vMinor: 0,
         geradoIA: true,
         arquivo: '',
-        origemAudio: origemAudio.value,
+        arquivoAudio: arquivoAudio.value,
         TipoDocumento: TipoDocumento.value,
         DocumentoAnterior: null,
         Modulo: props.moduloId as string,
         DocumentoOrigem: DocumentoOrigem.value,
       })
+      
+      const response = await criarDocumento(formDataToSend)
       
       if (response && response.status === 201) {
         emit('salvo')
@@ -183,61 +187,66 @@ const salvar = async () => {
 
       const idsDocumentosCriados: number[] = []
       
-      let response = await criarDocumento({
+      let formData = criarFormDataDocumento({
         vMajor: 1,
         vMinor: 0,
         geradoIA: true,
         arquivo: '',
-        origemAudio: origemAudio.value,
+        arquivoAudio: arquivoAudio.value,
         TipoDocumento: 'MINIMUNDO',
         DocumentoAnterior: null,
         Modulo: props.moduloId as string,
         DocumentoOrigem: [],
       })
+      
+      let response = await criarDocumento(formData)
 
       if (response) {
         idsDocumentosCriados.push(Number(response.data.id))
-        response = await criarDocumento({
+        formData =  criarFormDataDocumento({
           vMajor: 1,
           vMinor: 0,
           geradoIA: true,
           arquivo: '',
-          origemAudio: '',
+          arquivoAudio: null,
           TipoDocumento: 'REQUISITOS',
           DocumentoAnterior: null,
           Modulo: props.moduloId as string,
           DocumentoOrigem: idsDocumentosCriados,
         })
+        response = await criarDocumento(formData)
       }
 
       if (response) {
         idsDocumentosCriados.push(Number(response.data.id))
-        response = await criarDocumento({
+        formData = criarFormDataDocumento({
           vMajor: 1,
           vMinor: 0,
           geradoIA: true,
           arquivo: '',
-          origemAudio: '',
+          arquivoAudio: null,
           TipoDocumento: 'CASO_USO',
           DocumentoAnterior: null,
           Modulo: props.moduloId as string,
           DocumentoOrigem: idsDocumentosCriados,
         })
+        response = await criarDocumento(formData)
       }
 
       if (response) {
         idsDocumentosCriados.push(Number(response.data.id))
-        response = await criarDocumento({
+        formData = criarFormDataDocumento({
           vMajor: 1,
           vMinor: 0,
           geradoIA: true,
           arquivo: '',
-          origemAudio: '',
+          arquivoAudio: null,
           TipoDocumento: 'DIAGRAMA_CLASSE',
           DocumentoAnterior: null,
           Modulo: props.moduloId as string,
           DocumentoOrigem: idsDocumentosCriados,
         })
+        response = await criarDocumento(formData)
       }
 
       // if (response) {
@@ -248,7 +257,7 @@ const salvar = async () => {
       //     vMinor: 0,
       //     geradoIA: true,
       //     arquivo: '',
-      //     origemAudio: '',
+      //     arquivoAudio: '',
       //     TipoDocumento: 'PROTOTIPO_INTERFACE',
       //     DocumentoAnterior: null,
       //     Modulo: props.moduloId as string,
@@ -260,6 +269,26 @@ const salvar = async () => {
     }
   } finally {
     carregando.value = false
+  }
+}
+
+const triggerFileInput = () => {
+  if (fileInput.value) {
+    fileInput?.value.click()
+  }
+}
+
+const onFileChange = (event: any) => {
+  const file = event.target.files[0]
+  if (file) {
+    arquivoAudio.value = file
+  }
+}
+
+const onDrop = (event: any) => {
+  const file = event.dataTransfer.files[0]
+  if (file) {
+    arquivoAudio.value = file
   }
 }
 </script>
@@ -304,11 +333,31 @@ const salvar = async () => {
       <!-- Escolha de áudio de origem para Minimundo -->
       <div v-if="TipoDocumento === 'MINIMUNDO'">
         <h3 class="font-semibold">{{ $t('document.createModal.audioOrigin') }}:</h3>
-        <text-input
-        class="w-full"
-        :placeholder="$t('document.createModal.audioOrigin')"
-        v-model="origemAudio"
-        />
+
+        <!-- Drag & Drop de áudio -->
+        <div
+          class="drop-zone"
+          @click="triggerFileInput"
+          @dragover.prevent
+          @drop.prevent="onDrop"
+        >
+          <div v-if="!arquivoAudio">
+            <p class="text-gray-700 font-medium"> {{ $t('document.createModal.audioLabel') }}</p>
+            <p class="text-xs text-gray-500"> {{ $t('document.createModal.audioLabel2') }}</p>
+          </div>
+          
+          <div v-else>
+            <p class="text-gray-700 font-medium">{{ arquivoAudio.name }}</p>
+          </div>
+
+          <input
+            type="file"
+            accept="audio/*"
+            ref="fileInput"
+            @change="onFileChange"
+            hidden
+          />
+        </div>
       </div>
 
       <!-- Seleção de Minimundo -->
@@ -316,7 +365,7 @@ const salvar = async () => {
         <h3 class="font-semibold">{{ $t('document.createModal.origindDomainStorytelling') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="minimundo_origem !== null">
-            {{ formatarTipoDocumento(minimundo_origem?.TipoDocumento) }} (v{{ formatarVersao(minimundo_origem?.vMajor, minimundo_origem?.vMinor) }})
+            {{ $t(formatarTipoDocumento(minimundo_origem?.TipoDocumento)) }} (v{{ formatarVersao(minimundo_origem?.vMajor, minimundo_origem?.vMinor) }})
           </div>
           <div v-else class="text-gray-500 italic">
             {{ $t('document.createModal.noDocument') }}
@@ -329,7 +378,7 @@ const salvar = async () => {
         <h3 class="font-semibold">{{ $t('document.createModal.originRequirements') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="requisito_origem !== null">
-            {{ formatarTipoDocumento(requisito_origem?.TipoDocumento) }} (v{{ formatarVersao(requisito_origem?.vMajor, requisito_origem?.vMinor) }})
+            {{ $t(formatarTipoDocumento(requisito_origem?.TipoDocumento)) }} (v{{ formatarVersao(requisito_origem?.vMajor, requisito_origem?.vMinor) }})
           </div>
           <div v-else class="text-gray-500 italic">
             {{ $t('document.createModal.noDocument') }}
@@ -342,7 +391,7 @@ const salvar = async () => {
         <h3 class="font-semibold">{{ $t('document.createModal.originUseCases') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="casoDeUso_origem !== null">
-            {{ formatarTipoDocumento(casoDeUso_origem?.TipoDocumento) }} (v{{ formatarVersao(casoDeUso_origem?.vMajor, casoDeUso_origem?.vMinor) }})
+            {{ $t(formatarTipoDocumento(casoDeUso_origem?.TipoDocumento)) }} (v{{ formatarVersao(casoDeUso_origem?.vMajor, casoDeUso_origem?.vMinor) }})
           </div>
           <div v-else class="text-gray-500 italic">
             {{ $t('document.createModal.noDocument') }}
@@ -370,11 +419,30 @@ const salvar = async () => {
       <!-- Oferece a opção de criar todos apenas quando ainda não tem nenhum documento -->
       <div v-if="categoriasDropdown.length === 4">
         <h3 class="font-semibold">{{ $t('document.createModal.audioOrigin') }}:</h3>
-          <text-input
-          class="w-full"
-          :placeholder="$t('document.createModal.audioOrigin')"
-          v-model="origemAudio"
-        />
+          <!-- Drag & Drop de áudio -->
+          <div
+            class="drop-zone"
+            @click="triggerFileInput"
+            @dragover.prevent
+            @drop.prevent="onDrop"
+          >
+            <div v-if="!arquivoAudio">
+              <p class="text-gray-700 font-medium"> {{ $t('document.createModal.audioLabel') }}</p>
+              <p class="text-xs text-gray-500"> {{ $t('document.createModal.audioLabel2') }}</p>
+            </div>
+            
+            <div v-else>
+              <p class="text-gray-700 font-medium">{{ arquivoAudio.name }}</p>
+            </div>
+
+            <input
+              type="file"
+              accept="audio/*"
+              ref="fileInput"
+              @change="onFileChange"
+              hidden
+            />
+          </div>
       </div>
 
       <div v-else-if="categoriasDropdown.length === 0 && modoCriacao === 'todos'" class="text-center">
@@ -406,3 +474,24 @@ const salvar = async () => {
     </div>
   </modal>
 </template>
+
+<style>
+.drop-zone {
+  border: 2px dashed #aaa;
+  margin-top: 8px;
+  padding: 20px;
+  cursor: pointer;
+  border-radius: 8px;
+  min-width: 200px;
+  min-height: 100px;
+
+  display: flex;
+  justify-content: center;   /* horizontal */
+  align-items: center;       /* vertical */
+  text-align: center;
+}
+
+.drop-zone:hover {
+  border-color: #666;
+}
+</style>

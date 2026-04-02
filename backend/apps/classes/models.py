@@ -50,8 +50,8 @@ class Documento(PolymorphicModel, models.Model):
     # string do documento
     arquivo = models.TextField(null=True, blank=True)
     
-    # path do audio de origem do documento (se houver)
-    origemAudio = models.CharField(null=True, blank=True)
+    # audio de origem do documento (se houver)
+    arquivoAudio = models.FileField(upload_to='audios/',null=True, blank=True)
     
     # id dos documentos de origem
     DocumentoOrigem = models.ManyToManyField('Documento', blank=True, null=True, symmetrical=False, related_name='documento_%(class)s_origem')

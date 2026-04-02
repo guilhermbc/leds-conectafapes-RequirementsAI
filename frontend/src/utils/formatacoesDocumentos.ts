@@ -99,3 +99,37 @@ export function formatarTipoDocumento(tipo: string): string {
         return ''
     }
 }
+
+// Função para extrair o nome do arquivo de uma URL
+export const getNomeArquivo = (url: any) => {
+  if (!url) return ''
+  return url.split('/').pop()
+}
+
+// Função para criar um FormData a partir dos dados do documento
+export const criarFormDataDocumento = (dados: any): FormData => {
+  const formData = new FormData()
+  
+  // Adicionar cada campo ao FormData
+  formData.append('vMajor', dados.vMajor)
+  formData.append('vMinor', dados.vMinor)
+  formData.append('geradoIA', dados.geradoIA)
+  formData.append('arquivo', dados.arquivo)
+  formData.append('TipoDocumento', dados.TipoDocumento)
+  if (dados.DocumentoAnterior) {
+    formData.append('DocumentoAnterior', dados.DocumentoAnterior)
+  }
+  formData.append('Modulo', dados.Modulo)
+  
+  // Adicionar arquivo de áudio se presente
+  if (dados.arquivoAudio) {
+    formData.append('arquivoAudio', dados.arquivoAudio)
+  }
+  
+  // Adicionar array de DocumentoOrigem
+  dados.DocumentoOrigem.forEach((id: number) => {
+    formData.append(`DocumentoOrigem`, id.toString())
+  })
+  
+  return formData
+}
