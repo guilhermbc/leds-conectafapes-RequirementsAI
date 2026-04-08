@@ -12,6 +12,7 @@
     "requirements": "Requisitos",
     "useCases": "Casos de Uso",
     "classDiagram": "Diagrama de Classes",
+    "UCandCD": "Casos de Uso e Diagrama de Classes",
     "sidebar": {
       "originDocuments": "Documentos de Origem",
       "previousVersion": "Versão Anterior",

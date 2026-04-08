@@ -221,6 +221,52 @@ def send_to_llm(data: dict) -> str | tuple:
                         result = (prototipo_interface, descricao_interface)
                 except:
                     result = None
+
+            case 'CASO_USO_E_DIAGRAMA_CLASSE':
+                
+                try:
+                    if data.get('DocumentoOrigem'):
+                        originMw = ''
+                        originRq = ''
+
+                        for docId in data.get('DocumentoOrigem'):
+                            doc = Documento.objects.get(pk=docId)
+                            if doc.TipoDocumento == 'MINIMUNDO':
+                                originMw = doc.arquivo
+                            elif doc.TipoDocumento == 'REQUISITOS':
+                                originRq = doc.arquivo
+
+                        # 1. Gera CASO DE USO
+                        uc_data = run_uc({ 'minimundo': originMw, 'report': originRq })
+
+                        if uc_data and isinstance(uc_data, dict):
+                            state_uc = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
+                            
+                            diagrama_uc = state_uc.get("usecases_diagram")
+                            tabela_uc = state_uc.get("format_uc")
+                            descricao_uc = state_uc.get("report_validateuc")
+
+                            # 2. Gera DIAGRAMA DE CLASSE usando resultado do UC
+                            cd_data = run_dc({
+                                'minimundo': originMw,
+                                'report': originRq,
+                                'format_uc': tabela_uc,
+                                'report_validateuc': descricao_uc
+                            })
+
+                            if cd_data and isinstance(cd_data, dict):
+                                state_cd = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
+                                diagrama_classes = state_cd.get("diagrama_classes_final")
+
+                                result = {
+                                    "caso_uso": (diagrama_uc, tabela_uc, descricao_uc),
+                                    "diagrama_classe": diagrama_classes
+                                }
+                except Exception as e:
+                    print(e)
+                    result = None
+
+
     
     finally:
         # Limpar arquivo temporário se existir
