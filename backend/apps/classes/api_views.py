@@ -239,14 +239,11 @@ class DocumentoViewSet(ModelViewSet):
         serializer_uc.is_valid(raise_exception=True)
         self.perform_create(serializer_uc)
 
-        doc_uc = serializer_uc.instance
-
         # CLASSES
         data_cd = data.copy()
         data_cd.update({
             'arquivo': diagrama_classe_result,
             'TipoDocumento': 'DIAGRAMA_CLASSE',
-            'DocumentoAnterior': doc_uc.id,
             'vMajor': vMajor,
             'vMinor': vMinor,
             'geradoIA': True
