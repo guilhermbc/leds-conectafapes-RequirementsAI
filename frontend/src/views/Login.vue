@@ -2,7 +2,6 @@
 import { ref, inject, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useI18n } from 'vue-i18n'
 import { chaveModal } from '@/types/ui'
 import {
   campoNecessario,
@@ -12,12 +11,6 @@ import {
 
 const router = useRouter()
 const auth = useAuthStore()
-const { locale } = useI18n()
-
-function changeLanguage(lang: string) {
-  locale.value = lang
-  localStorage.setItem('language', lang)
-}
 
 // Modal
 const modal = inject(chaveModal)
@@ -62,8 +55,7 @@ const entrar = async () => {
     // Redireciona para página principal
     router.push({ name: 'projeto-home' })
   } catch (e) {
-    erro.value = 'Invalid username or password.'
-
+    erro.value = 'Usuário ou senha inválidos.'
   } finally {
     loading.value = false
   }
@@ -71,23 +63,6 @@ const entrar = async () => {
 </script>
 
 <template>
-  <div class="absolute top-4 right-4">
-    <button 
-      class="px-5 py-2 mr-2 bg-blue-800 text-white rounded-lg 
-                  hover:bg-blue-900 transition cursor-pointer"
-      @click="changeLanguage('en')"
-    >
-      EN
-    </button>
-    <button
-      class="px-5 py-2 bg-blue-800 text-white rounded-lg 
-                  hover:bg-blue-900 transition cursor-pointer"
-      @click="changeLanguage('pt')"
-    >
-      PT
-    </button>
-  </div>
-
   <div class="flex flex-col items-center justify-center min-h-screen">
     
     <!-- Título -->
@@ -100,11 +75,11 @@ const entrar = async () => {
       
       <text-input
         class="w-full mb-4"
-        placeholder=""
+        placeholder="exemplo123"
         v-model="usuario"
         @keyup-enter="entrar"
       >
-        {{ $t('login.username')}}
+        Nome de Usuário
       </text-input>
 
       <text-input
@@ -113,7 +88,7 @@ const entrar = async () => {
         @keyup-enter="entrar"
         type="password"
       >
-        {{ $t('login.password')}}
+        Senha
       </text-input>
 
       <!-- Erro -->
@@ -123,28 +98,19 @@ const entrar = async () => {
 
       <!-- Botão -->
       <div class="flex justify-between items-center">
-        <div>
-          <button
-            class="text-sm text-blue-700 hover:underline transition cursor-pointer mr-4"
-            @click="$router.push({ name: 'register' })"
-          >
-            {{ $t('register.button') }}
-          </button>
-
-          <button
-            class="text-sm text-blue-700 hover:underline transition cursor-pointer"
-            @click="esqueciSenha"
-          >
-            {{ $t('login.forgot')}}
-          </button>
-        </div>
+        <button
+          class="text-sm text-blue-700 hover:underline transition cursor-pointer"
+          @click="esqueciSenha"
+        >
+          Esqueci a senha
+        </button>
 
         <button
           class="px-5 py-2 bg-blue-800 text-white rounded-lg 
                  hover:bg-blue-900 transition cursor-pointer"
           @click="entrar"
         >
-          <span v-if="!loading">{{ $t('login.button')}}</span>
+          <span v-if="!loading">Entrar</span>
           <span v-else>Entrando...</span>
         </button>
       </div>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue"
-import { useI18n } from "vue-i18n"
 import { criarModulo, atualizarModulo } from "../controllers/modulo"
 import type { Modulo } from "../types/modulo"
 import type { Documento } from "@/modules/Documento/types/documento"
@@ -67,8 +66,6 @@ const modo = computed(() => (props.modulo ? "editar" : "criar"))
 
 const carregando = ref(false)
 
-const podeSalvar = computed(() => nome.value.trim().length > 0 && !carregando.value)
-
 // Métodos ------------------------------------------------------
 
 const salvar = async () => {
@@ -108,20 +105,20 @@ const salvar = async () => {
 <template>
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4">
-      {{ modo === "criar" ? $t('module.createModal.title') : $t('module.editModal.title') }}
+      {{ modo === "criar" ? "Criar Módulo" : "Editar Módulo" }}
     </h2>
 
-    <h3 class="font-semibold">{{ $t('module.createModal.name') }}:</h3>
+    <h3 class="font-semibold">Nome:</h3>
     <text-input
       class="w-full"
-      :placeholder="$t('module.createModal.name')"
+      placeholder="Nome"
       v-model="nome"
     />
 
-    <h3 class="font-semibold">{{ $t('module.createModal.description') }}:</h3>
+    <h3 class="font-semibold">Descrição:</h3>
     <text-input
       class="w-full"
-      :placeholder="$t('module.createModal.description')"
+      placeholder="Descrição"
       v-model="descricao"
     />
 
@@ -131,16 +128,16 @@ const salvar = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        {{ $t('module.cancel') }}
+        Cancelar
       </button>
 
       <button
         class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 
-        transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        :disabled="!podeSalvar" 
+        transition cursor-pointer"
+        :disabled="carregando" 
         @click="salvar"
       >
-        {{ modo === "criar" ? $t('module.createModal.createButton') : $t('module.editModal.editButton') }}
+        {{ modo === "criar" ? "Criar" : "Atualizar" }}
       </button>
     </div>
   </modal>

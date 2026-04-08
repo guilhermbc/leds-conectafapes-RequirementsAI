@@ -29,7 +29,7 @@ User = get_user_model()
 username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
 email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@admin.com")
 password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "admin123")
-client_id = os.environ.get("OAUTH_CLIENT_ID", "teste123")
+client_id = os.environ.get("OAUTH_CLIENT_ID", "HEY, LISTEN!")
 
 # Criar ou atualizar usuário
 user, created = User.objects.get_or_create(
