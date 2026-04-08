@@ -20,14 +20,7 @@ export const listarDocumento = async () => {
   return await adminApi.get<DocumentoListRes>(documentoReqConf.url)
 }
 
-export const criarDocumento = async (documento: DocumentoCreateReq | FormData) => {
-  if (documento instanceof FormData) {
-    return await adminApi.post<DocumentoCreateRes>(
-      documentoReqConf.url,
-      documento
-    )
-  }
-
+export const criarDocumento = async (documento: DocumentoCreateReq) => {
   return await adminApi.post<DocumentoCreateRes>(
     documentoReqConf.url,
     documento

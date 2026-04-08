@@ -1,20 +1,9 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/stores/auth';
-import { useI18n } from 'vue-i18n';
-import { useRouter } from 'vue-router';
-
-const { locale } = useI18n() 
-const router = useRouter()
-
-function changeLanguage(lang: string) {
-  locale.value = lang
-  localStorage.setItem('language', lang)
-}
 
 const sair = async () => {
   const auth = useAuthStore()
   await auth.logout()
-  router.push('/')
 }
 </script>
 
@@ -25,15 +14,7 @@ const sair = async () => {
       <span class="text-lg font-semibold">
         RequirementsAI
       </span>
-      <!-- Botões -->
-      <div class="flex items-center">
-        <!-- Botões de Idioma -->
-        <div>
-          <p-button class="bg-blue-950 mr-2 hover:bg-blue-500 transition cursor-pointer" @click="changeLanguage('en')">EN</p-button>
-          <p-button class="bg-blue-950 mr-4 hover:bg-blue-500 transition cursor-pointer" @click="changeLanguage('pt')">PT</p-button>
-        </div>
-        <p-button class="w-[80px] bg-blue-950 hover:bg-blue-500 transition cursor-pointer" @click="sair"> {{ $t('navigation.logout') }} </p-button>
-      </div>
+      <p-button class="bg-blue-950" @click="sair">SAIR</p-button>
     </nav>
     <main class="flex justify-center items-center w-full">
       <router-view />

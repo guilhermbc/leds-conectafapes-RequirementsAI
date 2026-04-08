@@ -2,7 +2,6 @@
 import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
-import { useI18n } from 'vue-i18n'
 import { obterProjeto } from '../controllers/projeto'
 import type { Projeto } from '../types/projeto'
 import Criar from './Criar.vue'
@@ -14,8 +13,6 @@ import ListarModulo from '../../Modulo/views/Listar.vue'
 const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
-
-const { locale } = useI18n()
 
 const projeto = ref<Projeto | null>(null)
 
@@ -85,7 +82,7 @@ onBeforeMount(carregarProjeto)
           class="h-[45px] px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
           @click="voltar"
         >
-          {{ $t('navigation.back') }}
+          ← Voltar
         </button>
 
         <div class="ml-auto grid grid-cols-2 gap-3 h-[45px]">
@@ -95,7 +92,7 @@ onBeforeMount(carregarProjeto)
                   hover:bg-gray-700 hover:text-white transition cursor-pointer"
             @click="abrirModalEditar()"
           >
-            {{ $t('project.edit') }}
+            Editar
           </button>
 
           <!-- Botão de Excluir -->
@@ -104,7 +101,7 @@ onBeforeMount(carregarProjeto)
             hover:bg-red-800 transition cursor-pointer"
             @click="abrirModalExcluir()"
           >
-            {{ $t('project.delete') }}
+            Excluir
           </button>
         </div>
 
