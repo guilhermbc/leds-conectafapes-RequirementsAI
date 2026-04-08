@@ -81,7 +81,7 @@ onBeforeMount(carregarModulo)
           class="h-[45px] px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
           @click="voltar"
         >
-          ← Voltar
+        {{ $t('navigation.back') }}
         </button>
 
         <div class="ml-auto grid grid-cols-2 gap-3 h-[45px]">
@@ -91,7 +91,7 @@ onBeforeMount(carregarModulo)
                   hover:bg-gray-700 hover:text-white transition cursor-pointer"
             @click="abrirModalEditar()"
           >
-            Editar
+            {{ $t('module.edit') }}
           </button>
 
           <!-- Botão de Excluir -->
@@ -100,7 +100,7 @@ onBeforeMount(carregarModulo)
             hover:bg-red-800 transition cursor-pointer"
             @click="abrirModalExcluir()"
           >
-            Excluir
+            {{ $t('module.delete') }}
           </button>
         </div>
 

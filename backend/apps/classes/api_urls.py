@@ -4,7 +4,8 @@ from .api_views import (
     ProjetoViewSet,
     ModuloViewSet,
     DocumentoViewSet,
-    HealthViewSet
+    UserViewSet,
+    HealthViewSet,
 )
 router = routers.DefaultRouter()
 
@@ -14,7 +15,8 @@ router.register(r'documento', DocumentoViewSet, basename='documento')
 router.register(r'health', HealthViewSet, basename='health')
 
 urlpatterns = [
-    path('classes/', include(router.urls))
+    path('classes/', include(router.urls)),
+    path('register/', UserViewSet.as_view(), name='user-register')
     # path('classes/modulo/get_last_docs/<int:modulo_id>', , name='get_last_docs')
 ]
 

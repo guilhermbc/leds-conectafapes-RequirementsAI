@@ -1,0 +1,57 @@
+{
+  "document": {
+    "currentDocumentsTitle": "Versões Atuais dos Documentos",
+    "allDocumentsTitle": "Todos os Documentos",
+    "new": "Novo Documento",
+    "none": "Nenhum documento encontrado.",
+    "uploadNewVersion": "Upload de Nova Versão",
+    "generateNewAIVersion": "Gerar Nova Versão com IA",
+    "download": "Download",
+    "contentText": "Conteúdo do Documento",
+    "domainStorytelling": "Narrativa de Domínio",
+    "requirements": "Requisitos",
+    "useCases": "Casos de Uso",
+    "classDiagram": "Diagrama de Classes",
+    "sidebar": {
+      "originDocuments": "Documentos de Origem",
+      "previousVersion": "Versão Anterior",
+      "noPreviousVersion": "Nenhuma versão anterior",
+      "nextVersion": "Próxima Versão",
+      "noNextVersion": "Nenhuma próxima versão"
+    },
+    "createModal": {
+      "title": "Criar Documento",
+      "specificOption": "Criar documento específico",
+      "allOption": "Criar todos os documentos",
+      "dropdownTitle": "Tipo de Documento",
+      "dropdownLabel": "Selecionar tipo de documento",
+      "audioOrigin": "Origem de Áudio",
+      "audioLabel": "Clique para selecionar um arquivo de áudio ou arraste e solte aqui",
+      "audioLabel2": ".mp3 ou .wav",
+      "origindDomainStorytelling": "Narrativa de Domínio de Origem",
+      "originRequirements": "Requisitos de Origem",
+      "originUseCases": "Casos de Uso de Origem",
+      "originClassDiagram": "Diagrama de Classes de Origem",
+      "noDocument": "Nenhum documento disponível.",
+      "allDocumentsCreatedIndividual": "Todos os documentos foram criados. Crie novas versões fazendo upload de uma nova versão do documento ou gerando uma nova versão com IA.",
+      "allDocumentsCreatedAll": "Esta opção só está disponível se nenhum documento tiver sido criado ainda.",
+      "createButton": "Criar"
+    },
+    "editModal": {
+      "title": "Upload de Nova Versão",
+      "subtitle": "Faça upload de uma nova versão do documento",
+      "contentLabel": "Clique para selecionar um arquivo markdown ou arraste e solte aqui",
+      "contentLabel2": ".md ou .markdown",
+      "confirmationMessage": "Tem certeza que deseja fazer upload desta nova versão de",
+      "editButton": "Salvar Alterações"
+    },
+    "newAIVersionModal": {
+      "title": "Gerar Nova Versão com IA",
+      "originAudioTitle": "Áudio de Origem (mudança opcional)",
+      "originAudio": "Áudio de Origem",
+      "confirmationMessage": "Tem certeza que deseja gerar uma nova versão de",
+      "generateButton": "Gerar"
+    },
+    "cancel": "Cancelar"
+  }
+}

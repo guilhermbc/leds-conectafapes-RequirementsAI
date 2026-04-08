@@ -1,0 +1,26 @@
+{
+  "module": {
+    "title": "Módulos",
+    "new": "Novo Módulo",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "none": "Nenhum módulo encontrado.",
+    "noDescription": "Sem descrição disponível.",
+    "createModal": {
+      "title": "Criar Módulo",
+      "name": "Nome",
+      "description": "Descrição",
+      "createButton": "Criar"
+    },
+    "editModal": {
+      "title": "Editar Módulo",
+      "editButton": "Salvar Alterações"
+    },
+    "deleteModal": {
+      "title": "Excluir Módulo",
+      "message": "Tem certeza que deseja excluir",
+      "deleteButton": "Excluir"
+    },
+    "cancel": "Cancelar"
+  }
+}

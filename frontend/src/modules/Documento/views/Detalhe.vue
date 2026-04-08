@@ -10,9 +10,9 @@ import MarkdownViewer from '@/components/MarkdownViewer.vue'
 import { obterDocumento } from '../controllers/documento'
 import { obterModulo } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
-import NovaVersao from './NovaVersaoIA.vue'
-import Editar from './NovaVersaoManual.vue'
-import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
+import NovaVersaoIA from './NovaVersaoIA.vue'
+import UploadNovaVersao from './UploadNovaVersao.vue'
+import { formatarTipoDocumento, formatarVersao, getNomeArquivo } from '@/utils/formatacoesDocumentos';
 
 const route = useRoute()
 const router = useRouter()
@@ -113,17 +113,17 @@ watch(
   }
 )
 
-const mostrarModalEditar = ref(false)
+const mostrarModalUploadNovaVersao = ref(false)
 
-function abrirModalEditar(){
-  mostrarModalEditar.value = true
+function abrirModalUploadNovaVersao(){
+  mostrarModalUploadNovaVersao.value = true
 }
 
 // Mostrar modal nova versão
-const mostrarModalNV = ref(false)
+const mostrarModalNovaVersaoIA = ref(false)
 
-function abrirModalNV(){
-  mostrarModalNV.value = true
+function abrirModalNovaVersaoIA(){
+  mostrarModalNovaVersaoIA.value = true
 }
 
 function baixarMarkdown() {
@@ -192,7 +192,7 @@ audio {
           class="px-4 py-2 border border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
           @click="voltar"
         >
-          ← Voltar
+          {{ $t('navigation.back') }}
         </button>
 
         <!-- Container dos botões à direita -->
@@ -203,13 +203,13 @@ audio {
             <button
               class="px-4 py-2 border border-gray-700 bg-white text-gray-700 rounded-md
                     hover:bg-gray-700 hover:text-white transition cursor-pointer"
-              @click="abrirModalEditar"
+              @click="abrirModalUploadNovaVersao"
             >
-              Editar
+              {{ $t('document.uploadNewVersion') }}
             </button>
 
-            <Editar
-              v-model="mostrarModalEditar"
+            <UploadNovaVersao
+              v-model="mostrarModalUploadNovaVersao"
               @salvo="irParaSeguinte()"
               :documentoId="route.params.id as string"
             />
@@ -217,13 +217,13 @@ audio {
             <button
               class="bg-blue-600 text-white px-4 py-2 rounded-md shadow
                     hover:bg-blue-700 transition cursor-pointer"
-              @click="abrirModalNV"
+              @click="abrirModalNovaVersaoIA"
             >
-              Gerar Nova Versão
+              {{ $t('document.generateNewAIVersion') }}
             </button>
 
-            <NovaVersao
-              v-model="mostrarModalNV"
+            <NovaVersaoIA
+              v-model="mostrarModalNovaVersaoIA"
               @salvo="irParaSeguinte()"
               :documentoId="route.params.id as string"
             />
@@ -235,7 +235,7 @@ audio {
                   hover:bg-gray-800 transition cursor-pointer w-[calc(100%)]"
             @click="baixarMarkdown"
           >
-            Download
+            {{ $t('document.download') }}
           </button>
 
         </div>
@@ -250,12 +250,12 @@ audio {
       <div v-else-if="documento">
         <!-- Título -->
         <h1 class="text-3xl font-semibold text-gray-800 mb-4">
-          {{ formatarTipoDocumento(documento.TipoDocumento)}} (v{{ formatarVersao(documento.vMajor, documento.vMinor) }})
+          {{ $t(formatarTipoDocumento(documento.TipoDocumento))}} (v{{ formatarVersao(documento.vMajor, documento.vMinor) }})
         </h1>
 
         <!-- Editor Markdown -->
         <div class="w-full">
-          <p class="text-gray-600 font-medium mb-2">Conteúdo do Documento:</p>
+          <p class="text-gray-600 font-medium mb-2">{{ $t('document.contentText') }}:</p>
           <div class="border border-gray-700 rounded-lg px-4 py-4">
             <MarkdownViewer v-if="documento.TipoDocumento === 'PROTOTIPO_INTERFACE'" :source="textoAposHtml(documento.arquivo)"/>
             <MarkdownViewer v-else :source="documento.arquivo"/>      
@@ -272,15 +272,15 @@ audio {
       
       <!-- Documento Origem -->
       <div class="mb-4">
-        <p class="text-gray-600 font-medium mb-1">Documentos de Origem:</p>
+        <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.originDocuments') }}:</p>
         <!-- Se o documento for um minimundo -->
         <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2">
-          {{ documento?.origemAudio }}
+          {{ getNomeArquivo(documento?.arquivoAudio) }}
         </p>
         <ul v-else-if="documento?.TipoDocumento !== 'MINIMUNDO' && documento?.DocumentoOrigem?.length" class="list-disc ml-6 text-blue-600">
           <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">
             <RouterLink :to="`/Documento/${origem.id}`" class="hover:underline">
-              {{ formatarTipoDocumento(origem.TipoDocumento) }} (v{{ formatarVersao(origem.vMajor, origem.vMinor) }})
+              {{ $t(formatarTipoDocumento(origem.TipoDocumento)) }} (v{{ formatarVersao(origem.vMajor, origem.vMinor) }})
             </RouterLink>
           </li>
         </ul>
@@ -289,10 +289,10 @@ audio {
 
       <!-- Documento Anterior -->
       <div class="mb-4">
-        <p class="text-gray-600 font-medium mb-1">Versão Anterior:</p>
+        <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.previousVersion') }}:</p>
         <!-- Se não houver nenhuma versão anterior-->
         <p v-if="!documento?.DocumentoAnterior" class="text-gray-500 italic ml-2">
-          Não há versões anteriores.
+          {{ $t('document.sidebar.noPreviousVersion') }}
         </p>
         <ul v-else class="list-disc ml-6 text-blue-600">
           <li>
@@ -300,7 +300,7 @@ audio {
               :to="`/Documento/${documento.DocumentoAnterior.id}`"
               class="text-blue-600 hover:underline"
             >
-              {{ formatarTipoDocumento(documento.DocumentoAnterior.TipoDocumento) }} (v{{ formatarVersao(documento.DocumentoAnterior.vMajor, documento.DocumentoAnterior.vMinor)}})
+              {{ $t(formatarTipoDocumento(documento.DocumentoAnterior.TipoDocumento)) }} (v{{ formatarVersao(documento.DocumentoAnterior.vMajor, documento.DocumentoAnterior.vMinor)}})
             </RouterLink>
           </li>
         </ul>
@@ -308,15 +308,15 @@ audio {
 
       <!-- Documentos Seguintes -->
       <div class="mb-4">
-        <p class="text-gray-600 font-medium mb-1">Versão Seguinte:</p>
+        <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.nextVersion') }}:</p>
         <!-- Se não houver nenhuma nova versão -->
         <p v-if="!documentosSeguintes || documentosSeguintes.length === 0" class="text-gray-500 italic ml-2">
-          Não há novas versões.
+          {{ $t('document.sidebar.noNextVersion') }}
         </p>
         <ul v-else-if="documentosSeguintes.length > 0"class="list-disc ml-6 text-blue-600">
           <li v-for="seguinte in documentosSeguintes" :key="seguinte.id">
             <RouterLink :to="{ name: 'documento-detalhe', params: { id: seguinte.id }}" class="text-blue-600 hover:underline">
-              {{ formatarTipoDocumento(seguinte.TipoDocumento) }} (v{{formatarVersao(seguinte.vMajor, seguinte.vMinor)}})
+              {{ $t(formatarTipoDocumento(seguinte.TipoDocumento)) }} (v{{formatarVersao(seguinte.vMajor, seguinte.vMinor)}})
             </RouterLink>
           </li>
         </ul>

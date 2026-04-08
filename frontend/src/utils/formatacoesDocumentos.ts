@@ -86,16 +86,50 @@ export function formatarVersao(vMajor: number, vMinor: number): string {
  */
 export function formatarTipoDocumento(tipo: string): string {
     if (tipo === 'MINIMUNDO') {
-        return 'Minimundo'
+        return 'document.domainStorytelling'
     } else if (tipo === 'REQUISITOS') {
-        return 'Requisitos'
+        return 'document.requirements'
     } else if (tipo === 'CASO_USO') {
-        return 'Casos de Uso'
+        return 'document.useCases'
     } else if (tipo === 'DIAGRAMA_CLASSE') {
-        return 'Diagrama de Classes'
+        return 'document.classDiagram'
     } else if (tipo === 'PROTOTIPO_INTERFACE') {
-        return 'Protótipo de Interface'
+        return 'document.InterfacePrototype'
     } else {
         return ''
     }
+}
+
+// Função para extrair o nome do arquivo de uma URL
+export const getNomeArquivo = (url: any) => {
+  if (!url) return ''
+  return url.split('/').pop()
+}
+
+// Função para criar um FormData a partir dos dados do documento
+export const criarFormDataDocumento = (dados: any): FormData => {
+  const formData = new FormData()
+  
+  // Adicionar cada campo ao FormData
+  formData.append('vMajor', dados.vMajor)
+  formData.append('vMinor', dados.vMinor)
+  formData.append('geradoIA', dados.geradoIA)
+  formData.append('arquivo', dados.arquivo)
+  formData.append('TipoDocumento', dados.TipoDocumento)
+  if (dados.DocumentoAnterior) {
+    formData.append('DocumentoAnterior', dados.DocumentoAnterior)
+  }
+  formData.append('Modulo', dados.Modulo)
+  
+  // Adicionar arquivo de áudio se presente
+  if (dados.arquivoAudio) {
+    formData.append('arquivoAudio', dados.arquivoAudio)
+  }
+  
+  // Adicionar array de DocumentoOrigem
+  dados.DocumentoOrigem.forEach((id: number) => {
+    formData.append(`DocumentoOrigem`, id.toString())
+  })
+  
+  return formData
 }
