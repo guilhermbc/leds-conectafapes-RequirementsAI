@@ -62,6 +62,8 @@ const modo = computed(() => (props.projeto ? "editar" : "criar"))
 
 const carregando = ref(false)
 
+const podeSalvar = computed(() => nome.value.trim().length > 0 && !carregando.value)
+
 // Métodos ------------------------------------------------------
 
 const salvar = async () => {
@@ -100,20 +102,20 @@ const salvar = async () => {
 <template>
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4">
-      {{ modo === "criar" ? "Criar Projeto" : "Editar Projeto" }}
+      {{ modo === "criar" ? $t('project.createModal.title') : $t('project.editModal.title') }}
     </h2>
 
-    <h3 class="font-semibold">Nome:</h3>
+    <h3 class="font-semibold">{{ $t('project.createModal.name') }}:</h3>
     <text-input
       class="w-full"
-      placeholder="Nome"
+      :placeholder="$t('project.createModal.name')"
       v-model="nome"
     />
 
-    <h3 class="font-semibold">Descrição:</h3>
+    <h3 class="font-semibold">{{ $t('project.createModal.description') }}:</h3>
     <text-input
       class="w-full"
-      placeholder="Descrição"
+      :placeholder="$t('project.createModal.description')"
       v-model="descricao"
     />
 
@@ -123,16 +125,16 @@ const salvar = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        Cancelar
+        {{ $t('project.cancel') }}
       </button>
 
       <button
         class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 
-        transition cursor-pointer"
-        :disabled="carregando" 
+        transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="!podeSalvar" 
         @click="salvar"
       >
-        {{ modo === "criar" ? "Criar" : "Atualizar" }}
+        {{ modo === "criar" ? $t('project.createModal.createButton') : $t('project.editModal.editButton') }}
       </button>
     </div>
   </modal>

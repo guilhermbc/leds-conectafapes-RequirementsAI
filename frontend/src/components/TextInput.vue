@@ -1,10 +1,12 @@
 <script lang="ts">
 import { computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { GenericTextInputProps } from './GenericTextInput.vue'
 import type { ValidationResult, ValidationResultFunction } from '@/utils/regras'
 
 export interface TextInputProps extends Omit<GenericTextInputProps, 'variant'> {
   rules?: ValidationResultFunction[];
+  showValidation?: boolean;
 }
 </script>
 
@@ -16,7 +18,10 @@ const {
   type,
   placeholder,
   rules,
+  showValidation = false,
 } = defineProps<TextInputProps>()
+
+const { t } = useI18n()
 
 const hasRules = computed(() => {
   return rules !== undefined && rules.length > 0
@@ -32,9 +37,10 @@ const validationMessages = computed<ValidationResult[]>(() => {
 })
 
 const validationMessage = computed<string>(() => {
-  return validationMessages.value.find((message) => {
+  const msg = validationMessages.value.find((message) => {
     return typeof message === 'string'
-  }) || ''
+  })
+  return msg ? t(msg as string) : ''
 })
 
 const isValid = computed<boolean>(() => {
@@ -44,11 +50,10 @@ const isValid = computed<boolean>(() => {
 })
 
 const variant = computed(() => {
-  if (isValid.value) {
+  if (!showValidation) {
     return 'default'
-  } else {
-    return 'error'
   }
+  return isValid.value ? 'default' : 'error'
 })
 
 const emit = defineEmits<{
@@ -83,7 +88,7 @@ watch(isValid, (newValue) => {
     />
 
     <div class="h-(--text-2xl) my-1 overflow-auto text-red-400">
-      {{ validationMessage }}
+      <span v-if="showValidation">{{ validationMessage }}</span>
     </div>
   </div>
 </template>
