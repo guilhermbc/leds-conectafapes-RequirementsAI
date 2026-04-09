@@ -1,0 +1,26 @@
+{
+  "module": {
+    "title": "Modules",
+    "new": "New Module",
+    "edit": "Edit",
+    "delete": "Delete",
+    "none": "No modules found.",
+    "noDescription": "No description available.",
+    "createModal": {
+      "title": "Create Module",
+      "name": "Name",
+      "description": "Description",
+      "createButton": "Create"
+    },
+    "editModal": {
+      "title": "Edit Module",
+      "editButton": "Save Changes"
+    },
+    "deleteModal": {
+      "title": "Delete Module",
+      "message": "Are you sure you want to delete",
+      "deleteButton": "Delete"
+    },
+    "cancel": "Cancel"
+  }
+}

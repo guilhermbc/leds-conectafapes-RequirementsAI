@@ -1,0 +1,32 @@
+{
+  "login": {
+    "username": "Username",
+    "password": "Password",
+    "button": "Login",
+    "forgot": "Forgot password",
+    "error": "Invalid username or password."
+  },
+  "register": {
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "button": "Create account",
+    "loading": "Creating...",
+    "success": "Account created successfully!",
+    "back": "Back to login",
+    "passwordMismatch": "Passwords do not match."
+  },
+  "navigation": {
+    "logout": "LOGOUT",
+    "back": "← Back"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "minLength": "Must be at least 3 characters.",
+    "specialChars": "Must contain at least one special character.",
+    "passwordMismatch": "Passwords do not match.",
+    "usernameExists": "A user with this username already exists.",
+    "emailExists": "A user with this email already exists."
+  }
+}

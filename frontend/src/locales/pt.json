@@ -1,0 +1,32 @@
+{
+  "login": {
+    "username": "Usuário",
+    "password": "Senha",
+    "button": "Entrar",
+    "forgot": "Esqueci minha senha",
+    "error": "Usuário ou senha inválidos."
+  },
+  "register": {
+    "username": "Usuário",
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "button": "Criar conta",
+    "loading": "Criando...",
+    "success": "Conta criada com sucesso!",
+    "back": "Voltar para login",
+    "passwordMismatch": "As senhas não coincidem."
+  },
+  "navigation": {
+    "logout": "SAIR",
+    "back": "← Voltar"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório.",
+    "minLength": "Deve ter pelo menos 3 caracteres.",
+    "specialChars": "Deve conter pelo menos um caractere especial (!@#$%^).",
+    "passwordMismatch": "As senhas não coincidem.",
+    "usernameExists": "Um usuário com este nome de usuário já existe.",
+    "emailExists": "Um usuário com este e-mail já existe."
+  }
+}

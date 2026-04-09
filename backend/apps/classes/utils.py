@@ -1,3 +1,5 @@
+import os
+from os import path
 from hashids import Hashids
 from django.conf import settings
 from django.http import Http404
@@ -79,129 +81,150 @@ def update_version(doc_old_v: Documento) -> tuple[int, int]:
 
 def send_to_llm(data: dict) -> str | tuple:
     result = None
+    path = data.get('audio_path')
+    print(data)
+    
+    try:
+        match (data.get('TipoDocumento')):
+            case 'MINIMUNDO':
+                try:
+                    if path:
+                        path = data.get('audio_path')
 
-    match (data.get('TipoDocumento')):
-        case 'MINIMUNDO':
-            try:
-                if data.get('origemAudio'):
-                    path = '../shared/uploads/' + data['origemAudio']
+                        mw_data = run_mw({ 'video_entrevista': path })
 
-                    mw_data = run_mw({ 'video_entrevista': path })
-                    if mw_data and isinstance(mw_data, dict):
-                        state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
-                        result = state.get('minimundo')
-            except:
-                result = None
-            
-        case 'REQUISITOS':
-            try:
-                print('Requisitos')
+                        if mw_data and isinstance(mw_data, dict):
+                            state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
+                            result = state.get('minimundo')
 
-                if data.get('DocumentoOrigem'):
-                    originMw = ''
-                    for docId in data.get('DocumentoOrigem'):
-                        doc = Documento.objects.get(pk=docId)
-                        if doc.TipoDocumento == 'MINIMUNDO':
-                            originMw = doc.arquivo
-                    
-                    oldRq = ''
-                    if data.get('DocumentoAnterior'):
-                        doc = Documento.objects.get(pk=data.get('DocumentoAnterior'))
-                        if doc.TipoDocumento == 'REQUISITOS':
-                            oldRq = doc.arquivo
+                except Exception as e:
+                    print(e)
+                    result = None
+                
+            case 'REQUISITOS':
+                try:
+                    print('Requisitos')
+                    print(data)
 
-                    rq_data = run_rq({ 'minimundo': originMw, 'old_requirements':oldRq })
-                    if rq_data and isinstance(rq_data, dict):
-                        state = next(iter(rq_data.values())) if len(rq_data) == 1 else rq_data
-                        result = state.get('report')
-            except:
-                result = None
+                    documentos_origem = data.get('DocumentoOrigem')
+                
+                    if documentos_origem:                        
+                        # Se tiver só um documento de origem, garantir que seja tratado como lista
+                        if isinstance(documentos_origem, str):
+                            documentos_origem = [documentos_origem]
+                        elif not documentos_origem:
+                            documentos_origem = []
+                        print('Documentos de origem:', documentos_origem)
 
-        case 'CASO_USO':
-            try:
-                if data.get('DocumentoOrigem'):
-                    
-                    originMw = ''
-                    originRq = ''
-                    for docId in data.get('DocumentoOrigem'):
-                        doc = Documento.objects.get(pk=docId)
-                        if doc.TipoDocumento == 'MINIMUNDO':
-                            originMw = doc.arquivo
-                        elif doc.TipoDocumento == 'REQUISITOS':
-                            originRq = doc.arquivo
+                        originMw = ''
+                        for docId in documentos_origem:
+                            doc = Documento.objects.get(pk=docId)
+                            if doc.TipoDocumento == 'MINIMUNDO':
+                                originMw = doc.arquivo
+                        
+                        oldRq = ''
+                        if data.get('DocumentoAnterior'):
+                            doc = Documento.objects.get(pk=data.get('DocumentoAnterior'))
+                            if doc.TipoDocumento == 'REQUISITOS':
+                                oldRq = doc.arquivo
 
-                    uc_data = run_uc({ 'minimundo':originMw, 'report':originRq})
-                    if uc_data and isinstance(uc_data, dict):
-                        state = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
-                        diagrama = state.get("usecases_diagram")
-                        tabela = state.get("format_uc")
-                        descricao = state.get("report_validateuc")
+                        rq_data = run_rq({ 'minimundo': originMw, 'old_requirements':oldRq })
+                        if rq_data and isinstance(rq_data, dict):
+                            state = next(iter(rq_data.values())) if len(rq_data) == 1 else rq_data
+                            result = state.get('report')
+                except:
+                    result = None
 
-                        result = (diagrama, tabela, descricao)
-            except:
-                result = None
-            
-        case 'DIAGRAMA_CLASSE':
+            case 'CASO_USO':
+                try:
+                    if data.get('DocumentoOrigem'):
+                        
+                        originMw = ''
+                        originRq = ''
+                        for docId in data.get('DocumentoOrigem'):
+                            doc = Documento.objects.get(pk=docId)
+                            if doc.TipoDocumento == 'MINIMUNDO':
+                                originMw = doc.arquivo
+                            elif doc.TipoDocumento == 'REQUISITOS':
+                                originRq = doc.arquivo
 
-            '''
-            expected data
-            { minimundo: str, report: str, format_uc: str, report_validateuc: str }
-            '''
-            try:
-                if data.get('DocumentoOrigem'):
-                    originMw = ''
-                    originRq = ''
-                    originUcTable = ''
-                    originUcDescr = ''
+                        uc_data = run_uc({ 'minimundo':originMw, 'report':originRq})
+                        if uc_data and isinstance(uc_data, dict):
+                            state = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
+                            diagrama = state.get("usecases_diagram")
+                            tabela = state.get("format_uc")
+                            descricao = state.get("report_validateuc")
 
-                    for docId in data.get('DocumentoOrigem'):
-                        doc = Documento.objects.get(pk=docId)
-                        if doc.TipoDocumento == 'MINIMUNDO':
-                            originMw = doc.arquivo
-                        elif doc.TipoDocumento == 'REQUISITOS':
-                            originRq = doc.arquivo
-                        elif doc.TipoDocumento == 'CASO_USO':
-                            _, originUcTable, originUcDescr = doc.arquivo.split('\n<!-- -->\n')
+                            result = (diagrama, tabela, descricao)
+                except:
+                    result = None
+                
+            case 'DIAGRAMA_CLASSE':
 
-                    cd_data = run_dc({
-                        'minimundo': originMw,
-                        'report': originRq,
-                        'format_uc': originUcTable,
-                        'report_validateuc': originUcDescr })
-                    if cd_data and isinstance(cd_data, dict):
-                        state = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
-                        result = state.get("diagrama_classes_final")
-            except:
-                result = None
+                '''
+                expected data
+                { minimundo: str, report: str, format_uc: str, report_validateuc: str }
+                '''
+                try:
+                    if data.get('DocumentoOrigem'):
+                        originMw = ''
+                        originRq = ''
+                        originUcTable = ''
+                        originUcDescr = ''
 
-        case 'PROTOTIPO_INTERFACE':
-            '''
-            expected data
-            { report: str, cdinuc_description_revised: str, ucincd_revised: str }
-            '''
-            try:
-                if data.get('DocumentoOrigem'):
-                    originRq = ''
-                    originUcDescr = ''
-                    originCd = ''
+                        for docId in data.get('DocumentoOrigem'):
+                            doc = Documento.objects.get(pk=docId)
+                            if doc.TipoDocumento == 'MINIMUNDO':
+                                originMw = doc.arquivo
+                            elif doc.TipoDocumento == 'REQUISITOS':
+                                originRq = doc.arquivo
+                            elif doc.TipoDocumento == 'CASO_USO':
+                                _, originUcTable, originUcDescr = doc.arquivo.split('\n<!-- -->\n')
 
-                    for docId in data.get('DocumentoOrigem'):
-                        doc = Documento.objects.get(pk=docId)
-                        if doc.TipoDocumento == 'REQUISITOS':
-                            originRq = doc.arquivo
-                        elif doc.TipoDocumento == 'CASO_USO':
-                            _, _, originUcDescr = doc.arquivo.split('\n<!-- -->\n')
-                        elif doc.TipoDocumento == 'DIAGRAMA_CLASSE':
-                            originCd = doc.arquivo
+                        cd_data = run_dc({
+                            'minimundo': originMw,
+                            'report': originRq,
+                            'format_uc': originUcTable,
+                            'report_validateuc': originUcDescr })
+                        if cd_data and isinstance(cd_data, dict):
+                            state = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
+                            result = state.get("diagrama_classes_final")
+                except:
+                    result = None
 
-                ip_data = run_ip({ 'report': originRq, 'cdinuc_description_revised': originUcDescr, 'ucincd_revised': originCd })
-                if ip_data and isinstance(ip_data, dict):
-                    state = next(iter(ip_data.values())) if len(ip_data) == 1 else ip_data
-                    prototipo_interface = state.get("interface_prototype")
-                    descricao_interface = state.get("interface_description")
+            case 'PROTOTIPO_INTERFACE':
+                '''
+                expected data
+                { report: str, cdinuc_description_revised: str, ucincd_revised: str }
+                '''
+                try:
+                    if data.get('DocumentoOrigem'):
+                        originRq = ''
+                        originUcDescr = ''
+                        originCd = ''
 
-                    result = (prototipo_interface, descricao_interface)
-            except:
-                result = None
+                        for docId in data.get('DocumentoOrigem'):
+                            doc = Documento.objects.get(pk=docId)
+                            if doc.TipoDocumento == 'REQUISITOS':
+                                originRq = doc.arquivo
+                            elif doc.TipoDocumento == 'CASO_USO':
+                                _, _, originUcDescr = doc.arquivo.split('\n<!-- -->\n')
+                            elif doc.TipoDocumento == 'DIAGRAMA_CLASSE':
+                                originCd = doc.arquivo
 
-    return result if result else Http404()
+                    ip_data = run_ip({ 'report': originRq, 'cdinuc_description_revised': originUcDescr, 'ucincd_revised': originCd })
+                    if ip_data and isinstance(ip_data, dict):
+                        state = next(iter(ip_data.values())) if len(ip_data) == 1 else ip_data
+                        prototipo_interface = state.get("interface_prototype")
+                        descricao_interface = state.get("interface_description")
+
+                        result = (prototipo_interface, descricao_interface)
+                except:
+                    result = None
+    
+    finally:
+        # Limpar arquivo temporário se existir
+        if path and os.path.exists(path):
+            os.remove(path)
+
+    return result

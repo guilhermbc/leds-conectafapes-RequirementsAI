@@ -1,0 +1,57 @@
+{
+  "document": {
+    "currentDocumentsTitle": "Current Documents Versions",
+    "allDocumentsTitle": "All Documents",
+    "new": "New Document",
+    "none": "No Documents found.",
+    "uploadNewVersion": "Upload New Version",
+    "generateNewAIVersion": "Generate New Version with AI",
+    "download": "Download",
+    "contentText": "Document's Content",
+    "domainStorytelling": "Domain Storytelling",
+    "requirements": "Requirements",
+    "useCases": "Use Cases",
+    "classDiagram": "Class Diagram",
+    "sidebar": {
+      "originDocuments": "Origin Documents",
+      "previousVersion": "Previous Version",
+      "noPreviousVersion": "No previous version",
+      "nextVersion": "Next Version",
+      "noNextVersion": "No next version"
+    },
+    "createModal": {
+      "title": "Create Document",
+      "specificOption": "Create specific document",
+      "allOption": "Create all documents",
+      "dropdownTitle": "Document Type",
+      "dropdownLabel": "Select document type",
+      "audioOrigin": "Audio Origin",
+      "audioLabel": "Click to select an audio file or drag and drop it here",
+      "audioLabel2": ".mp3 or .wav",
+      "origindDomainStorytelling": "Origin Domain Storytelling",
+      "originRequirements": "Origin Requirements",
+      "originUseCases": "Origin Use Cases",
+      "originClassDiagram": "Origin Class Diagram",
+      "noDocument": "No document available.",
+      "allDocumentsCreatedIndividual": "All documents have been created. Create new versions by uploading a new version of a document or by generating a new version with AI.",
+      "allDocumentsCreatedAll": "This option is only available if no document has been created yet.",
+      "createButton": "Create"
+    },
+    "editModal": {
+      "title": "Upload New Version",
+      "subtitle": "Upload a new version of the document",
+      "contentLabel": "Click to select a markdown file or drag and drop it here",
+      "contentLabel2": ".md or .markdown",
+      "confirmationMessage": "Are you sure you want to upload this new version of",
+      "editButton": "Save Changes"
+    },
+    "newAIVersionModal": {
+      "title": "Generate New Version with AI",
+      "originAudioTitle": "Origin Audio (optional change)",
+      "originAudio": "Origin Audio",
+      "confirmationMessage": "Are you sure you want to generate a new version of",
+      "generateButton": "Generate"
+    },
+    "cancel": "Cancel"
+  }
+}

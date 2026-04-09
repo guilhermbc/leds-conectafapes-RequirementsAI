@@ -7,19 +7,29 @@ export const campoNecessario: ValidationResultFunction = (campo) => {
   if (!!campo) {
     return true
   }
-  return 'Este campo é necessário.'
+  return 'validation.required'
 }
 
 export const minimo3caracteres: ValidationResultFunction = (texto) => {
   if (texto.length >= 3) {
     return true
   }
-  return 'Este campo deve possuir pelo menos 3 caracteres.'
+  return 'validation.minLength'
 }
 // Note que cada regra é responsável por um tipo de validação, sem interseção.
 export const caracteresEspeciais: ValidationResultFunction = (senha) => {
   if (/[!@#\\$%\\^]/.test(senha)) {
     return true
   }
-  return 'A senha deve possuir caracteres especiais como: ! @ # $ % ^'
+  return 'validation.specialChars'
+}
+
+export const confirmaSenha: ValidationResultFunction = (confirmPassword, password?: string) => {
+  if (!confirmPassword) {
+    return 'validation.required'
+  }
+  if (password && confirmPassword !== password) {
+    return 'validation.passwordMismatch'
+  }
+  return true
 }

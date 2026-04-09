@@ -58,12 +58,12 @@ const excluir = async () => {
 <template>
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4">
-      Excluir Módulo
+      {{ $t('module.deleteModal.title') }}
     </h2>
 
     <div>
       <h3 class="text-lg text-center font-semibold my-4"> 
-        Deseja mesmo excluir "{{ modulo?.nome }}"?
+        {{ $t("module.deleteModal.message") }} "{{ modulo?.nome }}"?
       </h3>
     </div>
 
@@ -73,7 +73,7 @@ const excluir = async () => {
         transition cursor-pointer" 
         @click="close"
       >
-        Cancelar
+        {{ $t('module.cancel') }}
       </button>
 
       <button
@@ -82,7 +82,7 @@ const excluir = async () => {
         :disabled="carregando" 
         @click="excluir" 
       >
-        Excluir
+        {{ $t('module.deleteModal.deleteButton') }}
       </button>
     </div>
   </modal>

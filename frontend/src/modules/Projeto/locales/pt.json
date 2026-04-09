@@ -1,0 +1,26 @@
+{
+  "project": {
+    "title": "Projetos",
+    "new": "Novo Projeto",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "none": "Nenhum projeto encontrado.",
+    "noDescription": "Sem descrição disponível.",
+    "createModal": {
+      "title": "Criar Projeto",
+      "name": "Nome",
+      "description": "Descrição",
+      "createButton": "Criar"
+    },
+    "editModal": {
+      "title": "Editar Projeto",
+      "editButton": "Salvar Alterações"
+    },
+    "deleteModal": {
+      "title": "Excluir Projeto",
+      "message": "Tem certeza que deseja excluir",
+      "deleteButton": "Excluir"
+    },
+      "cancel": "Cancelar"
+  }
+}
