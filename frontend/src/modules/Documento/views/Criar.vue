@@ -36,8 +36,7 @@ const DocumentoOrigem = ref<number[]>([])
 const categoriasDropdown = ref<string[]>([
   "document.domainStorytelling",
   "document.requirements",
-  "document.useCases",
-  "document.classDiagram",
+  "document.UCandCD",
 ])
 
 // Tipo de documento (categoria) escolhido na hora de criar
@@ -58,10 +57,8 @@ const TipoDocumento = computed(() => {
       return 'MINIMUNDO'
     case 'document.requirements':
       return 'REQUISITOS'
-    case 'document.useCases':
-      return 'CASO_USO'
-    case 'document.classDiagram':
-      return 'DIAGRAMA_CLASSE'
+    case 'document.UCandCD':
+      return 'CASO_USO_E_DIAGRAMA_CLASSE'
     // case 'Protótipo de Interface':
     //   return 'PROTOTIPO_INTERFACE'
     default:
@@ -84,8 +81,8 @@ const isDisabled = computed(() => {
     || (TipoDocumento.value === '')
     || (TipoDocumento.value === 'MINIMUNDO' && arquivoAudio.value === null)
     || (TipoDocumento.value === 'REQUISITOS' && minimundo_origem.value === null) 
-    || (TipoDocumento.value === 'CASO_USO' && (minimundo_origem.value === null || requisito_origem.value === null)) 
-    || (TipoDocumento.value === 'DIAGRAMA_CLASSE' && (minimundo_origem.value === null || requisito_origem.value === null || casoDeUso_origem.value === null)) 
+    || (TipoDocumento.value === 'CASO_USO_E_DIAGRAMA_CLASSE' && (minimundo_origem.value === null || requisito_origem.value === null)) 
+    // || (TipoDocumento.value === 'DIAGRAMA_CLASSE' && (minimundo_origem.value === null || requisito_origem.value === null || casoDeUso_origem.value === null)) 
     // || (TipoDocumento.value === 'PROTOTIPO_INTERFACE' && (requisito_origem.value === null || casoDeUso_origem.value === null || diagramaDeClasse_origem.value === null))
 })
 
@@ -117,8 +114,8 @@ const carregarDocumentos = async () => {
   categoriasDropdown.value = [
     "document.domainStorytelling",
     "document.requirements",
-    "document.useCases",
-    "document.classDiagram",
+    "document.UCandCD",
+    // "document.classDiagram",
     // "document.prototypeInterface"
   ]
 
@@ -361,7 +358,7 @@ const onDrop = (event: any) => {
       </div>
 
       <!-- Seleção de Minimundo -->
-      <div v-if="TipoDocumento === 'REQUISITOS' || TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'">
+      <div v-if="TipoDocumento === 'REQUISITOS' || TipoDocumento === 'CASO_USO_E_DIAGRAMA_CLASSE'">
         <h3 class="font-semibold">{{ $t('document.createModal.origindDomainStorytelling') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="minimundo_origem !== null">
@@ -374,7 +371,7 @@ const onDrop = (event: any) => {
       </div>
 
       <!-- Seleção de Requisitos -->
-      <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'">
+      <div v-if="TipoDocumento === 'CASO_USO_E_DIAGRAMA_CLASSE'">
         <h3 class="font-semibold">{{ $t('document.createModal.originRequirements') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="requisito_origem !== null">
@@ -387,7 +384,7 @@ const onDrop = (event: any) => {
       </div>
 
       <!-- Seleção de Casos de Uso -->
-      <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE'">
+      <!-- <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE'">
         <h3 class="font-semibold">{{ $t('document.createModal.originUseCases') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="casoDeUso_origem !== null">
@@ -397,7 +394,7 @@ const onDrop = (event: any) => {
             {{ $t('document.createModal.noDocument') }}
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- Seleção de Diagrama de Classe -->
       <!-- <div v-if="TipoDocumento === 'PROTOTIPO_INTERFACE'">

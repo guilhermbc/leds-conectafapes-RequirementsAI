@@ -5,7 +5,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
-from drf_yasg import openapi 
+from drf_yasg import openapi
+
+from apps.classes.api_views import UserViewSet
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -23,6 +25,7 @@ urlpatterns = [
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')), 
     path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('register/', UserViewSet.as_view(), name='register'),
     path('', include('apps.classes.api_urls')),
     *static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 ]
