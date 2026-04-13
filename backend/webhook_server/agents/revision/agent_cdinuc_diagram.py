@@ -19,7 +19,8 @@ persona_message_cdinuc_diagram = SystemMessage(
     - Actors
 
     **Output Format**:
-    - A single `@startuml` to `@enduml` PlantUML diagram;
+    - First, start with a PlantUML code block using triple backticks and `plantuml`;
+    - After, use `@startuml` to `@enduml` and finish the PlantUML diagram with triple backticks;
     - One `actor` declaration for each actor;
     - One `(Code)` declaration for each use case, optionally using `as "Name"` for clarity;
     - Use `Actor --> (UseCase)` to show relationships;
@@ -70,6 +71,7 @@ cdinuc_diagram_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **Example Output**:
+    ```plantuml
     @startuml
 
     actor Cliente
@@ -82,6 +84,7 @@ cdinuc_diagram_prompt = ChatPromptTemplate.from_messages([
     Bibliotecário --> (UC02)
 
     @enduml
+    ```
 
     ---
     **Final Output Format**:
