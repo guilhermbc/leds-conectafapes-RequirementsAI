@@ -29,6 +29,10 @@ from webhook_server.webhook_server_functions.interface_functions import (
     # expected data: report: str, cdinuc_description_revised: str, ucincd_revised: str
     run_graphIP_with_trace as run_ip
 )
+from webhook_server.webhook_server_functions.revision_functions import (
+    # expected data: report: str, report_validateuc: str, diagrama_classes_final: str
+    run_graphRv_with_trace as run_rev
+)
 
 hashids = Hashids(settings.HASHIDS_SALT, min_length=8)
 
@@ -258,10 +262,23 @@ def send_to_llm(data: dict) -> str | tuple:
                                 state_cd = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
                                 diagrama_classes = state_cd.get("diagrama_classes_final")
 
-                                result = {
-                                    "caso_uso": (diagrama_uc, tabela_uc, descricao_uc),
-                                    "diagrama_classe": diagrama_classes
-                                }
+                                rev_data = run_rev({
+                                    'diagrama_classes_final': diagrama_classes,
+                                    'report': originRq,
+                                    'report_validateuc': descricao_uc
+                                })
+
+                                if isinstance(rev_data, dict):
+                                    state_rev = next(iter(rev_data.values())) if len(rev_data) == 1 else cd_data
+                                    descricao_uc_revisada = state_rev.get("cdinuc_description_revised")
+                                    tabela_uc_revisada = state_rev.get("cdinuc_table_revised")
+                                    diagrama_uc_revisado = state_rev.get("cdinuc_diagram_revised")
+                                    diagrama_classes_revisado = state_rev.get("ucincd_revised")
+
+                                    result = {
+                                        "caso_uso": (diagrama_uc_revisado, tabela_uc_revisada, descricao_uc_revisada),
+                                        "diagrama_classe": diagrama_classes_revisado
+                                    }
                 except Exception as e:
                     print(e)
                     result = None

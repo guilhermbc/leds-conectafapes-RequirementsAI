@@ -44,8 +44,10 @@ class Documento(PolymorphicModel, models.Model):
     vMajor = models.IntegerField(null=True, blank=True)
     vMinor = models.IntegerField(null=True, blank=True)
 
-    # gerado por IA
+    # tag gerado por IA
     geradoIA = models.BooleanField(null=True, blank=True)
+    # tag ultima versão
+    vMaisRecente = models.BooleanField(null=True, blank=True)
 
     # string do documento
     arquivo = models.TextField(null=True, blank=True)
