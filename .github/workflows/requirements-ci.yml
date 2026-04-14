@@ -42,7 +42,7 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
-          OAUTH_CLIENT_ID="HEY, LISTEN!"
+          OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}
 
           echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/" >> ./frontend/.env
           echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
@@ -76,7 +76,7 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
-          OAUTH_CLIENT_ID="HEY, LISTEN!"
+          OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}
 
           echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/" >> ./frontend/.env
           echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
@@ -91,13 +91,13 @@ jobs:
       - name: Build & Push Frontend
         run: |
           FULL_IMAGE_FRONTEND="${IMAGE_FRONTEND}:${BRANCH_NAME}"
-          docker build -t $FULL_IMAGE_FRONTEND -f ./frontend/Dockerfile ./frontend
+          docker build --no-cache -t $FULL_IMAGE_FRONTEND -f ./frontend/Dockerfile ./frontend
           docker push $FULL_IMAGE_FRONTEND
 
       - name: Build & Push Backend
         run: |
           FULL_IMAGE_BACKEND="${IMAGE_BACKEND}:${BRANCH_NAME}"
-          docker build -t $FULL_IMAGE_BACKEND -f ./backend/Dockerfile ./backend
+          docker build --no-cache -t $FULL_IMAGE_BACKEND -f ./backend/Dockerfile ./backend
           docker push $FULL_IMAGE_BACKEND
 
   deploy:
