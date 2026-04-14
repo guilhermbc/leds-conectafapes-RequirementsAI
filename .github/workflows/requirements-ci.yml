@@ -42,7 +42,7 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
-          OAUTH_CLIENT_ID="HEY, LISTEN!"
+          OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}
 
           echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/" >> ./frontend/.env
           echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
@@ -76,7 +76,7 @@ jobs:
              BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
           fi
           
-          OAUTH_CLIENT_ID="HEY, LISTEN!"
+          OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}
 
           echo "VITE_BACKEND_ADMIN_BASE_URL=${BASE_URL}/" >> ./frontend/.env
           echo "VITE_CLIENT_ID=${OAUTH_CLIENT_ID}" >> ./frontend/.env
