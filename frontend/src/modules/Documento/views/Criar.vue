@@ -67,10 +67,10 @@ const TipoDocumento = computed(() => {
 })
 
 const isDisabled = computed(() => {
-  if (modoCriacao.value === 'todos' && categoriasDropdown.value.length < 4) {
+  if (modoCriacao.value === 'todos' && categoriasDropdown.value.length < 3) {
     return true
   }
-  else if (modoCriacao.value === 'todos' && categoriasDropdown.value.length === 4) {
+  else if (modoCriacao.value === 'todos' && categoriasDropdown.value.length === 3) {
     return carregando.value || arquivoAudio.value === null 
   }
 
@@ -222,7 +222,7 @@ const salvar = async () => {
           geradoIA: true,
           arquivo: '',
           arquivoAudio: null,
-          TipoDocumento: 'CASO_USO',
+          TipoDocumento: 'CASO_USO_E_DIAGRAMA_CLASSE',
           DocumentoAnterior: null,
           Modulo: props.moduloId as string,
           DocumentoOrigem: idsDocumentosCriados,
@@ -230,21 +230,38 @@ const salvar = async () => {
         response = await criarDocumento(formData)
       }
 
-      if (response) {
-        idsDocumentosCriados.push(Number(response.data.id))
-        formData = criarFormDataDocumento({
-          vMajor: 1,
-          vMinor: 0,
-          geradoIA: true,
-          arquivo: '',
-          arquivoAudio: null,
-          TipoDocumento: 'DIAGRAMA_CLASSE',
-          DocumentoAnterior: null,
-          Modulo: props.moduloId as string,
-          DocumentoOrigem: idsDocumentosCriados,
-        })
-        response = await criarDocumento(formData)
-      }
+      // if (response) {
+      //   idsDocumentosCriados.push(Number(response.data.id))
+      //   formData = criarFormDataDocumento({
+      //     vMajor: 1,
+      //     vMinor: 0,
+      //     geradoIA: true,
+      //     arquivo: '',
+      //     arquivoAudio: null,
+      //     TipoDocumento: 'CASO_USO',
+      //     DocumentoAnterior: null,
+      //     Modulo: props.moduloId as string,
+      //     DocumentoOrigem: idsDocumentosCriados,
+      //   })
+      //   response = await criarDocumento(formData)
+      // }
+
+      
+      // if (response) {
+      //   idsDocumentosCriados.push(Number(response.data.id))
+      //   formData = criarFormDataDocumento({
+      //     vMajor: 1,
+      //     vMinor: 0,
+      //     geradoIA: true,
+      //     arquivo: '',
+      //     arquivoAudio: null,
+      //     TipoDocumento: 'DIAGRAMA_CLASSE',
+      //     DocumentoAnterior: null,
+      //     Modulo: props.moduloId as string,
+      //     DocumentoOrigem: idsDocumentosCriados,
+      //   })
+      //   response = await criarDocumento(formData)
+      // }
 
       // if (response) {
       //   idsDocumentosCriados.push(Number(response.data.id))
@@ -414,7 +431,7 @@ const onDrop = (event: any) => {
     <div v-else>
 
       <!-- Oferece a opção de criar todos apenas quando ainda não tem nenhum documento -->
-      <div v-if="categoriasDropdown.length === 4">
+      <div v-if="categoriasDropdown.length === 3">
         <h3 class="font-semibold">{{ $t('document.createModal.audioOrigin') }}:</h3>
           <!-- Drag & Drop de áudio -->
           <div
