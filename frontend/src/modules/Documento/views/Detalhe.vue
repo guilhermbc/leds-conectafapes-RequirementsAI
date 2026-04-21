@@ -272,7 +272,7 @@ audio {
       
       <!-- Documento Origem -->
       <div class="mb-4">
-        <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.originDocuments') }}:</p>
+        <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.sourceDocuments') }}:</p>
         <!-- Se o documento for um minimundo -->
         <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2">
           {{ getNomeArquivo(documento?.arquivoAudio) }}

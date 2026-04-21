@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount } from 'vue'
+import { ref, onBeforeMount, computed} from 'vue'
 import Criar from './Criar.vue'
 import { obterModulo, listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
@@ -11,6 +11,21 @@ const props = defineProps<{
 
 const documentos = ref<Documento[]>([])
 const ultimosDocumentos = ref<Documento[]>([])
+
+// Verificar se o botão de criar documento deve ser desabilitado
+const isDisabled = computed(() => {
+  const tiposArtefatosCriados: string[] = []
+  for (const doc of documentos.value) {
+    if (!tiposArtefatosCriados.includes(doc.TipoDocumento)) {
+      tiposArtefatosCriados.push(doc.TipoDocumento)
+    }
+  }
+  if (tiposArtefatosCriados.length >= 4) {
+    return true
+  }
+  return false
+})
+
 
 const carregarDocumentos = async () => {
   const modulo = await obterModulo(props.moduloId as string)
@@ -26,7 +41,7 @@ onBeforeMount(carregarDocumentos)
 
 function abrirModal(){
   mostrarModal.value = true
-}
+} 
 
 </script>
 
@@ -35,8 +50,10 @@ function abrirModal(){
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold text-gray-800">{{ $t('document.currentDocumentsTitle') }}</h1>
       <button
-        class="w-[420px] h-[45px] bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer"
+        class="w-[420px] h-[45px] bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer
+        disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
         @click="abrirModal()"
+        :disabled="isDisabled"
       >
         {{ $t('document.new') }}
       </button>
