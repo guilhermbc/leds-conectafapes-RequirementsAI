@@ -1,7 +1,7 @@
 {
   "document": {
-    "currentDocumentsTitle": "Versões Atuais dos Artefatos",
-    "allDocumentsTitle": "Todos os Artefatos",
+    "currentDocumentsTitle": "Versões Atuais dos Artefatos Relacionados a Requisitos",
+    "allDocumentsTitle": "Todos os Artefatos Relacionados a Requisitos",
     "new": "Iniciar Especificação de Requisitos e Análise",
     "none": "Nenhum artefato encontrado.",
     "uploadNewVersion": "Upload de Nova Versão",
@@ -14,25 +14,25 @@
     "classDiagram": "Diagrama de Classes",
     "UCandCD": "Casos de Uso e Diagrama de Classes",
     "sidebar": {
-      "originDocuments": "Artefatos de Origem",
+      "sourceDocuments": "Artefatos de Origem",
       "previousVersion": "Versão Anterior",
       "noPreviousVersion": "Nenhuma versão anterior",
       "nextVersion": "Próxima Versão",
       "noNextVersion": "Nenhuma próxima versão"
     },
     "createModal": {
-      "title": "Criar Artefato",
+      "title": "Criar Artefato Relacionado a Requisitos",
       "specificOption": "Criar artefato específico",
       "allOption": "Criar todos os artefatos",
       "dropdownTitle": "Tipo de Artefato",
       "dropdownLabel": "Selecionar tipo de artefato",
-      "audioOrigin": "Origem de Áudio",
+      "audioSource": "Origem de Áudio",
       "audioLabel": "Clique para selecionar um arquivo de áudio ou arraste e solte aqui",
       "audioLabel2": ".mp3 ou .wav",
-      "origindDomainStorytelling": "Narrativa de Domínio de Origem",
-      "originRequirements": "Requisitos de Origem",
-      "originUseCases": "Casos de Uso de Origem",
-      "originClassDiagram": "Diagrama de Classes de Origem",
+      "sourcedDomainStorytelling": "Narrativa de Domínio de Origem",
+      "sourceRequirements": "Requisitos de Origem",
+      "sourceUseCases": "Casos de Uso de Origem",
+      "sourceClassDiagram": "Diagrama de Classes de Origem",
       "noDocument": "Nenhum artefato disponível.",
       "allDocumentsCreatedIndividual": "Todos os artefatos foram criados. Crie novas versões fazendo upload de uma nova versão do artefato ou gerando uma nova versão com IA.",
       "allDocumentsCreatedAll": "Esta opção só está disponível se nenhum artefato tiver sido criado ainda.",
@@ -48,8 +48,8 @@
     },
     "newAIVersionModal": {
       "title": "Gerar Nova Versão com IA",
-      "originAudioTitle": "Áudio de Origem (mudança opcional)",
-      "originAudio": "Áudio de Origem",
+      "sourceAudioTitle": "Áudio de Origem (mudança opcional)",
+      "sourceAudio": "Áudio de Origem",
       "confirmationMessage": "Tem certeza que deseja gerar uma nova versão de",
       "generateButton": "Gerar"
     },
