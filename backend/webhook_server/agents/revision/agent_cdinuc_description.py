@@ -35,13 +35,14 @@ persona_message_cdinuc_description = SystemMessage(
     #### 3. **Correct Inconsistencies**
     - If a use case references classes or operations that do not exist in the diagram:
     - Adjust the use case if possible;
-    - Or report the issue in the **Questions and Suggestions** section.
+    - Or report the issue in the **Questions and Validations** section.
     - If the correction requires modifying the class diagram, you may **suggest those changes** clearly.
 
     #### 4. **Maintain Original Structure**
     - Keep the original structure of each use case and only fill in or correct necessary fields.
     - Do **not remove** existing use cases.
     - You may **split a use case** only if it violates the definition of a complete transaction.
+    - Do not include additional comments in the contents of the generated document. The only additional comments allowed are in the final section titled **Questions and Validations**.
 
     ---
 
@@ -51,9 +52,9 @@ persona_message_cdinuc_description = SystemMessage(
 
     ---
 
-    #### Revised Use Cases
+    #### Revised Use Cases (the title must be in the same language as the use cases and class diagram)
 
-    Update and show the revised list of use cases in the structured format below:
+    Update and show the revised list of use cases in the structured format below (in the language of the use cases and class diagram):
 
     **Structure (for each use case):**
 
@@ -67,17 +68,19 @@ persona_message_cdinuc_description = SystemMessage(
 
     ---
 
-    #### Questions and Suggestions
+    #### Questions and Validations (the section title must be in the same language as the use cases and class diagram)
 
     - List any inconsistencies, doubts, or points that need clarification.
     - If you adjusted any use case to match the class diagram, explain **briefly what was changed and why**.
     - If needed, suggest updates to the class diagram for alignment.
+    - Do not include additional comments anywhere else in the document.
 
     ---
 
-    **Important**: Your entire response must be written in **Portuguese**, including the UCs section names, so **Actors** should be **Atores** and so on.
+    **Important**: Your entire response must be written in the language of the use cases and class diagram. All use case content, section titles, descriptions, and any additional text must be written in that same language.
+
     """
-    ) #**Important**: The entire response must be in Portuguese.
+    ) #**Important**: The entire response must be in the language of the previous texts.
 )
 
 # Prompt template

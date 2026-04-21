@@ -12,7 +12,7 @@ from pathlib import Path
 persona_message_minimundo = SystemMessage(
     content=(
     "You are a requirements engineer specializing in transforming transcripts into mini-worlds.\n"
-    "Your mission is to create a clear and accurate domain narrative based on the provided transcript, in Portuguese."
+    "Your mission is to create a clear and accurate domain narrative based on the provided transcript, in the audio language."
     )
 )
 
@@ -21,7 +21,7 @@ minimundo_prompt = ChatPromptTemplate.from_messages([
     ("human", """
     You are a requirements engineering expert.
 
-    Your goal is to create a relevant domain narrative based on the transcription and using a old version of the domain narrative below the transcription.
+    Your goal is to create a relevant domain narrative based on the transcription and using an old version of the domain narrative below the transcription.
     **Important:**
     - If the old domain narrative is empty, treat your output as the first version of the domain narrative.
     - If the old domain narrative exists, follow its instructions using its informations and the informations of the given transcription
@@ -44,8 +44,9 @@ minimundo_prompt = ChatPromptTemplate.from_messages([
     - The domain narrative based on the transcription should be logically organized, with distinct sections for different aspects of the system.
     - The domain narrative based on the transcription should be reviewed to ensure clarity and accuracy.
     - The domain narrative based on the transcription should be presented in a way that facilitates reading and understanding.
-    - The domain narrative based on the transcription should be written in Portuguese.
-    - Do not include any additional commentaries before the presentation of the domain narrative.
+    - The domain narrative based on the transcription should be written in the audio language.
+    - Do not include any additional commentaries at the beginning of the domain narrative.
+    - If you identify any inconsistencies or missing information in the transcription, explicitly list them at the end of the domain narrative in a section called 'Questions and Validations' and suggest specific questions to ask the user for clarification.
     """)
 ])
 

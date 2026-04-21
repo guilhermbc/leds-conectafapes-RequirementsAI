@@ -15,11 +15,11 @@ persona_message_uc = SystemMessage(
     - Markdown;
     - One table with the following columns: Code, Name, Actors, Events, Related Requirements, Preconditions, Classes;
     - Only include the normal flow of events in the “Events” column;
-    - A "Questions and Validations" block at the end, if needed.
+    - Do not include additional comments in the contents of the generated documents.
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
-    ) #**Important**: The entire response must be in Portuguese.
+    ) #**Important**: The entire response must be in the language of the previous texts.
 )
 
 # Prompt template
@@ -46,7 +46,7 @@ formatuc_prompt = ChatPromptTemplate.from_messages([
     **Your Objective**:  
     Transform each validated use case into a single row in a Markdown table with the following format:
 
-    ### Use Case Table (Tabela de Casos de Uso)
+    ### Use Case Table
 
     | Code | Name | Actors | Events | Related Requirements | Preconditions | Classes |
     |------|------|--------|--------|----------------------|---------------|---------|
@@ -80,7 +80,7 @@ formatuc_prompt = ChatPromptTemplate.from_messages([
 
     ---
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
     )
 ])

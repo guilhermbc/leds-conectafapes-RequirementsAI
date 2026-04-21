@@ -35,16 +35,16 @@ Revise the class diagram so that it reflects all the entities, attributes, and r
 ```mermaid
 classDiagram
     class Animal {
-        String name
+        name
     }
 
     class Dog {
-        String chipCode
+        chipCode
     }
 
     class Toy {
-        String color
-        String type
+        color
+        type
     }
 
     Dog --|> Animal
@@ -74,28 +74,30 @@ classDiagram
     - Add, modify, or remove classes and their attributes/relationships to align with the use cases.
     - Maintain correct cardinality and inheritance if applicable.
     - Ensure the revised class diagram fully supports the events and data described in the use cases.
+    - Do not specify the type of attributes in the class diagram. Only include the attribute names without types.
 
     **Generate**:
     1. A revised class diagram in Mermaid format.
     2. A data dictionary for all classes and attributes.
     3. A list of integrity constraints based on the requirements and use case logic (e.g., uniqueness, associations, limitations).
-    4. A list of questions or observations if anything is unclear or ambiguous.
+    4. A list of questions or observations if anything is unclear or ambiguous, but only in the final section titled **Questions and Validations**.
 
     **Additional Guidelines**:
     - Use PascalCase for class names.
     - Use camelCase for attributes.
     - Prefer nouns for names.
     - Do not invent behavior beyond what is supported by the use cases.
+    - Do not include additional comments in the contents of the generated document, except in the final section titled **Questions and Validations**.
 
-    **Output Format**: Markdown document with the following sections:
+    **Output Format**: Markdown document with the following sections (the section titles must be written in the language of the use cases and class diagram):
     - ## Class Diagram (Mermaid)
     - ## Data Dictionary
     - ## Integrity Constraints
-    - ## Questions
+    - ## Questions and Validations
 
-    **Your response must be in Portuguese.**
+    **Important**: Your entire response must be written in the language of the use cases and class diagram. All class diagram content, section titles, descriptions, and any additional text must be written in that same language.
     """
-    ) #**Important**: The entire response must be in Portuguese.
+    )
 )
 
 # Prompt template

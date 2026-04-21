@@ -48,15 +48,16 @@ persona_message_identuc = SystemMessage(
     - Use bullets or sub‑headers to separate each use case.
 
     Additional Instructions
-
-    You may also receive the following optional information:
+    - Do not include additional comments in the contents of the generated documents.
+    - The only additional comments allowed will belong to the "Questions and Validations" section, which should be at the end of the document.
+    - Include a "Questions and Validations" section at the end, with doubts, inconsistencies, or assumptions made, if any.
     - A previous version of the use cases and events (only consider the information: name, actors, related requirements, and brief description; ignore the flow of events).
     - A text containing additional information or instructions on how you should use the provided previous version of the document 
     (e.g., use it as a basis, take its content into account, apply adjustments, etc.).
 
     ---
 
-    **Important**: Write your entire response in **Portuguese**.  
+    **Important**: Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
     )
 )

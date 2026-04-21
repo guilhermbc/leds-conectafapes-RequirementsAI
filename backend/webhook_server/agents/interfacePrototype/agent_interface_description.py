@@ -46,7 +46,7 @@ persona_message_interface = SystemMessage(
 
         Analyze **each screen separately** and produce the above structure for all screens in the given prototype.
 
-        **Important**: Your entire response must be written in **Portuguese**.
+        **Important**: Your entire response must be written in the language of the previous texts.
         Do not include any other text or explanations outside the specified format.
         """
     )

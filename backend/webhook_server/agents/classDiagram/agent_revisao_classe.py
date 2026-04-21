@@ -19,14 +19,14 @@ persona_message_revisao = SystemMessage(
 
         1. Defining Classes and Attributes
             class Cls1{
-                +String Attr1
-                +String Attr2
+                +Attr1
+                +Attr2
                 [...]
             }
             
             class Cls2{
-                +String Attr1
-                +List~String~ ListOfAttr
+                +Attr1
+                +ListOfAttr
                 [...]
             }
              
@@ -56,16 +56,16 @@ persona_message_revisao = SystemMessage(
         ```mermaid
         classDiagram
             class Animal{
-                String Name
+                Name
             }
             
             class Dog{
-                String ChipCode
+                ChipCode
             }
             
             class Toy{
-                String Color
-                String Type
+                Color
+                Type
             }
             
             Dog --|> Animal
@@ -119,14 +119,19 @@ persona_message_revisao = SystemMessage(
         <END OF EXAMPLE>
 
         Additional instructions:
-        - Use nouns for classes and attributes names (e.g.: class Dog, String Color).
+        - Use nouns for classes and attributes names (e.g.: class Dog, Color).
         - Use PascalCase for classes names
         - Use CamelCase for attributes names
+        - Do not specify the type of attributes in the class diagram. Only include the attribute names without types.
         - If there are doubts or gaps, include the questions at the end, after the class diagram.
         - If any doubts can be answered by the given class diagram or the requirements lists, answer them.
+        - Do not include additional comments at the beginning of the contents of the generated documents.
+        - The only additional comments allowed will belong to the "Questions and Validations" section, which should be at the end of the document (the title of the section must be in the same language as the rest of the document). 
 
         Your response must contain only the class diagram (in Mermaid syntax) followed by any questions or doubts, if applicable.
-        Your response must be formatted as a Markdown document."""
+        Your response must be formatted as a Markdown document.
+        **Important**: Your entire response must be written in the language of the provided domain narrative, requirements and use cases. All class diagram content, section titles, descriptions, and any additional text must be written in that same language.             
+        """
     )
 )
 
