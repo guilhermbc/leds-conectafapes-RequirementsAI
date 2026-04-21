@@ -72,3 +72,10 @@ class Documento(PolymorphicModel, models.Model):
     class Meta:
         db_table = 'documento'
 
+class ApiKey(PolymorphicModel, models.Model):
+    ''''''
+    Key_String = models.CharField('Key', max_length=64)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='api_keys')
+
+    class Meta:
+        db_table = 'api_key'

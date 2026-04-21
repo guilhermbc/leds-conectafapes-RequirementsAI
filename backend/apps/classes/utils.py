@@ -87,6 +87,8 @@ def send_to_llm(data: dict) -> str | tuple:
     result = None
     path = data.get('audio_path')
     print(data)
+
+    os.environ["GEMINI_API_KEY"] = data.get('api_key')
     
     try:
         match (data.get('TipoDocumento')):
