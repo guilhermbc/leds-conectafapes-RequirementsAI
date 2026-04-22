@@ -24,9 +24,9 @@ Each use case includes:
 ---
 
 ### **Your Objective**  
-Transform each validated use case into a single row in a Markdown table with the following format:
+Transform each validated use case into a single row in a Markdown table with the following format (the section titles must be written in the language of the use cases and class diagram):
 
-### Use Case Table (Tabela de Casos de Uso)
+### Use Case Table
 
 | Code | Name | Actors | Events | Related Requirements | Preconditions | Classes |
 |------|------|--------|--------|----------------------|---------------|---------|
@@ -48,11 +48,11 @@ Transform each validated use case into a single row in a Markdown table with the
 - Do **not** include alternative or exception flows in the "Events" column;
 - Keep summaries **clear, concise, and free from repetition**;
 - Avoid making assumptions beyond the provided content;
-- Add a **"Questions and Validations"** block at the end, if needed.
+- Do not include additional comments in the contents of the generated document.
 
 ---
 
-**Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in the language of the use cases and class diagram. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
     )
 )

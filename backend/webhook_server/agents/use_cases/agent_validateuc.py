@@ -14,10 +14,11 @@ persona_message_validateuc = SystemMessage(
     - Plain text;
     - For each use case: Name, Actors, Preconditions, Normal Flow of Events, Alternative / Exception Flows, Related Requirements, and Classes;
     - A "Questions and Validations" block at the end, with doubts, assumptions, or inconsistencies.
+    - Do not include additional comments in the contents of the generated documents, except in the "Questions and Validations" section at the end.
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
-    ) #**Important**: The entire response must be in Portuguese.
+    ) #**Important**: The entire response must be in the language of the previous texts.
 )
 
 # Prompt template
@@ -75,14 +76,14 @@ validateuc_prompt = ChatPromptTemplate.from_messages([
         - RF01  
     - **Classes:**    
 
-    ## Questions and Vallidations
+    ## Questions and Validations
 
     1. What are the different types of users that need access to the system, and do they require different authentication mechanisms (e.g., two-factor authentication, SSO)?
     2. If a user enters incorrect credentials three times in a row, should the system temporarily lock the account or display a security warning?
 
     <END OF EXAMPLE>
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
     )
 ])

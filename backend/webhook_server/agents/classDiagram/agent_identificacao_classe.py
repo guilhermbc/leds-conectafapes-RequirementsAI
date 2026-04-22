@@ -41,6 +41,8 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
     - If the user cannot provide the necessary answers, **propose well-founded assumptions** and document them clearly.
     - Avoid representing derived values as attributes. Instead, model the original source data from which these values can be computed.
     - Avoid creating empty classes that have no attributes or associations of their own, even if they inherit them from other classes.
+    - Do not specify types for attributes; only list the attribute names.
+    - Do not include additional comments at the beginning of the contents of the generated documents.
     - Present your final response in the following format:
 
     ---
@@ -87,6 +89,8 @@ identificacao_prompt = ChatPromptTemplate.from_messages([
 
     Remember: if there is missing or conflicting information, ask the user.
     If the user has no answers, make well-founded assumptions and inform what decisions were made.
+    **Important**: Your entire response must be written in the language of the provided domain narrative, requirements and use cases. All class diagram content, section titles, descriptions, and any additional text must be written in that same language.             
+
      """)
 ])
 

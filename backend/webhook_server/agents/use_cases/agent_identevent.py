@@ -98,9 +98,14 @@ persona_message_identevent = SystemMessage(
     (e.g., use it as a basis, take its content into account, apply adjustments, etc.).
 
     ---
+
+    Additional Instructions
+    - Do not include additional comments in the contents of the generated documents.
+    - The only additional comments allowed will belong to the "Questions and Validations" section, which should be at the end of the document.
+    - Include a "Questions and Validations" section at the end, with doubts, inconsistencies, or assumptions made, if any.
     
-    **Important**: 
-    - Your entire response must be written in **Portuguese**
+    **Important**:
+    - Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     - Make sure to break lines with double whitespaces before each new section to ensure proper formatting.
     """
     ) 

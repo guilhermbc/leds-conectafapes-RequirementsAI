@@ -1,4 +1,5 @@
 import os
+import logging
 from os import path
 from hashids import Hashids
 from django.conf import settings
@@ -33,6 +34,8 @@ from webhook_server.webhook_server_functions.revision_functions import (
     # expected data: report: str, report_validateuc: str, diagrama_classes_final: str
     run_graphRv_with_trace as run_rev
 )
+
+logger = logging.getLogger(__name__)
 
 hashids = Hashids(settings.HASHIDS_SALT, min_length=8)
 
@@ -99,19 +102,42 @@ def send_to_llm(data: dict) -> str | tuple:
     try:
         match (data.get('TipoDocumento')):
             case 'MINIMUNDO':
+                logger.info("MINIMUNDO - início", extra={"data": data})
+
                 try:
-                    if path:
-                        path = data.get('audio_path')
+                    if not path:
+                        logger.error("MINIMUNDO sem audio_path", extra={"data": data})
+                        return None
 
-                        mw_data = run_mw({ 'video_entrevista': path, 'api_key': data.get('api_key') })
+                    logger.info("Chamando run_mw", extra={"path": path})
 
-                        if mw_data and isinstance(mw_data, dict):
-                            state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
-                            result = state.get('minimundo')
+                    mw_data = run_mw({ 'video_entrevista': path, 'api_key': data.get('api_key') })
+
+                    logger.info("Retorno run_mw", extra={"mw_data": mw_data})
+
+                    if not mw_data:
+                        logger.error("run_mw retornou vazio ou None")
+                        return None
+
+                    if not isinstance(mw_data, dict):
+                        logger.error("run_mw não retornou dict", extra={"tipo": type(mw_data)})
+                        return None
+
+                    state = next(iter(mw_data.values())) if len(mw_data) == 1 else mw_data
+
+                    logger.info("Estado extraído", extra={"state": state})
+
+                    result = state.get('minimundo')
+
+                    logger.info("Resultado minimundo", extra={"result": result})
+
+                    if not result:
+                        logger.error("Campo 'minimundo' não encontrado ou vazio", extra={"state": state})
+                        return None
 
                 except Exception as e:
-                    print(e)
-                    result = None
+                    logger.exception("Erro no case MINIMUNDO")
+                    return None
                 
             case 'REQUISITOS':
                 try:

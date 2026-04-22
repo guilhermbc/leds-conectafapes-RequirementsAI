@@ -13,6 +13,7 @@ persona_message_prioritization = SystemMessage(
         "3. Check for any unresolved gaps or unclear information. If any, list specific questions.\n"
         "4. Prepare the reviewed requirements for the final refinement stage.\n"
         "Respond with the adjusted tables and any questions (if applicable).\n"
+        "\n\n**IMPORTANT**: Your response must be in the language of the provided domain narrative. All table content, descriptions, and any additional text must be written in that same language.\n"
     )
 )
 

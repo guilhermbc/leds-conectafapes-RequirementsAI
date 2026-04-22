@@ -19,16 +19,17 @@ persona_message_cdinuc_diagram = SystemMessage(
     - Actors
 
     **Output Format**:
-    - A single `@startuml` to `@enduml` PlantUML diagram;
+    - First, start with a PlantUML code block using triple backticks and `plantuml`;
+    - After, use `@startuml` to `@enduml` and finish the PlantUML diagram with triple backticks;
     - One `actor` declaration for each actor;
     - One `(Code)` declaration for each use case, optionally using `as "Name"` for clarity;
-    - Use `Actor --> (UseCase)` to show relationships;
+    - Use `Actor -- (UseCase)` to show relationships;
     - Do **not** add include/extend relationships unless explicitly instructed;
-    - If you find inconsistencies or missing data, list them below the diagram under a heading called **Perguntas**.
+    - If you find inconsistencies or missing data, list them below the diagram under a heading called **Questions and Validations**.
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in the language of the previous texts.
     """
-    ) #**Important**: The entire response must be in Portuguese.
+    ) #**Important**: The entire response must be in the language of the previous texts.
 )
 
 # Prompt template
@@ -70,6 +71,9 @@ cdinuc_diagram_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **Example Output**:
+    ### Use Case Diagram (the title must be written in the language of the use cases and class diagram)
+
+    ```plantuml
     @startuml
 
     actor Cliente
@@ -78,20 +82,20 @@ cdinuc_diagram_prompt = ChatPromptTemplate.from_messages([
     (UC01) as "Cadastrar Cliente"
     (UC02) as "Devolver Livro"
 
-    Cliente --> (UC01)
-    Bibliotecário --> (UC02)
+    Cliente -- (UC01)
+    Bibliotecário -- (UC02)
 
     @enduml
+    ```
 
     ---
     **Final Output Format**:
     - One single PlantUML code block;
     - No extra explanations or markdown sections outside the diagram;
-    - If you find inconsistencies or missing information, list them after the diagram under a heading titled **Perguntas**.
+    - Do not include additional comments or sections outside the diagram.
     ---
 
-    **Important**: Your entire response must be written in **Portuguese**.
-
+    **Important**: Your entire response must be written in the language of the use cases and class diagram. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
     )
 ])

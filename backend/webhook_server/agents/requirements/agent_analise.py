@@ -51,7 +51,8 @@ persona_message_analise = SystemMessage(
 
     Remember: if there is missing or conflicting information, ask the user.
     If the user has no answers, make well-founded assumptions and inform what decisions were made.
-    Your response should be in Portuguese.
+
+    **IMPORTANT**: Your response must be in the language of the provided domain narrative. All functional requirements, business rules, non-functional requirements, and any additional text must be written in that same language.
 
     Important:
     You may also receive a previous requirements version.

@@ -1,4 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { RouterView } from 'vue-router'
+import { routes as documentoRoutes} from '../../Documento/routes'
 import Listar from '../views/Listar.vue'
 import Criar from '../views/Criar.vue'
 import Detalhes from '../views/Detalhe.vue'
@@ -6,20 +8,27 @@ import Detalhes from '../views/Detalhe.vue'
 export const routes: RouteRecordRaw[] = [
   {
     name: 'modulo-home',
-    path: 'home',
+    path: '',
     component: Listar,
-    meta: { requiresAuth: true }
+    meta: { breadcrumb: 'Módulos' }
   },
   {
     name: 'modulo-criar',
-    path: 'criar/:id?',
+    path: 'criar/:moduloId?',
     component: Criar,
-    meta: { requiresAuth: true }
+    meta: { breadcrumb: 'Criar Módulo' }
   },
   {
     name: 'modulo-detalhe',
-    path: ':id',
+    path: ':moduloId',
     component: Detalhes,
-    meta: { requiresAuth: true }
+    meta: { breadcrumb: 'Módulo' },
+    children: [
+      {
+        path: 'documentos',
+        component: RouterView,
+        children: documentoRoutes
+      }
+    ]
   }
 ]

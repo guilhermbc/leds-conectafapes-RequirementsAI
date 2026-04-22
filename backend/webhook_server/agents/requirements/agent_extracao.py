@@ -9,7 +9,9 @@ persona_message_extracao = SystemMessage(
     content=("""
         You are a requirements engineering expert. 
         Based on the following draft of requirements
-        
+
+        **IMPORTANT**: Your response must be in the language of the provided domain narrative (the text from which requirements are being extracted). All table content, descriptions, and any additional text must be written in that same language.
+
         Generate **exactly** 3 tables in Markdown format:
 
         1. **Functional Requirements Table (FRs)**  

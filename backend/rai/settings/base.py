@@ -204,8 +204,17 @@ CORS_ALLOWED_ORIGINS = [
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "root": {"level": "INFO", "handlers": ["file"]},
+
+    "root": {
+        "level": "INFO",
+        "handlers": ["console", "file"],
+    },
+
     "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "app",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
@@ -213,18 +222,25 @@ LOGGING = {
             "formatter": "app",
         },
     },
+
     "loggers": {
         "django": {
-            "handlers": ["file"],
+            "handlers": ["console", "file"],
             "level": "INFO",
-            "propagate": True
+            "propagate": True,
+        },
+        "apps": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
+
     "formatters": {
         "app": {
             "format": (
-                u"%(asctime)s [%(levelname)-8s] "
-                "(%(module)s.%(funcName)s) %(message)s"
+                "%(asctime)s [%(levelname)s] "
+                "%(name)s.%(funcName)s: %(message)s"
             ),
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },

@@ -1,3 +1,5 @@
+import os
+
 from .models import (
     Projeto,
     Modulo,
@@ -29,6 +31,9 @@ from rest_framework import filters
 import django_filters.rest_framework
 import json
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 from rest_framework.permissions import AllowAny # for testing
 from .filters import DocumentoFilter
@@ -281,6 +286,12 @@ class DocumentoViewSet(ModelViewSet):
         api_key_id = data.get('api_key')
         data['api_key'] = get_object_or_404(ApiKey, pk=api_key_id).Key_String
 
+        logger.info("FILES:", extra={"files": request.FILES})
+        logger.info("audio:", extra={
+            "existeAudio": bool(request.FILES.get('arquivoAudio')),
+            "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
+})
+
         if not arquivoAudio:
             data.pop('arquivoAudio', None)
 
@@ -298,6 +309,9 @@ class DocumentoViewSet(ModelViewSet):
                 temp_path = temp.name
 
             data['audio_path'] = temp_path  # substitui origemAudio
+            
+            logger.info("Temp path criado", extra={"path": temp_path})
+            logger.info("Arquivo existe?", extra={"exists": os.path.exists(temp_path)})
         else:
             if documento_anterior:
                 doc_anterior = get_object_or_404(Documento, pk=documento_anterior)

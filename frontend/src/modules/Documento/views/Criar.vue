@@ -67,10 +67,10 @@ const TipoDocumento = computed(() => {
 })
 
 const isDisabled = computed(() => {
-  if (modoCriacao.value === 'todos' && categoriasDropdown.value.length < 4) {
+  if (modoCriacao.value === 'todos' && categoriasDropdown.value.length < 3) {
     return true
   }
-  else if (modoCriacao.value === 'todos' && categoriasDropdown.value.length === 4) {
+  else if (modoCriacao.value === 'todos' && categoriasDropdown.value.length === 3) {
     return carregando.value || arquivoAudio.value === null 
   }
 
@@ -222,7 +222,7 @@ const salvar = async () => {
           geradoIA: true,
           arquivo: '',
           arquivoAudio: null,
-          TipoDocumento: 'CASO_USO',
+          TipoDocumento: 'CASO_USO_E_DIAGRAMA_CLASSE',
           DocumentoAnterior: null,
           Modulo: props.moduloId as string,
           DocumentoOrigem: idsDocumentosCriados,
@@ -230,21 +230,38 @@ const salvar = async () => {
         response = await criarDocumento(formData)
       }
 
-      if (response) {
-        idsDocumentosCriados.push(Number(response.data.id))
-        formData = criarFormDataDocumento({
-          vMajor: 1,
-          vMinor: 0,
-          geradoIA: true,
-          arquivo: '',
-          arquivoAudio: null,
-          TipoDocumento: 'DIAGRAMA_CLASSE',
-          DocumentoAnterior: null,
-          Modulo: props.moduloId as string,
-          DocumentoOrigem: idsDocumentosCriados,
-        })
-        response = await criarDocumento(formData)
-      }
+      // if (response) {
+      //   idsDocumentosCriados.push(Number(response.data.id))
+      //   formData = criarFormDataDocumento({
+      //     vMajor: 1,
+      //     vMinor: 0,
+      //     geradoIA: true,
+      //     arquivo: '',
+      //     arquivoAudio: null,
+      //     TipoDocumento: 'CASO_USO',
+      //     DocumentoAnterior: null,
+      //     Modulo: props.moduloId as string,
+      //     DocumentoOrigem: idsDocumentosCriados,
+      //   })
+      //   response = await criarDocumento(formData)
+      // }
+
+      
+      // if (response) {
+      //   idsDocumentosCriados.push(Number(response.data.id))
+      //   formData = criarFormDataDocumento({
+      //     vMajor: 1,
+      //     vMinor: 0,
+      //     geradoIA: true,
+      //     arquivo: '',
+      //     arquivoAudio: null,
+      //     TipoDocumento: 'DIAGRAMA_CLASSE',
+      //     DocumentoAnterior: null,
+      //     Modulo: props.moduloId as string,
+      //     DocumentoOrigem: idsDocumentosCriados,
+      //   })
+      //   response = await criarDocumento(formData)
+      // }
 
       // if (response) {
       //   idsDocumentosCriados.push(Number(response.data.id))
@@ -329,7 +346,7 @@ const onDrop = (event: any) => {
 
       <!-- Escolha de áudio de origem para Minimundo -->
       <div v-if="TipoDocumento === 'MINIMUNDO'">
-        <h3 class="font-semibold">{{ $t('document.createModal.audioOrigin') }}:</h3>
+        <h3 class="font-semibold">{{ $t('document.createModal.audioSource') }}:</h3>
 
         <!-- Drag & Drop de áudio -->
         <div
@@ -340,7 +357,7 @@ const onDrop = (event: any) => {
         >
           <div v-if="!arquivoAudio">
             <p class="text-gray-700 font-medium"> {{ $t('document.createModal.audioLabel') }}</p>
-            <p class="text-xs text-gray-500"> {{ $t('document.createModal.audioLabel2') }}</p>
+            <p class="text-xs text-gray-500"> ({{ $t('document.createModal.audioLabel2') }})</p>
           </div>
           
           <div v-else>
@@ -359,7 +376,7 @@ const onDrop = (event: any) => {
 
       <!-- Seleção de Minimundo -->
       <div v-if="TipoDocumento === 'REQUISITOS' || TipoDocumento === 'CASO_USO_E_DIAGRAMA_CLASSE'">
-        <h3 class="font-semibold">{{ $t('document.createModal.origindDomainStorytelling') }}:</h3>
+        <h3 class="font-semibold">{{ $t('document.createModal.sourcedDomainStorytelling') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="minimundo_origem !== null">
             {{ $t(formatarTipoDocumento(minimundo_origem?.TipoDocumento)) }} (v{{ formatarVersao(minimundo_origem?.vMajor, minimundo_origem?.vMinor) }})
@@ -372,7 +389,7 @@ const onDrop = (event: any) => {
 
       <!-- Seleção de Requisitos -->
       <div v-if="TipoDocumento === 'CASO_USO_E_DIAGRAMA_CLASSE'">
-        <h3 class="font-semibold">{{ $t('document.createModal.originRequirements') }}:</h3>
+        <h3 class="font-semibold">{{ $t('document.createModal.sourceRequirements') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="requisito_origem !== null">
             {{ $t(formatarTipoDocumento(requisito_origem?.TipoDocumento)) }} (v{{ formatarVersao(requisito_origem?.vMajor, requisito_origem?.vMinor) }})
@@ -385,7 +402,7 @@ const onDrop = (event: any) => {
 
       <!-- Seleção de Casos de Uso -->
       <!-- <div v-if="TipoDocumento === 'DIAGRAMA_CLASSE'">
-        <h3 class="font-semibold">{{ $t('document.createModal.originUseCases') }}:</h3>
+        <h3 class="font-semibold">{{ $t('document.createModal.sourceUseCases') }}:</h3>
         <div class="py-2 px-3 mt-1 mb-2 border border-gray-700 rounded">
           <div v-if="casoDeUso_origem !== null">
             {{ $t(formatarTipoDocumento(casoDeUso_origem?.TipoDocumento)) }} (v{{ formatarVersao(casoDeUso_origem?.vMajor, casoDeUso_origem?.vMinor) }})
@@ -414,8 +431,8 @@ const onDrop = (event: any) => {
     <div v-else>
 
       <!-- Oferece a opção de criar todos apenas quando ainda não tem nenhum documento -->
-      <div v-if="categoriasDropdown.length === 4">
-        <h3 class="font-semibold">{{ $t('document.createModal.audioOrigin') }}:</h3>
+      <div v-if="categoriasDropdown.length === 3">
+        <h3 class="font-semibold">{{ $t('document.createModal.audioSource') }}:</h3>
           <!-- Drag & Drop de áudio -->
           <div
             class="drop-zone"
@@ -425,7 +442,7 @@ const onDrop = (event: any) => {
           >
             <div v-if="!arquivoAudio">
               <p class="text-gray-700 font-medium"> {{ $t('document.createModal.audioLabel') }}</p>
-              <p class="text-xs text-gray-500"> {{ $t('document.createModal.audioLabel2') }}</p>
+              <p class="text-xs text-gray-500"> ({{$t('document.createModal.audioLabel2') }})</p>
             </div>
             
             <div v-else>
