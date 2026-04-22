@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { ref, onBeforeMount} from 'vue'
-import { useI18n } from 'vue-i18n'
 import {
   listarProjeto,
 } from '../controllers/projeto'
 import Criar from './Criar.vue'
 import type { Projeto } from '../types/projeto'
 
-const { locale } = useI18n()
-
 const items = ref<Projeto[]>([])
 
 const carregarProjetos = async () => {
   const projetos = await listarProjeto()
   items.value = projetos
+  for (const proj of items.value) {
+    console.log(proj.id, proj.nome)
+  }
 }
 
 const mostrarModal = ref(false)
@@ -51,7 +51,7 @@ onBeforeMount(carregarProjetos)
       <router-link
         v-for="proj in items"
         :key="proj.id"
-        :to="{ name: 'projeto-detalhe', params: { id: proj.id }}" 
+        :to="{ name: 'projeto-detalhe', params: { projetoId: proj.id }}" 
         class="block group h-48"
       >
 

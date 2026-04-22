@@ -4,11 +4,6 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import { chaveModal } from '@/types/ui'
-import {
-  campoNecessario,
-  minimo3caracteres,
-  caracteresEspeciais
-} from '@/utils/regras'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -30,26 +25,6 @@ const usuario = ref('')
 const senha = ref('')
 const erro = ref('')
 const loading = ref(false)
-
-// Regras
-const regrasUsuario = [campoNecessario, minimo3caracteres]
-const regrasSenha = [campoNecessario, minimo3caracteres, caracteresEspeciais]
-
-// Validação
-const usuarioValido = ref(false)
-const senhaValida = ref(false)
-
-const updateUsuarioValido = (novoValor: boolean) => {
-  usuarioValido.value = novoValor
-}
-
-const updateSenhaValida = (novoValor: boolean) => {
-  senhaValida.value = novoValor
-}
-
-const podeEntrar = computed(() => {
-  return usuarioValido.value && senhaValida.value && !loading.value
-})
 
 // Login
 const entrar = async () => {
