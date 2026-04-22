@@ -120,7 +120,7 @@ const onDrop = (event: any) => {
     <h2 class="text-xl font-bold mb-4">{{ $t('document.newAIVersionModal.title') }}</h2>
 
     <div v-if="TipoDocumento == 'MINIMUNDO'" class="">
-      <h3 class="font-semibold">{{ $t('document.newAIVersionModal.originAudioTitle') }}</h3>
+      <h3 class="font-semibold">{{ $t('document.newAIVersionModal.sourceAudioTitle') }}</h3>
       <!-- Drag & Drop de áudio -->
         <div
           class="drop-zone"

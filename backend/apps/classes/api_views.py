@@ -1,3 +1,5 @@
+import os
+
 from .models import (
     Projeto,
     Modulo,
@@ -25,7 +27,9 @@ from .pagination import CustomPagination
 from rest_framework import generics
 from rest_framework import filters
 import django_filters.rest_framework
-import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 from rest_framework.permissions import AllowAny # for testing
 from .filters import DocumentoFilter
@@ -186,6 +190,7 @@ class DocumentoViewSet(ModelViewSet):
         'vMajor',
         'vMinor',
         'geradoIA',
+        'vMaisRecente',
         'TipoDocumento',
         'DocumentoAnterior',
         'DocumentoOrigem',
@@ -199,6 +204,8 @@ class DocumentoViewSet(ModelViewSet):
         user = self.request.user
         if not user.is_authenticated:
             return Documento.objects.none()
+        
+        
         return Documento.objects.filter(user=user)
 
     def get_serializer_class(self):
@@ -207,6 +214,8 @@ class DocumentoViewSet(ModelViewSet):
         return DocumentoWriteSerializer
 
     def _create_caso_uso_com_classes(self, data):
+        documento_anterior = data.get("DocumentoAnterior")
+        
         result = send_to_llm({
             **data,
             'TipoDocumento': 'CASO_USO_E_DIAGRAMA_CLASSE'
@@ -232,7 +241,8 @@ class DocumentoViewSet(ModelViewSet):
             'TipoDocumento': 'CASO_USO',
             'vMajor': vMajor,
             'vMinor': vMinor,
-            'geradoIA': True
+            'geradoIA': True,
+            'vMaisRecente': True
         })
 
         serializer_uc = self.get_serializer(data=data_uc)
@@ -246,12 +256,17 @@ class DocumentoViewSet(ModelViewSet):
             'TipoDocumento': 'DIAGRAMA_CLASSE',
             'vMajor': vMajor,
             'vMinor': vMinor,
-            'geradoIA': True
+            'geradoIA': True,
+            'vMaisRecente': True
         })
 
         serializer_cd = self.get_serializer(data=data_cd)
         serializer_cd.is_valid(raise_exception=True)
         self.perform_create(serializer_cd)
+
+        # Atualizar estado de novidade do documento anterior
+        if documento_anterior:
+            Documento.objects.filter(id=documento_anterior).update(vMaisRecente=False)
 
         return Response({
             "caso_uso": serializer_uc.data,
@@ -263,8 +278,16 @@ class DocumentoViewSet(ModelViewSet):
         arquivoAudio = request.FILES.get('arquivoAudio')
         documentos_origem = request.data.getlist('DocumentoOrigem')
 
+        logger.info("FILES:", extra={"files": request.FILES})
+        logger.info("audio:", extra={
+            "existeAudio": bool(request.FILES.get('arquivoAudio')),
+            "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
+})
+
         if not arquivoAudio:
             data.pop('arquivoAudio', None)
+        
+        documento_anterior = data.get('DocumentoAnterior')
 
         # Força sempre lista no data, e nunca string
         data['DocumentoOrigem'] = documentos_origem
@@ -280,15 +303,17 @@ class DocumentoViewSet(ModelViewSet):
                 temp_path = temp.name
 
             data['audio_path'] = temp_path  # substitui origemAudio
+            
+            logger.info("Temp path criado", extra={"path": temp_path})
+            logger.info("Arquivo existe?", extra={"exists": os.path.exists(temp_path)})
         else:
-            if data.get('DocumentoAnterior'):
-                doc_anterior = get_object_or_404(Documento, pk=data.get('DocumentoAnterior'))
+            if documento_anterior:
+                doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
 
                 if data.get('TipoDocumento') == 'MINIMUNDO' and doc_anterior.arquivoAudio:
                     data['arquivoAudio'] = doc_anterior.arquivoAudio
                 else:
                     data.pop('arquivoAudio', None)
-
 
         # Se for CASO_USO/DIAGRAMA_CLASSE, enviar para um método separado
         if data.get('TipoDocumento') == 'CASO_USO_E_DIAGRAMA_CLASSE' and is_empty_or_null(data.get('arquivo')):
@@ -306,11 +331,11 @@ class DocumentoViewSet(ModelViewSet):
                 
                 vMajor, vMinor = version_from_another_doc(
                     doc_origem,
-                    data.get('DocumentoAnterior')
+                    documento_anterior
                 )
 
-            elif data.get('audio_path') and data.get('DocumentoAnterior'):  # 👈 ALTERADO
-                doc_anterior_id = data.get('DocumentoAnterior')
+            elif data.get('audio_path') and documento_anterior:  # 👈 ALTERADO
+                doc_anterior_id = documento_anterior
                 doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
                 vMajor, vMinor = version_from_audio(doc_anterior)
 
@@ -324,8 +349,8 @@ class DocumentoViewSet(ModelViewSet):
             result = data.get('arquivo')
 
             # Incremento Minor
-            if data.get('DocumentoAnterior'):
-                doc_anterior_id = data.get('DocumentoAnterior')
+            if documento_anterior:
+                doc_anterior_id = documento_anterior
                 doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
                 vMajor, vMinor = update_version(doc_anterior)
 
@@ -350,11 +375,16 @@ class DocumentoViewSet(ModelViewSet):
         data['vMinor'] = vMinor
         data['arquivo'] = result_string
         data['geradoIA'] = generated_by_ai
+        data['vMaisRecente'] = True
 
         # 👇 IMPORTANTE: passar data, não request.data
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+
+        # Atualizar estado de novidade do documento anterior
+        if documento_anterior:
+            Documento.objects.filter(id=documento_anterior).update(vMaisRecente=False)
 
         return Response(serializer.data, status=201)
 

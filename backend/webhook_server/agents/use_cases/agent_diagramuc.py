@@ -23,13 +23,13 @@ persona_message_diagramuc = SystemMessage(
     - After, use `@startuml` to `@enduml` and finish the PlantUML diagram with triple backticks;
     - One `actor` declaration for each actor;
     - One `(Code)` declaration for each use case, optionally using `as "Name"` for clarity;
-    - Use `Actor --> (UseCase)` to show relationships;
+    - Use `Actor -- (UseCase)` to show relationships;
     - Do **not** add include/extend relationships unless explicitly instructed;
-    - If you find inconsistencies or missing data, list them below the diagram under a heading called **Perguntas**.
+    - Do not include additional comments in the contents of the generated documents.
 
-    **Important**: Your entire response must be written in **Portuguese**.
+    **Important**: Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
-    ) #**Important**: The entire response must be in Portuguese.
+    ) #**Important**: The entire response must be in the language of the previous texts.
 )
 
 # Prompt template
@@ -72,6 +72,8 @@ diagramuc_prompt = ChatPromptTemplate.from_messages([
     ---
 
     **Example Output**:
+    ### Use Case Diagram
+
     ```plantuml
     @startuml
 
@@ -81,8 +83,8 @@ diagramuc_prompt = ChatPromptTemplate.from_messages([
     (UC01) as "Cadastrar Cliente"
     (UC02) as "Devolver Livro"
 
-    Cliente --> (UC01)
-    Bibliotecário --> (UC02)
+    Cliente -- (UC01)
+    Bibliotecário -- (UC02)
 
     @enduml
     ```
@@ -91,11 +93,10 @@ diagramuc_prompt = ChatPromptTemplate.from_messages([
     **Final Output Format**:
     - One single PlantUML code block;
     - No extra explanations or markdown sections outside the diagram;
-    - If you find inconsistencies or missing information, list them after the diagram under a heading titled **Perguntas**.
+    - Do not include additional comments in the contents of the generated documents.
     ---
 
-    **Important**: Your entire response must be written in **Portuguese**.
-
+    **Important**: Your entire response must be written in the language of the provided domain narrative and requirements. All use case content, section titles, descriptions, and any additional text must be written in that same language.
     """
     )
 ])

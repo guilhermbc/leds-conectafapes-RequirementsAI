@@ -16,8 +16,11 @@ persona_message_refinamento = SystemMessage(
     **Response Format**:
     - Markdown;
     - Three tables: Functional Requirements (FRs), Business Rules (BRs), Non-Functional Requirements (NFRs);
-    - A 'Questions and Validations' block at the end, if applicable."""
-    ) #**Important**: The entire response must be in Portuguese.
+    - A 'Questions and Validations' block at the end, if applicable.
+
+    **IMPORTANT**: Your response must be in the language of the provided domain narrative. All table content, descriptions, and any additional text must be written in that same language.
+    """
+    )
 )
 
 # Prompt template
@@ -47,15 +50,14 @@ refinamento_prompt = ChatPromptTemplate.from_messages([
     **Response Format**:  
     - In Markdown;
     - Three tables (FR, BR, NFR);
-    - After the tables, include a "Questions and validations" block if applicable.
+    - After the tables, include a "Questions and Validations" block if applicable.
 
     Generate only this. Avoid repetitions.
-                                              
-    **Important**: 
-    - Translate all your final output into **Portuguese**.
-    - Your answer must be entirely in **Portuguese**.
+
+    **Important**:
+    - Your entire response must be written in the language of the provided domain narrative.
     - Do not include any additional commentaries before the presentation of the requirements.
-    - The only other content allowed is the "Questions and validations" section at the end.
+    - The only other content allowed is the "Questions and Validations" section at the end.
     """
     )
 ])

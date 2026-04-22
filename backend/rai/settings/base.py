@@ -31,13 +31,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 DEBUG = True
 
 # load production server from .env
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 CORS_ALLOWED_ORIGINS = os.getenv("CORS_ORIGIN", "").split(",")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS')
+CSRF_TRUSTED_ORIGINS = csrf_origins.split(',') if csrf_origins else []
 
 # Avisa o Django que o Ingress está recebendo HTTPS e mandando HTTP pro Pod
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -203,8 +204,17 @@ CORS_ALLOWED_ORIGINS = [
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "root": {"level": "INFO", "handlers": ["file"]},
+
+    "root": {
+        "level": "INFO",
+        "handlers": ["console", "file"],
+    },
+
     "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "app",
+        },
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
@@ -212,18 +222,25 @@ LOGGING = {
             "formatter": "app",
         },
     },
+
     "loggers": {
         "django": {
-            "handlers": ["file"],
+            "handlers": ["console", "file"],
             "level": "INFO",
-            "propagate": True
+            "propagate": True,
+        },
+        "apps": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
+
     "formatters": {
         "app": {
             "format": (
-                u"%(asctime)s [%(levelname)-8s] "
-                "(%(module)s.%(funcName)s) %(message)s"
+                "%(asctime)s [%(levelname)s] "
+                "%(name)s.%(funcName)s: %(message)s"
             ),
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
