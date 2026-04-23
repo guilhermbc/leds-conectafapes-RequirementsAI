@@ -71,7 +71,7 @@ function abrirModal(){
       <router-link
         v-for="documento in ultimosDocumentos"
         :key="documento.id"
-        :to="{ name: 'documento-detalhe', params: { documentoId: documento.id } }"
+        :to="{ name: 'documento-detalhe', params: { id: documento.id } }"
         class="block group h-25"
       >
         <article

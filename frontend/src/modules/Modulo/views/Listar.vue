@@ -49,7 +49,7 @@ watch(() => props.projetoId, carregarModulos)
       <router-link
         v-for="modulo in modulos"
         :key="modulo.id"
-        :to="{ name: 'modulo-detalhe', params: { moduloId: modulo.id }}"
+        :to="{ name: 'modulo-detalhe', params: { id: modulo.id }}"
         class="block group h-48"
       >
         <article
