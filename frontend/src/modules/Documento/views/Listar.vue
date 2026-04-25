@@ -50,7 +50,7 @@ function abrirModal(){
     <div class="flex items-center justify-between mb-4">
       <h1 class="text-2xl font-semibold text-gray-800">{{ $t('document.currentDocumentsTitle') }}</h1>
       <button
-        class="w-[420px] h-[45px] bg-blue-600 text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer
+        class="w-[347px] h-[45px] bg-blue-600 text-sm text-white px-4 py-2 rounded-md shadow hover:bg-blue-700 transition cursor-pointer
         disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
         @click="abrirModal()"
         :disabled="isDisabled"

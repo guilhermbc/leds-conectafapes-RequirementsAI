@@ -6,7 +6,7 @@ export type Modulo = {
   modulo_documento: Documento[]
   nome : string
   descricao : string
-  projeto: Projeto | string
+  Projeto: Projeto | string
 }
 
 export type ModuloCreateReq = Pick<Modulo, "nome" | "descricao" | "Projeto">
