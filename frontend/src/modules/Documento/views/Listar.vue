@@ -12,6 +12,32 @@ const props = defineProps<{
 const documentos = ref<Documento[]>([])
 const ultimosDocumentos = ref<Documento[]>([])
 
+const iconesDocumento: Record<string, string> = {
+  MINIMUNDO: new URL('../../../assets/storytelling_icon.svg', import.meta.url).href,
+  REQUISITOS: new URL('../../../assets/requirements_icon.svg', import.meta.url).href,
+  CASO_USO: new URL('../../../assets/usecases_icon.svg', import.meta.url).href,
+  DIAGRAMA_CLASSE: new URL('../../../assets/classdiagram_icon.svg', import.meta.url).href,
+}
+
+const getIconForTipo = (tipo: string) => iconesDocumento[tipo] || ''
+
+const tiposDocumentoOrdenados = [
+  { valor: 'MINIMUNDO', nome: 'document.domainStorytelling' },
+  { valor: 'REQUISITOS', nome: 'document.requirements' },
+  { valor: 'CASO_USO', nome: 'document.useCases' },
+  { valor: 'DIAGRAMA_CLASSE', nome: 'document.classDiagram' },
+]
+
+const documentosPorTipo = computed(() => {
+  return tiposDocumentoOrdenados.map((tipo) => ({
+    ...tipo,
+    documentos: documentos.value
+      .filter((doc) => doc.TipoDocumento === tipo.valor)
+      .slice()
+      .reverse(),
+  }))
+})
+
 // Verificar se o botão de criar documento deve ser desabilitado
 const isDisabled = computed(() => {
   const tiposArtefatosCriados: string[] = []
@@ -33,6 +59,24 @@ const carregarDocumentos = async () => {
 
   ultimosDocumentos.value = ultimosDocs  
   documentos.value = modulo.modulo_documento
+}
+
+const origemNaoEstaAtual = (documento: Documento): boolean => {
+  const origens = Array.isArray(documento.DocumentoOrigem)
+    ? documento.DocumentoOrigem.filter(Boolean)
+    : documento.DocumentoOrigem && typeof documento.DocumentoOrigem === 'object'
+      ? [documento.DocumentoOrigem]
+      : []
+
+  if (origens.length === 0) {
+    return false
+  }
+
+  return origens.some((origem) => {
+    return typeof origem === 'object' && 'vMaisRecente' in origem
+      ? !origem.vMaisRecente
+      : false
+  })
 }
 
 const mostrarModal = ref(false)
@@ -75,11 +119,25 @@ function abrirModal(){
         class="block group h-25"
       >
         <article
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
+          :class="[
+            'relative rounded-lg shadow-sm hover:shadow-md transition p-4 pb-10 flex flex-col h-full',
+            'bg-white dark:bg-gray-800'
+          ]"
         >
+          <img
+            :src="getIconForTipo(documento.TipoDocumento)"
+            alt=""
+            class="absolute right-4 top-4 w-8 h-8 object-contain"
+          />
           <header class="mb-3">
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 break-words">{{ $t(formatarTipoDocumento(documento.TipoDocumento)) }} (v{{formatarVersao(documento.vMajor, documento.vMinor)  }})</h2>
           </header>
+          <span
+            v-if="origemNaoEstaAtual(documento)"
+            class="absolute right-4 bottom-4 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-semibold text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-200"
+          >
+            {{ $t('document.deprecated') }}
+          </span>
         </article>
       </router-link>
     </div>
@@ -95,21 +153,46 @@ function abrirModal(){
       {{ $t('document.none') }}
     </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      <router-link
-        v-for="documento in documentos"
-        :key="documento.id"
-        :to="{ name: 'documento-detalhe', params: { id: documento.id} }"
-        class="block group h-25"
-      >
-        <article
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition p-4 flex flex-col h-full"
-        >
-          <header class="mb-3">
-            <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 break-words">{{ $t(formatarTipoDocumento(documento.TipoDocumento)) }} (v{{formatarVersao(documento.vMajor, documento.vMinor)  }})</h2>
-          </header>
-        </article>
-      </router-link>
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div v-for="coluna in documentosPorTipo" :key="coluna.valor" class="h-full">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 h-full flex flex-col">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            {{ $t(coluna.nome) }}
+          </h3>
+
+          <div class="space-y-3 flex-1">
+            <div v-if="coluna.documentos.length === 0" class="text-gray-500 italic text-sm">
+              {{ $t('document.none') }}
+            </div>
+
+            <router-link
+              v-else
+              v-for="documento in coluna.documentos"
+              :key="documento.id"
+              :to="{ name: 'documento-detalhe', params: { id: documento.id } }"
+              class="block group"
+            >
+              <article
+                class="relative bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition flex flex-col h-full"
+              >
+                <img
+                  :src="getIconForTipo(documento.TipoDocumento)"
+                  alt=""
+                  class="absolute right-4 top-4 w-8 h-8 object-contain"
+                />
+                <header class="mb-2">
+                  <h2 class="text-base font-medium text-gray-900 dark:text-gray-100 break-words">
+                    {{ $t(formatarTipoDocumento(documento.TipoDocumento)) }}
+                  </h2>
+                </header>
+                <p class="text-sm text-gray-600 dark:text-gray-300">
+                  v{{ formatarVersao(documento.vMajor, documento.vMinor) }}
+                </p>
+              </article>
+            </router-link>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
