@@ -266,7 +266,10 @@ class DocumentoViewSet(ModelViewSet):
 
         # Atualizar estado de novidade do documento anterior
         if documento_anterior:
-            Documento.objects.filter(id=documento_anterior).update(vMaisRecente=False)
+            doc_anterior = get_object_or_404(Documento, id=documento_anterior)
+            if doc_anterior.vMaisRecente is not False:
+                doc_anterior.vMaisRecente = False
+                doc_anterior.save()
 
         return Response({
             "caso_uso": serializer_uc.data,
@@ -384,7 +387,10 @@ class DocumentoViewSet(ModelViewSet):
 
         # Atualizar estado de novidade do documento anterior
         if documento_anterior:
-            Documento.objects.filter(id=documento_anterior).update(vMaisRecente=False)
+            doc_anterior = get_object_or_404(Documento, id=documento_anterior)
+            if doc_anterior.vMaisRecente is not False:
+                doc_anterior.vMaisRecente = False
+                doc_anterior.save()
 
         return Response(serializer.data, status=201)
 
