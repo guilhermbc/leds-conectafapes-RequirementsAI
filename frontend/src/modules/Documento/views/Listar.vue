@@ -57,7 +57,8 @@ const carregarDocumentos = async () => {
   const modulo = await obterModulo(props.moduloId as string)
   const ultimosDocs = await listarUltimosDocumentos(props.moduloId as string)
 
-  ultimosDocumentos.value = ultimosDocs  
+  ultimosDocumentos.value = ultimosDocs
+  console.log('Documentos carregados:', ultimosDocumentos.value)
   documentos.value = modulo.modulo_documento
 }
 
@@ -111,7 +112,7 @@ function abrirModal(){
       {{ $t('document.none') }}
     </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <router-link
         v-for="documento in ultimosDocumentos"
         :key="documento.id"
@@ -120,20 +121,20 @@ function abrirModal(){
       >
         <article
           :class="[
-            'relative rounded-lg shadow-sm hover:shadow-md transition p-4 pb-10 flex flex-col h-full',
+            'relative rounded-lg shadow-sm hover:shadow-md transition p-4 pr-12 pb-10 flex flex-col h-full',
             'bg-white dark:bg-gray-800'
           ]"
         >
           <img
             :src="getIconForTipo(documento.TipoDocumento)"
             alt=""
-            class="absolute right-4 top-4 w-8 h-8 object-contain"
+            class="absolute right-4 top-4 w-6 h-6 sm:w-8 sm:h-8 object-contain"
           />
           <header class="mb-3">
             <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 break-words">{{ $t(formatarTipoDocumento(documento.TipoDocumento)) }} (v{{formatarVersao(documento.vMajor, documento.vMinor)  }})</h2>
           </header>
           <span
-            v-if="origemNaoEstaAtual(documento)"
+            v-if="documento.obsoleto"
             class="absolute right-4 bottom-4 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-semibold text-yellow-800 dark:bg-yellow-500/20 dark:text-yellow-200"
           >
             {{ $t('document.deprecated') }}
@@ -173,12 +174,12 @@ function abrirModal(){
               class="block group"
             >
               <article
-                class="relative bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition flex flex-col h-full"
+                class="relative bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 pr-12 hover:shadow-md transition flex flex-col h-full"
               >
                 <img
                   :src="getIconForTipo(documento.TipoDocumento)"
                   alt=""
-                  class="absolute right-4 top-4 w-8 h-8 object-contain"
+                  class="absolute right-4 top-4 w-6 h-6 sm:w-8 sm:h-8 object-contain"
                 />
                 <header class="mb-2">
                   <h2 class="text-base font-medium text-gray-900 dark:text-gray-100 break-words">
