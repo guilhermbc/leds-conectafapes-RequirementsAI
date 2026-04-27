@@ -48,6 +48,7 @@ class Documento(PolymorphicModel, models.Model):
     geradoIA = models.BooleanField(null=True, blank=True)
     # tag ultima versão
     vMaisRecente = models.BooleanField(null=True, blank=True)
+    obsoleto = models.BooleanField(default=False)
 
     # string do documento
     arquivo = models.TextField(null=True, blank=True)
@@ -68,6 +69,40 @@ class Documento(PolymorphicModel, models.Model):
     TipoDocumento = models.CharField(max_length=20, choices=DOCS.choices, default=DOCS.MINIMUNDO)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documentos')
+
+    def atualizar_obsolescencia(self):
+        origens = self.DocumentoOrigem.all()
+
+        if not origens.exists():
+            self.obsoleto = False
+            return
+
+        self.obsoleto = any(not doc.vMaisRecente for doc in origens)
+
+    def marcar_dependentes_como_obsoletos(self):
+        dependentes = Documento.objects.filter(DocumentoOrigem=self)
+
+        for doc in dependentes:
+            doc.atualizar_obsolescencia()
+            doc.save(update_fields=['obsoleto'], skip_obsolescencia=True)
+
+    def save(self, *args, **kwargs):
+        skip_obsolescencia = kwargs.pop('skip_obsolescencia', False)
+        previous_vMaisRecente = None
+
+        if self.pk and not skip_obsolescencia:
+            previous_vMaisRecente = Documento.objects.filter(pk=self.pk).values_list('vMaisRecente', flat=True).first()
+
+        super().save(*args, **kwargs)
+
+        if skip_obsolescencia:
+            return
+
+        self.atualizar_obsolescencia()
+        super().save(update_fields=['obsoleto'])
+
+        if self.vMaisRecente is False and previous_vMaisRecente is not False:
+            self.marcar_dependentes_como_obsoletos()
 
     class Meta:
         db_table = 'documento'

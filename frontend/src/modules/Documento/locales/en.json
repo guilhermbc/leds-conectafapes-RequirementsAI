@@ -4,6 +4,7 @@
     "allDocumentsTitle": "All Requirement-Related Artifacts",
     "new": "Start Requirements Specification and Analysis",
     "none": "No Requirement-Related Artifacts found.",
+    "deprecated": "Deprecated",
     "uploadNewVersion": "Upload New Version",
     "generateNewAIVersion": "Generate New Version with AI",
     "download": "Download",

@@ -9,6 +9,9 @@ import MarkdownViewer from '@/components/MarkdownViewer.vue'
 
 import { obterDocumento } from '../controllers/documento'
 import { obterModulo } from '@/modules/Modulo/controllers/modulo'
+import { obterProjeto } from '@/modules/Projeto/controllers/projeto'
+import type { Projeto } from '@/modules/Projeto/types/projeto'
+import type { Modulo } from '@/modules/Modulo/types/modulo'
 import type { Documento } from '../types/documento'
 import NovaVersaoIA from './NovaVersaoIA.vue'
 import UploadNovaVersao from './UploadNovaVersao.vue'
@@ -21,6 +24,9 @@ const ui = useUiStore()
 const documentoId = ref(route.params.id as string)
 const documento = ref<Documento | null>(null)
 const documentosSeguintes = ref<Documento[]>([])
+
+const modulo = ref<Modulo | null>(null)
+const projeto = ref<Projeto | null>(null)
 
 const loading = ref(true)
 
@@ -40,6 +46,8 @@ const carregarDocumento = async () => {
 
     const data = await obterDocumento(documentoId.value)
     documento.value = Array.isArray(data) ? data[0] : data
+    modulo.value = typeof documento.value?.Modulo === 'string' ? null : documento.value?.Modulo as Modulo
+    projeto.value = await obterProjeto(modulo.value?.Projeto as string)
 
     await carregarDocumentosSeguintes()
   }
@@ -173,6 +181,7 @@ function textoAposHtml(conteudo: string): string {
 
 </script>
 
+
 <style scoped>
 audio {
   border-radius: 8px;
@@ -182,8 +191,46 @@ audio {
 
 
 <template>
-  <div class="flex my-auto mt-20 w-11/12 gap-6 items-start">
-    <div class="w-10/12 mb-0 p-4 border border-1 border-gray-500 rounded-lg">
+  <div class="w-full my-auto mt-20 p-4">
+    <!-- Breadcrumbs -->
+    <div class="text-lg text-gray-800 mb-5">
+      <router-link 
+        to="/Projeto/home"
+        class="hover:text-blue-600 hover:underline"
+      >
+      Home
+    </router-link>
+
+    >
+      
+    <router-link 
+      :to="`/Projeto/${projeto?.id}`"
+      class="hover:text-blue-600 hover:underline"
+    >
+      {{ projeto?.nome }}
+    </router-link>
+
+    >
+      
+    <router-link 
+    :to="`/Modulo/${modulo?.id}`"
+      class="hover:text-blue-600 hover:underline"
+    >
+      {{ modulo?.nome }}
+    </router-link>
+
+    >
+
+    <router-link 
+      :to="`/Documento/${documento?.id}`"
+      class="hover:text-blue-600 hover:underline"
+    >
+      {{ $t(formatarTipoDocumento(documento?.TipoDocumento || '')) }} (v{{ formatarVersao(documento?.vMajor || 0, documento?.vMinor || 0) }})
+    </router-link>
+  </div>
+  
+    <div class="flex w-full gap-6 items-start">
+      <div class="flex-1 min-w-0 p-4 border border-gray-500 rounded-lg">
       <!-- Cabeçalho com alinhamento correto -->
       <div class="flex items-start justify-between mb-6 w-full">
 
@@ -268,13 +315,13 @@ audio {
     </div>
 
     <!-- Barra lateral com informações de documentos relacionados -->
-    <div class="border border-1 border-gray-500 p-2 rounded-lg w-2/12">
+    <div class="border border-1 border-gray-500 p-2 rounded-lg w-3/12">
       
       <!-- Documento Origem -->
       <div class="mb-4">
         <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.sourceDocuments') }}:</p>
         <!-- Se o documento for um minimundo -->
-        <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2">
+        <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2 break-words">
           {{ getNomeArquivo(documento?.arquivoAudio) }}
         </p>
         <ul v-else-if="documento?.TipoDocumento !== 'MINIMUNDO' && documento?.DocumentoOrigem?.length" class="list-disc ml-6 text-blue-600">
@@ -322,5 +369,7 @@ audio {
         </ul>
       </div>
     </div>
+  </div>           
   </div>
+  
 </template>

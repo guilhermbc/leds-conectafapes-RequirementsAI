@@ -6,20 +6,20 @@ import Detalhes from '../views/Detalhe.vue'
 export const routes: RouteRecordRaw[] = [
   {
     name: 'documento-home',
-    path: '',
+    path: 'home',
     component: Listar,
-    meta: { breadcrumb: 'Documentos' }
+    meta: { requiresAuth: true }
   },
   {
     name: 'documento-criar',
-    path: 'criar/:documentoId?',
+    path: 'criar/:id?',
     component: Criar,
-    meta: { breadcrumb: 'Criar Documento' }
+    meta: { requiresAuth: true }
   },
   {
     name: 'documento-detalhe',
-    path: ':documentoId',
+    path: ':id',
     component: Detalhes,
-    meta: { breadcrumb: 'Documento' }
+    meta: { requiresAuth: true }
   }
 ]
