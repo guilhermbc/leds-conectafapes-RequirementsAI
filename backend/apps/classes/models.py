@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
 
+from .custom_fields import EncryptedTextField
+
 User = get_user_model()
 
 class DOCS(models.TextChoices):
@@ -121,3 +123,10 @@ class Documento(PolymorphicModel, models.Model):
     class Meta:
         db_table = 'documento'
 
+class ApiKey(PolymorphicModel, models.Model):
+    ''''''
+    Key_String = EncryptedTextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='api_keys')
+
+    class Meta:
+        db_table = 'api_key'
