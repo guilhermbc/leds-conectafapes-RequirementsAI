@@ -6,6 +6,7 @@ export type Documento = {
   vMinor : number
   geradoIA : boolean
   vMaisRecente : boolean
+  parUC_CD : Documento | int
   obsoleto : boolean
   arquivo : string
   arquivoAudio: File | null
@@ -21,6 +22,7 @@ export type DocumentoCreateReq = Pick<Documento,
                                       | "arquivo"
                                       | "geradoIA"
                                       | "vMaisRecente"
+                                      | "parUC_CD"
                                       | "obsoleto"
                                       | "arquivoAudio"
                                       | "TipoDocumento"

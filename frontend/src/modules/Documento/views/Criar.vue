@@ -174,6 +174,7 @@ const salvar = async () => {
       })
       
       const response = await criarDocumento(formDataToSend)
+      console.log('Resposta da criação de documento:', response)
       
       if (response && response.status === 201) {
         emit('salvo')

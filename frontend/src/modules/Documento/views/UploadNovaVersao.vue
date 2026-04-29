@@ -16,7 +16,14 @@ const emit = defineEmits<{
   (e: "salvo"): void
 }>()
 
-const close = () => emit("update:modelValue", false)
+const close = () => {
+  if (carregando.value) return
+  emit("update:modelValue", false)
+}
+
+const closeForced = () => {
+  emit("update:modelValue", false)
+}
 
 // Campos do documento
 const id = ref('')
@@ -27,6 +34,9 @@ const TipoDocumento = ref('')
 const Modulo = ref('')
 const DocumentoAnterior = ref('')
 const DocumentoOrigem = ref<number[]>([])
+const parUC_CDId = ref('')
+const parUC_CDArquivo = ref('')
+const TipoDocumentoAction = ref<'ATUALIZAR' | 'SIMPLES'>('ATUALIZAR')
 
 const conteudoMarkdown = ref('')
 
@@ -55,7 +65,17 @@ const carregarDocumento = async () => {
   Modulo.value = typeof documento.Modulo === 'object' && documento.Modulo !== null 
     ? documento.Modulo.id 
     : documento.Modulo
-  DocumentoAnterior.value = documento.DocumentoAnterior
+  DocumentoAnterior.value = typeof documento.DocumentoAnterior === 'object'
+    ? documento.DocumentoAnterior?.id ?? ''
+    : documento.DocumentoAnterior ?? ''
+  DocumentoOrigem.value = []
+  parUC_CDId.value = typeof documento.parUC_CD === 'object' && documento.parUC_CD !== null
+    ? (documento.parUC_CD as any).id ?? ''
+    : documento.parUC_CD ?? ''
+  parUC_CDArquivo.value = typeof documento.parUC_CD === 'object' && documento.parUC_CD !== null
+    ? (documento.parUC_CD as any).arquivo ?? ''
+    : ''
+  TipoDocumentoAction.value = 'ATUALIZAR'
 
   for (const docOrigem of documento.DocumentoOrigem) {
     DocumentoOrigem.value.push(docOrigem.id)
@@ -82,8 +102,9 @@ const salvar = async () => {
 
   carregando.value = true
 
-  try{
-    const formDataToSend = criarFormDataDocumento({
+  try {
+    // Upload de Nova Versão
+    let formDataToSend = criarFormDataDocumento({
       vMajor: vMajor.value,
       vMinor: vMinor.value,
       geradoIA: false,
@@ -94,11 +115,62 @@ const salvar = async () => {
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
-    
-    const response = await criarDocumento(formDataToSend)
 
-    emit("salvo")
-    close()
+    let response = await criarDocumento(formDataToSend)
+    console.log('Resposta da criação de documento:', response)
+
+    if (response && response.status === 201) {
+      // Atualização do par UC/CD relacionado, caso seja um documento de Caso de Uso ou Diagrama de Classe
+      if (TipoDocumento.value === 'CASO_USO' || TipoDocumento.value === 'DIAGRAMA_CLASSE') {
+        let arquivoParaEnviar = conteudoMarkdown.value
+        let tipoDocumentoParaEnviar = ''
+
+        let geradoIAEnviar = false
+        // Usar IA para atualizar o par UC/CD relacionado
+        if (TipoDocumentoAction.value === 'ATUALIZAR') {
+          arquivoParaEnviar = ''
+          geradoIAEnviar = true
+        }
+        // Não usar IA, apenas incrementar a versão do par UC/CD relacionado
+        else {
+          arquivoParaEnviar = parUC_CDArquivo.value
+          geradoIAEnviar = false
+        }
+
+        // Definir o tipo do documento a ser enviado
+        if (TipoDocumento.value === 'CASO_USO') {
+          tipoDocumentoParaEnviar = 'DIAGRAMA_CLASSE'
+        } else {
+          tipoDocumentoParaEnviar = 'CASO_USO'
+        }
+
+        const parId = parUC_CDId.value
+
+        if (TipoDocumento.value === 'CASO_USO') {
+          tipoDocumentoParaEnviar = 'DIAGRAMA_CLASSE'
+        } else {
+          tipoDocumentoParaEnviar = 'CASO_USO'
+        }
+
+        formDataToSend = criarFormDataDocumento({
+        vMajor: vMajor.value,
+        vMinor: vMinor.value,
+        geradoIA: geradoIAEnviar,
+        arquivo: arquivoParaEnviar,
+        // arquivoAudio: arquivoAudio.value,
+        TipoDocumento: tipoDocumentoParaEnviar,
+        DocumentoAnterior: parId,
+        parUC_CD: response.data.id,
+        Modulo: Modulo.value,
+        DocumentoOrigem: DocumentoOrigem.value,
+      })
+      }
+
+      if (response) {
+        emit("salvo")
+        closeForced()
+      }
+    }
 
   } finally {
     carregando.value = false
@@ -107,7 +179,7 @@ const salvar = async () => {
 </script>
 
 <template>
-  <modal v-model="props.modelValue" @close="close">
+<modal v-model="props.modelValue" @close="close" :disableClose="carregando">
     <h2 class="text-xl font-bold mb-4"> {{ $t('document.editModal.title') }} </h2>
 
     <h3 class="font-semibold">
@@ -130,6 +202,29 @@ const salvar = async () => {
         @change="onFileSelected"
       />
     </label>
+
+    
+    <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'" class="mb-4 rounded-lg border border-gray-300 p-4 bg-gray-50">
+      <p v-if="TipoDocumento === 'CASO_USO'" class="font-medium mb-3"> {{ $t('document.editModal.updateCDChoicesTitle') }}</p>
+      <p v-else="TipoDocumento === 'DIAGRAMA_CLASSE'" class="font-medium mb-3"> {{ $t('document.editModal.updateUCChoicesTitle') }}</p>
+      <label class="block mb-4 cursor-pointer">
+        <input type="radio" value="ATUALIZAR" v-model="TipoDocumentoAction" class="mr-3 mt-1 float-left" />
+        
+        <span class="text-base leading-relaxed">
+          {{ $t('document.editModal.updateAI') }}
+          <span class="font-bold">{{ $t('document.editModal.updateAIBold') }}</span>
+        </span>
+      </label>
+
+      <label class="block cursor-pointer">
+        <input type="radio" value="SIMPLES" v-model="TipoDocumentoAction" class="mr-3 mt-1 float-left" />
+        
+        <span class="text-base leading-relaxed">
+          {{ $t('document.editModal.updateSimple') }}
+          <span class="font-bold">{{ $t('document.editModal.updateSimpleBold') }}</span>
+        </span>
+      </label>
+    </div>
 
     <div>
       <h3 class="text-lg text-center font-semibold my-4"> 

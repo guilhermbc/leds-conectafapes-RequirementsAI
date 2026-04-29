@@ -21,6 +21,20 @@ const iconesDocumento: Record<string, string> = {
 
 const getIconForTipo = (tipo: string) => iconesDocumento[tipo] || ''
 
+const coresPorTipo: Record<string, string> = {
+  MINIMUNDO: 'doc-minimundo',
+  REQUISITOS: 'doc-requisitos',
+  CASO_USO: 'doc-caso-uso',
+  DIAGRAMA_CLASSE: 'doc-diagrama',
+}
+
+const coresColunaPorTipo: Record<string, string> = {
+  MINIMUNDO: 'col-minimundo',
+  REQUISITOS: 'col-requisitos',
+  CASO_USO: 'col-caso-uso',
+  DIAGRAMA_CLASSE: 'col-diagrama',
+}
+
 const tiposDocumentoOrdenados = [
   { valor: 'MINIMUNDO', nome: 'document.domainStorytelling' },
   { valor: 'REQUISITOS', nome: 'document.requirements' },
@@ -60,24 +74,6 @@ const carregarDocumentos = async () => {
   ultimosDocumentos.value = ultimosDocs
   console.log('Documentos carregados:', ultimosDocumentos.value)
   documentos.value = modulo.modulo_documento
-}
-
-const origemNaoEstaAtual = (documento: Documento): boolean => {
-  const origens = Array.isArray(documento.DocumentoOrigem)
-    ? documento.DocumentoOrigem.filter(Boolean)
-    : documento.DocumentoOrigem && typeof documento.DocumentoOrigem === 'object'
-      ? [documento.DocumentoOrigem]
-      : []
-
-  if (origens.length === 0) {
-    return false
-  }
-
-  return origens.some((origem) => {
-    return typeof origem === 'object' && 'vMaisRecente' in origem
-      ? !origem.vMaisRecente
-      : false
-  })
 }
 
 const mostrarModal = ref(false)
@@ -121,8 +117,8 @@ function abrirModal(){
       >
         <article
           :class="[
-            'relative rounded-lg shadow-sm hover:shadow-md transition p-4 pr-12 pb-10 flex flex-col h-full',
-            'bg-white dark:bg-gray-800'
+            'relative rounded-lg shadow-sm hover:shadow-md transition p-4 pr-12 pb-10 flex flex-col h-full border',
+            coresPorTipo[documento.TipoDocumento]
           ]"
         >
           <img
@@ -156,13 +152,23 @@ function abrirModal(){
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       <div v-for="coluna in documentosPorTipo" :key="coluna.valor" class="h-full">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 h-full flex flex-col">
+        <div
+          :class="[
+            'relative rounded-lg shadow-sm p-4 h-full flex flex-col',
+            coresColunaPorTipo[coluna.valor]
+          ]"
+        >
+          <img
+            :src="getIconForTipo(coluna.valor)"
+            alt=""
+            class="absolute right-4 top-4 w-6 h-6 sm:w-8 sm:h-8 object-contain"
+          />
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {{ $t(coluna.nome) }}
           </h3>
 
           <div class="space-y-3 flex-1">
-            <div v-if="coluna.documentos.length === 0" class="text-gray-500 italic text-sm">
+            <div v-if="coluna.documentos.length === 0" class="text-gray-300 italic text-sm">
               {{ $t('document.none') }}
             </div>
 
@@ -174,13 +180,11 @@ function abrirModal(){
               class="block group"
             >
               <article
-                class="relative bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 p-4 pr-12 hover:shadow-md transition flex flex-col h-full"
+                :class="[
+                  'relative rounded-lg border p-4 pr-12 hover:shadow-md transition flex flex-col h-full',
+                  coresPorTipo[documento.TipoDocumento]
+                ]"
               >
-                <img
-                  :src="getIconForTipo(documento.TipoDocumento)"
-                  alt=""
-                  class="absolute right-4 top-4 w-6 h-6 sm:w-8 sm:h-8 object-contain"
-                />
                 <header class="mb-2">
                   <h2 class="text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                     {{ $t(formatarTipoDocumento(documento.TipoDocumento)) }}
@@ -197,3 +201,72 @@ function abrirModal(){
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Colunas */
+.col-minimundo {
+  background-color: #0f172a;
+}
+
+.col-requisitos {
+  background-color: #08192e;
+}
+
+.col-caso-uso {
+  background-color: #0a2540;
+}
+
+.col-diagrama {
+  background-color: #0a2f52;
+}
+
+/* Cards */
+.doc-minimundo {
+  background-color: #0f172a;
+  /* border: 1px solid #334155; */
+  color: #e2e8f0;
+}
+
+.doc-requisitos {
+  background-color: #08192e;
+  /* border: 1px solid #1d4ed8; */
+  color: #e2e8f0;
+}
+
+.doc-caso-uso {
+  background-color: #0a2540;
+  /* border: 1px solid #2563eb; */
+  color: #e2e8f0;
+}
+
+.doc-diagrama {
+  background-color: #0a2f52;
+  /* border: 1px solid #60a5fa; */
+  color: #e2e8f0;
+}
+
+/* Hover dos cards */
+.doc-minimundo:hover {
+  background-color: #111827;
+}
+
+.doc-requisitos:hover {
+  background-color: #0a1f3a;
+}
+
+.doc-caso-uso:hover {
+  background-color: #0b2d52;
+}
+
+.doc-diagrama:hover {
+  background-color: #0c3a66;
+}
+
+article {
+  transition: all 0.2s ease;
+}
+
+article:hover {
+  transform: translateY(-2px);
+}
+</style>
