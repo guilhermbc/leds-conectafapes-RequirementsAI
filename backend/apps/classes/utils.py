@@ -168,9 +168,13 @@ def send_to_llm(data: dict) -> str | tuple:
             case 'CASO_USO':
                 try:
                     if data.get('DocumentoOrigem'):
-                        
-                        originMw = ''
                         originRq = ''
+                        thisUc = data.get('arquivo')
+                        
+                        if data.get('parUC_CD'):
+                            doc = Documento.objects.get(pk=data.get('parUC_CD'))
+                            originCd = doc.arquivo
+
                         for docId in data.get('DocumentoOrigem'):
                             doc = Documento.objects.get(pk=docId)
                             if doc.TipoDocumento == 'MINIMUNDO':
@@ -178,14 +182,19 @@ def send_to_llm(data: dict) -> str | tuple:
                             elif doc.TipoDocumento == 'REQUISITOS':
                                 originRq = doc.arquivo
 
-                        uc_data = run_uc({ 'minimundo':originMw, 'report':originRq})
+                        uc_data = run_rev({
+                                    'diagrama_classes_final': originCd,
+                                    'report': originRq,
+                                    'report_validateuc': thisUc
+                                })
+
                         if uc_data and isinstance(uc_data, dict):
                             state = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
-                            diagrama = state.get("usecases_diagram")
-                            tabela = state.get("format_uc")
-                            descricao = state.get("report_validateuc")
+                            descricao_uc = state_rev.get("cdinuc_description_revised")
+                            tabela_uc = state_rev.get("cdinuc_table_revised")
+                            diagrama_uc = state_rev.get("cdinuc_diagram_revised")
 
-                            result = (diagrama, tabela, descricao)
+                            result = (diagrama_uc, tabela_uc, descricao_uc)
                 except:
                     result = None
                 

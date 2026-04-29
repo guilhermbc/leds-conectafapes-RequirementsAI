@@ -62,6 +62,9 @@ class Documento(PolymorphicModel, models.Model):
     # id da versao anterior do documento (se houver)
     DocumentoAnterior = models.ForeignKey('Documento', blank=True, null=True, on_delete=models.DO_NOTHING, related_name="documento_%(class)s_anteior")
     
+    # par de CASO_USO <-> DIAGRAMA_CLASSE
+    parUC_CD = models.ForeignKey('Documento', blank=True, null=True, on_delete=models.DO_NOTHING, related_name="documento_%(class)s_paruc_cd")
+
     # id do modulo que o documento pertence
     Modulo = models.ForeignKey('Modulo', blank=True, null=True, on_delete=models.CASCADE, related_name="modulo_%(class)s")
     
@@ -77,7 +80,10 @@ class Documento(PolymorphicModel, models.Model):
             self.obsoleto = False
             return
 
-        self.obsoleto = any(not doc.vMaisRecente for doc in origens)
+        self.obsoleto = any(
+            doc.obsoleto or doc.vMaisRecente is False
+            for doc in origens
+        )
 
     def marcar_dependentes_como_obsoletos(self):
         dependentes = Documento.objects.filter(DocumentoOrigem=self)
@@ -89,6 +95,14 @@ class Documento(PolymorphicModel, models.Model):
     def save(self, *args, **kwargs):
         skip_obsolescencia = kwargs.pop('skip_obsolescencia', False)
         previous_vMaisRecente = None
+
+        if self.TipoDocumento not in {DOCS.CASO_USO, DOCS.DIAGRAMA_CLASSE}:
+            self.parUC_CD = None
+        elif self.parUC_CD:
+            if self.TipoDocumento == DOCS.CASO_USO and self.parUC_CD.TipoDocumento != DOCS.DIAGRAMA_CLASSE:
+                self.parUC_CD = None
+            elif self.TipoDocumento == DOCS.DIAGRAMA_CLASSE and self.parUC_CD.TipoDocumento != DOCS.CASO_USO:
+                self.parUC_CD = None
 
         if self.pk and not skip_obsolescencia:
             previous_vMaisRecente = Documento.objects.filter(pk=self.pk).values_list('vMaisRecente', flat=True).first()
