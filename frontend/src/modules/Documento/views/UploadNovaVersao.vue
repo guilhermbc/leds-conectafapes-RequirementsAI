@@ -37,6 +37,7 @@ const DocumentoOrigem = ref<number[]>([])
 const parUC_CDId = ref('')
 const parUC_CDArquivo = ref('')
 const TipoDocumentoAction = ref<'ATUALIZAR' | 'SIMPLES'>('ATUALIZAR')
+const storytellingUpload = ref<'TEXTO' | 'AUDIO'>('TEXTO')
 
 const conteudoMarkdown = ref('')
 
@@ -101,8 +102,12 @@ const salvar = async () => {
   if (carregando.value) return
 
   carregando.value = true
+  let TipoDocumentoParaEnviar = TipoDocumento.value
 
   try {
+    if (TipoDocumento.value === 'CASO_USO' || TipoDocumento.value === 'DIAGRAMA_CLASSE') {
+      TipoDocumentoParaEnviar = `${TipoDocumento.value}_${TipoDocumentoAction.value}`
+    }
     // Upload de Nova Versão
     let formDataToSend = criarFormDataDocumento({
       vMajor: vMajor.value,
@@ -113,7 +118,7 @@ const salvar = async () => {
       
       // CASO_USO_ATUALIZAR, CASO_USO_SIMPLES, DIAGRAMA_CLASSE_ATUALIZAR, DIAGRAMA_CLASSE_SIMPLES
       // ATUALIZAR = usar IA para atualizar o par UC/CD relacionado, SIMPLES = não usar IA, apenas incrementar a versão do par UC/CD relacionado
-      TipoDocumento: `${TipoDocumento.value}_${TipoDocumentoAction.value}`,
+      TipoDocumento: TipoDocumentoParaEnviar,
       DocumentoAnterior: id.value,
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
@@ -205,7 +210,26 @@ const salvar = async () => {
       />
     </label>
 
-    
+    <div v-if="TipoDocumento === 'MINIMUNDO'">
+      <label class="block mb-4 cursor-pointer">
+        <input type="radio" value="TEXTO" v-model="TipoDocumentoAction" class="mr-3 mt-1 float-left" />
+        
+        <span class="text-base leading-relaxed">
+          {{ $t('document.editModal.updateAI') }}
+          <span class="font-bold">{{ $t('document.editModal.updateAIBold') }}</span>
+        </span>
+      </label>
+
+      <label class="block mb-4 cursor-pointer">
+        <input type="radio" value="AUDIO" v-model="TipoDocumentoAction" class="mr-3 mt-1 float-left" />
+        
+        <span class="text-base leading-relaxed">
+          {{ $t('document.editModal.updateAI') }}
+          <span class="font-bold">{{ $t('document.editModal.updateAIBold') }}</span>
+        </span>
+      </label>
+    </div>
+
     <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'" class="mb-4 rounded-lg border border-gray-300 p-4 bg-gray-50">
       <p v-if="TipoDocumento === 'CASO_USO'" class="font-medium mb-3"> {{ $t('document.editModal.updateCDChoicesTitle') }}</p>
       <p v-else="TipoDocumento === 'DIAGRAMA_CLASSE'" class="font-medium mb-3"> {{ $t('document.editModal.updateUCChoicesTitle') }}</p>

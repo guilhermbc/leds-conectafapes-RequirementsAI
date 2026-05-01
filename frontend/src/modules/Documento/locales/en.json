@@ -19,6 +19,7 @@
     "UCandCD": "Use Cases and Class Diagram",
     "sidebar": {
       "sourceDocuments": "Source Artifacts",
+      "generateNewStorytelling": "Generate New Storytelling with New Audio",
       "previousVersion": "Previous Version",
       "pairUC_CD": "Use Cases/Class Diagram Pair",
       "noPreviousVersion": "No previous version",

@@ -146,11 +146,8 @@ function abrirModal(){
     </div>
 
     <!-- Todos os Documentos -->
-    <div v-if="documentos.length === 0" class="text-center text-gray-500 py-12">
-      {{ $t('document.none') }}
-    </div>
 
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-h-[162px]">
       <div v-for="coluna in documentosPorTipo" :key="coluna.valor" class="h-full">
         <div
           :class="[

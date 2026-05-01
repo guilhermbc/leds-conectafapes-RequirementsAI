@@ -161,6 +161,12 @@ function abrirModalNovaVersaoIA(){
   mostrarModalNovaVersaoIA.value = true
 }
 
+const mostrarModalGerarProximoDocumento = ref(false)
+
+function abrirModalGerarProximoDocumento(){
+  mostrarModalGerarProximoDocumento.value = true
+}
+
 function baixarMarkdown() {
   if (!documento.value || !documento.value.arquivo) {
     console.error("Nenhum conteúdo encontrado para download.");
@@ -292,7 +298,7 @@ audio {
               class="bg-blue-600 text-white px-4 py-2 rounded-md shadow
                     hover:bg-blue-700 transition cursor-pointer
                     disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
-              @click="abrirModalNovaVersaoIA"
+              @click="abrirModalGerarProximoDocumento"
               :disabled="!isGerarProximoArtefatoDisponivel"
             >
               {{ $t('document.generateNewRequirements') }}
@@ -310,7 +316,7 @@ audio {
             </button>
 
             <GerarProximoDocumento
-              v-model="mostrarModalNovaVersaoIA"
+              v-model="mostrarModalGerarProximoDocumento"
               :documentoId="route.params.id as string"
             />
           </div>
@@ -360,9 +366,24 @@ audio {
       <div class="mb-4">
         <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.sourceDocuments') }}:</p>
         <!-- Se o documento for um minimundo -->
-        <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2 break-words">
-          {{ getNomeArquivo(documento?.arquivoAudio) }}
-        </p>
+        <div v-if="documento?.TipoDocumento === 'MINIMUNDO'">
+          <p class="text-gray-500 italic ml-2 break-words">
+            {{ getNomeArquivo(documento?.arquivoAudio) }}
+          </p>
+          
+          <button class="w-full mt-2 rounded-lg px-2.5 py-1 text-sm font-semibold transition-colors duration-200 cursor-pointer
+               bg-blue-900 text-blue-100 hover:bg-blue-950 
+               dark:bg-blue-200 dark:text-blue-900 dark:hover:bg-blue-300"
+               @click="abrirModalNovaVersaoIA">
+            {{ $t('document.sidebar.generateNewStorytelling') }}
+          </button>
+
+          <NovaVersaoIA
+              v-model="mostrarModalNovaVersaoIA"
+              :documentoId="route.params.id as string"
+          />
+        </div>
+        
         <ul v-else-if="documento?.TipoDocumento !== 'MINIMUNDO' && documento?.DocumentoOrigem?.length" class="list-disc ml-6 text-blue-600">
           <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">
             <RouterLink :to="`/Documento/${origem.id}`" class="hover:underline">
@@ -372,6 +393,7 @@ audio {
         </ul>
         <p v-else class="text-gray-500 italic ml-2">Sem documentos de origem.</p>
       </div>
+
 
       <!-- Par UC/CD -->
        <div v-if="documento?.parUC_CD" class="mb-4">

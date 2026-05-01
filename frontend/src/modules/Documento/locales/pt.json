@@ -20,6 +20,7 @@
     "UCandCD": "Casos de Uso e Diagrama de Classes",
     "sidebar": {
       "sourceDocuments": "Artefatos de Origem",
+      "generateNewStorytelling": "Gerar Nova Narrativa com Novo Áudio",
       "previousVersion": "Versão Anterior",
       "pairUC_CD": "Par Caso de Uso/Diagrama de Classes",
       "noPreviousVersion": "Nenhuma versão anterior",

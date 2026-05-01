@@ -312,7 +312,7 @@ const onDrop = (event: any) => {
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4"> {{ $t('document.createModal.title') }} </h2>
 
-    <div class="mb-4 font-semibold">
+    <!-- <div class="mb-4 font-semibold">
       <label class="mr-4">
         <input type="radio" v-model="modoCriacao" value="individual" />
         {{ $t('document.createModal.specificOption') }}
@@ -321,7 +321,7 @@ const onDrop = (event: any) => {
         <input type="radio" v-model="modoCriacao" value="todos" />
         {{ $t('document.createModal.allOption') }}
       </label>
-    </div>
+    </div> -->
 
     <div v-if="modoCriacao === 'individual'">
       <h3 class="font-semibold"> {{ $t('document.createModal.dropdownTitle') }}:</h3>
