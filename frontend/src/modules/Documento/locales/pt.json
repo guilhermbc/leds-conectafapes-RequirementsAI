@@ -4,7 +4,7 @@
     "allDocumentsTitle": "Todos os Artefatos Relacionados a Requisitos",
     "new": "Iniciar Especificação de Requisitos e Análise",
     "none": "Nenhum artefato encontrado.",
-    "deprecated": "Antigo",
+    "deprecated": "Dessincronizado",
     "uploadNewVersion": "Upload de Nova Versão",
     "generateNewRequirements": "Gerar Requisitos com IA",
     "generateNewUseCases": "Gerar Casos de Uso com IA",

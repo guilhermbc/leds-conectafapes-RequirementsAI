@@ -4,7 +4,7 @@
     "allDocumentsTitle": "All Requirement-Related Artifacts",
     "new": "Start Requirements Specification and Analysis",
     "none": "No Requirement-Related Artifacts found.",
-    "deprecated": "Old",
+    "deprecated": "Out of Sync",
     "uploadNewVersion": "Upload New Version",
     "generateNewRequirements": "Generate Requirements with AI",
     "generateNewUseCases": "Generate Use Cases with AI",

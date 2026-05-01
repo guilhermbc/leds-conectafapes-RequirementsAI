@@ -110,7 +110,10 @@ const salvar = async () => {
       geradoIA: false,
       arquivo: conteudoMarkdown.value,
       // arquivoAudio: arquivoAudio.value,
-      TipoDocumento: TipoDocumento.value,
+      
+      // CASO_USO_ATUALIZAR, CASO_USO_SIMPLES, DIAGRAMA_CLASSE_ATUALIZAR, DIAGRAMA_CLASSE_SIMPLES
+      // ATUALIZAR = usar IA para atualizar o par UC/CD relacionado, SIMPLES = não usar IA, apenas incrementar a versão do par UC/CD relacionado
+      TipoDocumento: `${TipoDocumento.value}_${TipoDocumentoAction.value}`,
       DocumentoAnterior: id.value,
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
@@ -119,60 +122,59 @@ const salvar = async () => {
     let response = await criarDocumento(formDataToSend)
     console.log('Resposta da criação de documento:', response)
 
-    if (response && response.status === 201) {
-      // Atualização do par UC/CD relacionado, caso seja um documento de Caso de Uso ou Diagrama de Classe
-      if (TipoDocumento.value === 'CASO_USO' || TipoDocumento.value === 'DIAGRAMA_CLASSE') {
-        let arquivoParaEnviar = conteudoMarkdown.value
-        let tipoDocumentoParaEnviar = ''
+    // if (response && response.status === 201) {
+    //   // Atualização do par UC/CD relacionado, caso seja um documento de Caso de Uso ou Diagrama de Classe
+    //   if (TipoDocumento.value === 'CASO_USO' || TipoDocumento.value === 'DIAGRAMA_CLASSE') {
+    //     let arquivoParaEnviar = conteudoMarkdown.value
+    //     let tipoDocumentoParaEnviar = ''
 
-        let geradoIAEnviar = false
-        // Usar IA para atualizar o par UC/CD relacionado
-        if (TipoDocumentoAction.value === 'ATUALIZAR') {
-          arquivoParaEnviar = ''
-          geradoIAEnviar = true
-        }
-        // Não usar IA, apenas incrementar a versão do par UC/CD relacionado
-        else {
-          arquivoParaEnviar = parUC_CDArquivo.value
-          geradoIAEnviar = false
-        }
+    //     let geradoIAEnviar = false
+    //     // Usar IA para atualizar o par UC/CD relacionado
+    //     if (TipoDocumentoAction.value === 'ATUALIZAR') {
+    //       arquivoParaEnviar = ''
+    //       geradoIAEnviar = true
+    //     }
+    //     // Não usar IA, apenas incrementar a versão do par UC/CD relacionado
+    //     else {
+    //       arquivoParaEnviar = parUC_CDArquivo.value
+    //       geradoIAEnviar = false
+    //     }
 
-        // Definir o tipo do documento a ser enviado
-        if (TipoDocumento.value === 'CASO_USO') {
-          tipoDocumentoParaEnviar = 'DIAGRAMA_CLASSE'
-        } else {
-          tipoDocumentoParaEnviar = 'CASO_USO'
-        }
+    //     // Definir o tipo do documento a ser enviado
+    //     if (TipoDocumento.value === 'CASO_USO') {
+    //       tipoDocumentoParaEnviar = 'DIAGRAMA_CLASSE'
+    //     } else {
+    //       tipoDocumentoParaEnviar = 'CASO_USO'
+    //     }
 
-        const parId = parUC_CDId.value
+    //     const parId = parUC_CDId.value
 
-        if (TipoDocumento.value === 'CASO_USO') {
-          tipoDocumentoParaEnviar = 'DIAGRAMA_CLASSE'
-        } else {
-          tipoDocumentoParaEnviar = 'CASO_USO'
-        }
+    //     if (TipoDocumento.value === 'CASO_USO') {
+    //       tipoDocumentoParaEnviar = 'DIAGRAMA_CLASSE'
+    //     } else {
+    //       tipoDocumentoParaEnviar = 'CASO_USO'
+    //     }
 
-        formDataToSend = criarFormDataDocumento({
-        vMajor: vMajor.value,
-        vMinor: vMinor.value,
-        geradoIA: geradoIAEnviar,
-        arquivo: arquivoParaEnviar,
-        // arquivoAudio: arquivoAudio.value,
-        TipoDocumento: tipoDocumentoParaEnviar,
-        DocumentoAnterior: parId,
-        parUC_CD: response.data.id,
-        Modulo: Modulo.value,
-        DocumentoOrigem: DocumentoOrigem.value,
-      })
-      }
+    //     formDataToSend = criarFormDataDocumento({
+    //     vMajor: vMajor.value,
+    //     vMinor: vMinor.value,
+    //     geradoIA: geradoIAEnviar,
+    //     arquivo: arquivoParaEnviar,
+    //     // arquivoAudio: arquivoAudio.value,
+    //     TipoDocumento: tipoDocumentoParaEnviar,
+    //     DocumentoAnterior: parId,
+    //     parUC_CD: response.data.id,
+    //     Modulo: Modulo.value,
+    //     DocumentoOrigem: DocumentoOrigem.value,
+    //   })
+    // }
 
-      if (response) {
-        emit("salvo")
-        closeForced()
-      }
+    if (response) {
+      emit("salvo")
+      closeForced()
     }
-
-  } finally {
+  }
+  finally {
     carregando.value = false
   }
 }
