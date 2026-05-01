@@ -195,6 +195,7 @@ class DocumentoViewSet(ModelViewSet):
         'vMinor',
         'geradoIA',
         'vMaisRecente',
+        'obsoleto',
         'TipoDocumento',
         'DocumentoAnterior',
         'DocumentoOrigem',
@@ -209,8 +210,6 @@ class DocumentoViewSet(ModelViewSet):
         user = self.request.user
         if not user.is_authenticated:
             return Documento.objects.none()
-        
-        
         return Documento.objects.filter(user=user)
 
     def get_serializer_class(self):
@@ -232,9 +231,20 @@ class DocumentoViewSet(ModelViewSet):
                 previous_cd_id = doc_anterior.id
                 previous_uc_id = getattr(doc_anterior.parUC_CD, 'id', None)
 
+
+        # Ambos gerados juntos, por IA
+        if data.get('TipoDocumento') == 'CASO_USO_E_DIAGRAMA_CLASSE':
+            pass
+        # Se for qualquer outro caso, primeiro deve-se criar o novo documento enviado por upload
+        else:
+            self._create_uploaded_uc_cd(data)
+            
+
+
+
         result = send_to_llm({
             **data,
-            'TipoDocumento': 'CASO_USO_E_DIAGRAMA_CLASSE'
+            'TipoDocumento': data.get('TipoDocumento')
         })
 
         if not result:
@@ -328,7 +338,7 @@ class DocumentoViewSet(ModelViewSet):
         logger.info("audio:", extra={
             "existeAudio": bool(request.FILES.get('arquivoAudio')),
             "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
-})
+        })
 
         if not arquivoAudio:
             data.pop('arquivoAudio', None)
@@ -360,7 +370,11 @@ class DocumentoViewSet(ModelViewSet):
                     data.pop('arquivoAudio', None)
 
         # Se for CASO_USO/DIAGRAMA_CLASSE, enviar para um método separado
-        if data.get('TipoDocumento') == 'CASO_USO_E_DIAGRAMA_CLASSE' and is_empty_or_null(data.get('arquivo')):
+        if data.get('TipoDocumento') in ['CASO_USO_E_DIAGRAMA_CLASSE', # Ambos gerados juntos, por IA
+                                         'CASO_USO_SIMPLES', # Upload do UC e incremento de versão do CD relacionado, sem usar IA
+                                         'DIAGRAMA_CLASSE_SIMPLES', # Upload do CD e incremento de versão do UC relacionado, sem usar IA
+                                         'CASO_USO_ATUALIZAR', # Upload do UC e geração de nova versão do CD relacionado com IA
+                                         'DIAGRAMA_CLASSE_ATUALIZAR']: # Upload do CD e geração de nova versão do UC relacionado com IA
             return self._create_caso_uso_com_classes(data)
         
         # Definir parUC_CD
@@ -478,6 +492,7 @@ class DocumentoViewSet(ModelViewSet):
         is_caso_uso = tipo_documento.startswith('CASO_USO')
         is_update = tipo_documento.endswith('_ATUALIZAR')
 
+        # Define o tipo do documento principal e do par
         actual_tipo = 'CASO_USO' if is_caso_uso else 'DIAGRAMA_CLASSE'
         pair_tipo = 'DIAGRAMA_CLASSE' if is_caso_uso else 'CASO_USO'
 
@@ -485,24 +500,30 @@ class DocumentoViewSet(ModelViewSet):
         old_doc = get_object_or_404(Documento, id=documento_anterior) if documento_anterior else None
         pair_previous = getattr(old_doc, 'parUC_CD', None) if old_doc else None
 
+        # Criar documento principal
         data_main = data.copy()
         data_main.update({
-            'TipoDocumento': actual_tipo,
+            'TipoDocumento': actual_tipo, # Substituir o tipo corretamente (nada de CASO_USO_SIMPLES, etc)
             'geradoIA': False,
             'vMaisRecente': True,
         })
 
+        # Definir versão do documento principal
         vMajor, vMinor = self._compute_uploaded_version(data_main)
         data_main['vMajor'] = vMajor
         data_main['vMinor'] = vMinor
 
+        # Criar o documento principal
         serializer_main = self.get_serializer(data=data_main)
         serializer_main.is_valid(raise_exception=True)
         self.perform_create(serializer_main)
         main_doc = serializer_main.instance
 
+        # Criar o documento par
         pair_doc = None
         if is_update or pair_previous:
+            # A princípio, o par recebe os mesmos dados do documento principal, 
+            # exceto pelo tipo e pelo relacionamento de versão com o documento anterior do par (se existir)
             pair_data = data.copy()
             pair_data.update({
                 'TipoDocumento': pair_tipo,
