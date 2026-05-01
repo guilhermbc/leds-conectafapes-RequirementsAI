@@ -90,14 +90,6 @@ def send_to_llm(data: dict) -> str | tuple:
     result = None
     path = data.get('audio_path')
     print(data)
-
-    # os.environ["GEMINI_API_KEY"] = data.get('api_key')
-
-    # llm_model = ChatGoogleGenerativeAI(
-    #     model="gemini-3-flash-preview",
-    #     temperature=0,
-    #     api_key=data.get('api_key')
-    # )
     
     try:
         match (data.get('TipoDocumento')):
@@ -111,7 +103,7 @@ def send_to_llm(data: dict) -> str | tuple:
 
                     logger.info("Chamando run_mw", extra={"path": path})
 
-                    mw_data = run_mw({ 'video_entrevista': path, 'api_key': data.get('api_key') })
+                    mw_data = run_mw({'video_entrevista': path})
 
                     logger.info("Retorno run_mw", extra={"mw_data": mw_data})
 
@@ -166,7 +158,7 @@ def send_to_llm(data: dict) -> str | tuple:
                             if doc.TipoDocumento == 'REQUISITOS':
                                 oldRq = doc.arquivo
 
-                        rq_data = run_rq({ 'minimundo': originMw, 'old_requirements':oldRq, 'api_key': data.get('api_key') })
+                        rq_data = run_rq({ 'minimundo': originMw, 'old_requirements':oldRq })
                         if rq_data and isinstance(rq_data, dict):
                             state = next(iter(rq_data.values())) if len(rq_data) == 1 else rq_data
                             result = state.get('report')
@@ -232,8 +224,7 @@ def send_to_llm(data: dict) -> str | tuple:
                             'minimundo': originMw,
                             'report': originRq,
                             'format_uc': originUcTable,
-                            'report_validateuc': originUcDescr,
-                            'api_key': data.get('api_key') })
+                            'report_validateuc': originUcDescr })
                         if cd_data and isinstance(cd_data, dict):
                             state = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
                             result = state.get("diagrama_classes_final")
@@ -260,7 +251,7 @@ def send_to_llm(data: dict) -> str | tuple:
                             elif doc.TipoDocumento == 'DIAGRAMA_CLASSE':
                                 originCd = doc.arquivo
 
-                    ip_data = run_ip({ 'report': originRq, 'cdinuc_description_revised': originUcDescr, 'ucincd_revised': originCd, 'api_key': data.get('api_key') })
+                    ip_data = run_ip({ 'report': originRq, 'cdinuc_description_revised': originUcDescr, 'ucincd_revised': originCd })
                     if ip_data and isinstance(ip_data, dict):
                         state = next(iter(ip_data.values())) if len(ip_data) == 1 else ip_data
                         prototipo_interface = state.get("interface_prototype")
@@ -285,7 +276,7 @@ def send_to_llm(data: dict) -> str | tuple:
                                 originRq = doc.arquivo
 
                         # 1. Gera CASO DE USO
-                        uc_data = run_uc({ 'minimundo': originMw, 'report': originRq, 'api_key': data.get('api_key') })
+                        uc_data = run_uc({ 'minimundo': originMw, 'report': originRq })
 
                         if uc_data and isinstance(uc_data, dict):
                             state_uc = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
@@ -299,8 +290,7 @@ def send_to_llm(data: dict) -> str | tuple:
                                 'minimundo': originMw,
                                 'report': originRq,
                                 'format_uc': tabela_uc,
-                                'report_validateuc': descricao_uc,
-                                'api_key': data.get('api_key')
+                                'report_validateuc': descricao_uc
                             })
 
                             if cd_data and isinstance(cd_data, dict):
@@ -310,8 +300,7 @@ def send_to_llm(data: dict) -> str | tuple:
                                 rev_data = run_rev({
                                     'diagrama_classes_final': diagrama_classes,
                                     'report': originRq,
-                                    'report_validateuc': descricao_uc,
-                                    'api_key': data.get('api_key')
+                                    'report_validateuc': descricao_uc
                                 })
 
                                 if isinstance(rev_data, dict):

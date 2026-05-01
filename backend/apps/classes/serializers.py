@@ -5,17 +5,13 @@ from .models import (
     Projeto,
     Modulo,
     Documento,
-    ApiKey
 )
 
 class DocumentoWriteSerializer(serializers.ModelSerializer):
-    api_key = serializers.PrimaryKeyRelatedField(queryset=ApiKey.objects.all(), write_only=True)
-
     class Meta:
         model = Documento
         exclude = ("polymorphic_ctype",)
         read_only_fields = ("user",)
-        write_only_fields = ("api_key",)
 
 class DocumentoReadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,8 +57,3 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
-    
-class ApiKeySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ApiKey
-        exclude = ("polymorphic_ctype",)

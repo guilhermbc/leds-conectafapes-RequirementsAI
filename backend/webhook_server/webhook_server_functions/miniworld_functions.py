@@ -24,8 +24,7 @@ def preparar_estado_minimundo(data: dict) -> dict:
         "mensagem_usuario": caminho_video,
         "video_entrevista": caminho_video,
         "old_mw": old_mw,
-        "mw_instruction": mw_instruction,
-        "api_key": data["api_key"]
+        "mw_instruction": mw_instruction
     }
 
 # Execução

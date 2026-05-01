@@ -21,8 +21,7 @@ def preparar_estado_revisao(data: dict) -> dict:
         "mensagem_usuario": diagrama_classes,
         "report": requisitos,
         "report_validateuc": descricao_uc,
-        "diagrama_classes_final": diagrama_classes,
-        "api_key": data["api_key"]
+        "diagrama_classes_final": diagrama_classes
     }
 
 @traceable(name="Run Revision")

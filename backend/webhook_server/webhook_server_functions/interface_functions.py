@@ -17,8 +17,7 @@ def preparar_estado_prototipo_interface(data: dict) -> dict:
     return {
         "mensagem_usuario": descricao_uc,
         "cdinuc_description_revised": descricao_uc,
-        "ucincd_revised": diagrama_classes,
-        "api_key": data["api_key"]
+        "ucincd_revised": diagrama_classes
     }
 
 @traceable(name="Run Interface Prototype")

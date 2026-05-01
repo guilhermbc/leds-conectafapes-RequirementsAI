@@ -1,8 +1,6 @@
 from typing import TypedDict, Optional
 
 class MyState(TypedDict):
-    api_key: Optional[str]
-
     video_entrevista: Optional[str]
     mensagem_usuario: Optional[str]
     mensagem: Optional[str]

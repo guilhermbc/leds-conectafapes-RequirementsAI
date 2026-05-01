@@ -4,21 +4,19 @@ from .models import (
     Projeto,
     Modulo,
     Documento,
-    DOCS,
-    ApiKey
+    DOCS
 )
 from .serializers import (
     ProjetoReadSerializer, ProjetoWriteSerializer,
     ModuloReadSerializer, ModuloWriteSerializer,
     DocumentoReadSerializer, DocumentoWriteSerializer,
-    UserRegisterSerializer,
-    ApiKeySerializer
+    UserRegisterSerializer
 )
 
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from rest_framework.decorators import action
-from rest_framework.viewsets import ViewSet, ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -26,11 +24,9 @@ from rest_condition import And, Or
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope, OAuth2Authentication
 from rest_framework.authentication import SessionAuthentication
 from .pagination import CustomPagination
-from rest_framework import generics, mixins
+from rest_framework import generics
 from rest_framework import filters
 import django_filters.rest_framework
-import json
-import os
 import logging
 
 logger = logging.getLogger(__name__)
@@ -329,10 +325,6 @@ class DocumentoViewSet(ModelViewSet):
         data = request.data.dict()
         arquivoAudio = request.FILES.get('arquivoAudio')
         documentos_origem = request.data.getlist('DocumentoOrigem')
-        documento_anterior = data.get('DocumentoAnterior')
-
-        api_key_id = data.get('api_key')
-        data['api_key'] = get_object_or_404(ApiKey, pk=api_key_id).Key_String
 
         logger.info("FILES:", extra={"files": request.FILES})
         logger.info("audio:", extra={
@@ -342,6 +334,8 @@ class DocumentoViewSet(ModelViewSet):
 
         if not arquivoAudio:
             data.pop('arquivoAudio', None)
+        
+        documento_anterior = data.get('DocumentoAnterior')
 
         # Força sempre lista no data, e nunca string
         data['DocumentoOrigem'] = documentos_origem
@@ -608,19 +602,3 @@ class DocumentoViewSet(ModelViewSet):
 class UserViewSet(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer
     permissions_classes = [AllowAny]
-
-class ApiKeyViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
-    queryset = ApiKey.objects.all()
-    serializer_class = ApiKeySerializer
-    authentication_classes = [OAuth2Authentication, SessionAuthentication]
-    permission_classes = [Or(IsAdminUser, TokenHasReadWriteScope)]
-
-    def get_queryset(self):
-        user = self.request.user
-        if not user.is_authenticated:
-            return Documento.objects.none()
-        
-        return Documento.objects.filter(user=user)
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
