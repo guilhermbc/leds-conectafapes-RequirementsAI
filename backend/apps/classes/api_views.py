@@ -230,95 +230,95 @@ class DocumentoViewSet(ModelViewSet):
 
         # Ambos gerados juntos, por IA
         if data.get('TipoDocumento') == 'CASO_USO_E_DIAGRAMA_CLASSE':
-            pass
-        # Se for qualquer outro caso, primeiro deve-se criar o novo documento enviado por upload
-        else:
-            self._create_uploaded_uc_cd(data)
-            
-
-
-
-        result = send_to_llm({
+            # Pode ser duas coisas:
+            # Gerar os dois pela primeira vez, sem documento anterior
+            # Ou gerar uma nova versão dos dois
+            result = send_to_llm({
             **data,
             'TipoDocumento': data.get('TipoDocumento')
-        })
+            })
 
-        if not result:
-            return Response({'error': 'Erro ao gerar documentos'}, status=500)
+            if not result:
+                return Response({'error': 'Erro ao gerar documentos'}, status=500)
 
-        caso_uso_result = result.get('caso_uso')
-        diagrama_classe_result = result.get('diagrama_classe')
+            caso_uso_result = result.get('caso_uso')
+            diagrama_classe_result = result.get('diagrama_classe')
 
-        # montar UC
-        result_string_uc = ''
-        for element in caso_uso_result:
-            result_string_uc += element + '\n<!-- -->\n'
+            # montar UC
+            result_string_uc = ''
+            for element in caso_uso_result:
+                result_string_uc += element + '\n<!-- -->\n'
 
-        if previous_uc_id:
-            previous_uc = get_object_or_404(Documento, id=previous_uc_id)
-            vMajor_uc, vMinor_uc = update_version(previous_uc)
+            if previous_uc_id:
+                previous_uc = get_object_or_404(Documento, id=previous_uc_id)
+                vMajor_uc, vMinor_uc = update_version(previous_uc)
+            else:
+                vMajor_uc, vMinor_uc = 1, 0
+
+            if previous_cd_id:
+                previous_cd = get_object_or_404(Documento, id=previous_cd_id)
+                vMajor_cd, vMinor_cd = update_version(previous_cd)
+            else:
+                vMajor_cd, vMinor_cd = 1, 0
+
+            # CASO USO
+            data_uc = data.copy()
+            data_uc.update({
+                'arquivo': result_string_uc,
+                'TipoDocumento': 'CASO_USO',
+                'vMajor': vMajor_uc,
+                'vMinor': vMinor_uc,
+                'geradoIA': True,
+                'vMaisRecente': True,
+                'DocumentoAnterior': previous_uc_id,
+            })
+
+            serializer_uc = self.get_serializer(data=data_uc)
+            serializer_uc.is_valid(raise_exception=True)
+            self.perform_create(serializer_uc)
+
+            # CLASSES
+            data_cd = data.copy()
+            data_cd.update({
+                'arquivo': diagrama_classe_result,
+                'TipoDocumento': 'DIAGRAMA_CLASSE',
+                'vMajor': vMajor_cd,
+                'vMinor': vMinor_cd,
+                'geradoIA': True,
+                'vMaisRecente': True,
+                'DocumentoAnterior': previous_cd_id,
+            })
+
+            serializer_cd = self.get_serializer(data=data_cd)
+            serializer_cd.is_valid(raise_exception=True)
+            self.perform_create(serializer_cd)
+
+            uc_instance = serializer_uc.instance
+            cd_instance = serializer_cd.instance
+            uc_instance.parUC_CD = cd_instance
+            uc_instance.save(update_fields=['parUC_CD'])
+            cd_instance.parUC_CD = uc_instance
+            cd_instance.save(update_fields=['parUC_CD'])
+
+            # Atualizar estado de novidade do documento anterior
+            if documento_anterior:
+                doc_anterior = get_object_or_404(Documento, id=documento_anterior)
+                if doc_anterior.vMaisRecente is not False:
+                    doc_anterior.vMaisRecente = False
+                    doc_anterior.save(update_fields=['vMaisRecente'])
+                if getattr(doc_anterior, 'parUC_CD', None) and doc_anterior.parUC_CD.vMaisRecente is not False:
+                    doc_anterior.parUC_CD.vMaisRecente = False
+                    doc_anterior.parUC_CD.save(update_fields=['vMaisRecente'])
+
+            return Response({
+                "caso_uso": serializer_uc.data,
+                "diagrama_classe": serializer_cd.data
+            }, status=201)
+
+            
+        # Se for qualquer outro caso, joga pra essa função que vai criar os dois documentos adequadamente, com IA ou não
         else:
-            vMajor_uc, vMinor_uc = 1, 0
-
-        if previous_cd_id:
-            previous_cd = get_object_or_404(Documento, id=previous_cd_id)
-            vMajor_cd, vMinor_cd = update_version(previous_cd)
-        else:
-            vMajor_cd, vMinor_cd = 1, 0
-
-        # CASO USO
-        data_uc = data.copy()
-        data_uc.update({
-            'arquivo': result_string_uc,
-            'TipoDocumento': 'CASO_USO',
-            'vMajor': vMajor_uc,
-            'vMinor': vMinor_uc,
-            'geradoIA': True,
-            'vMaisRecente': True,
-            'DocumentoAnterior': previous_uc_id,
-        })
-
-        serializer_uc = self.get_serializer(data=data_uc)
-        serializer_uc.is_valid(raise_exception=True)
-        self.perform_create(serializer_uc)
-
-        # CLASSES
-        data_cd = data.copy()
-        data_cd.update({
-            'arquivo': diagrama_classe_result,
-            'TipoDocumento': 'DIAGRAMA_CLASSE',
-            'vMajor': vMajor_cd,
-            'vMinor': vMinor_cd,
-            'geradoIA': True,
-            'vMaisRecente': True,
-            'DocumentoAnterior': previous_cd_id,
-        })
-
-        serializer_cd = self.get_serializer(data=data_cd)
-        serializer_cd.is_valid(raise_exception=True)
-        self.perform_create(serializer_cd)
-
-        uc_instance = serializer_uc.instance
-        cd_instance = serializer_cd.instance
-        uc_instance.parUC_CD = cd_instance
-        uc_instance.save(update_fields=['parUC_CD'])
-        cd_instance.parUC_CD = uc_instance
-        cd_instance.save(update_fields=['parUC_CD'])
-
-        # Atualizar estado de novidade do documento anterior
-        if documento_anterior:
-            doc_anterior = get_object_or_404(Documento, id=documento_anterior)
-            if doc_anterior.vMaisRecente is not False:
-                doc_anterior.vMaisRecente = False
-                doc_anterior.save(update_fields=['vMaisRecente'])
-            if getattr(doc_anterior, 'parUC_CD', None) and doc_anterior.parUC_CD.vMaisRecente is not False:
-                doc_anterior.parUC_CD.vMaisRecente = False
-                doc_anterior.parUC_CD.save(update_fields=['vMaisRecente'])
-
-        return Response({
-            "caso_uso": serializer_uc.data,
-            "diagrama_classe": serializer_cd.data
-        }, status=201)
+            return self._create_uploaded_uc_cd(data)
 
 
     def create(self, request, *args, **kwargs):
@@ -525,29 +525,22 @@ class DocumentoViewSet(ModelViewSet):
                 'vMaisRecente': True,
             })
 
+            # Se for atualização, o par é gerado por IA.
             if is_update:
                 pair_data['geradoIA'] = True
 
                 main_origin_ids = list(main_doc.DocumentoOrigem.values_list('id', flat=True))
-                pair_origin_ids = main_origin_ids.copy()
+                pair_data['DocumentoOrigem'] = main_origin_ids.copy()
 
-                if pair_previous and pair_previous.id not in pair_origin_ids:
-                    pair_origin_ids.append(pair_previous.id)
-                if main_doc.id not in pair_origin_ids:
-                    pair_origin_ids.append(main_doc.id)
+                # pair_origin_ids = main_origin_ids.copy()
 
-                pair_data['DocumentoOrigem'] = pair_origin_ids
+                # if pair_previous and pair_previous.id not in pair_origin_ids:
+                #     pair_origin_ids.append(pair_previous.id)
+                # if main_doc.id not in pair_origin_ids:
+                #     pair_origin_ids.append(main_doc.id)
 
-                if pair_tipo == 'DIAGRAMA_CLASSE':
-                    pair_content = send_to_llm({
-                        'TipoDocumento': 'DIAGRAMA_CLASSE',
-                        'DocumentoOrigem': pair_origin_ids,
-                    })
-                else:
-                    pair_content = send_to_llm({
-                        'TipoDocumento': 'CASO_USO_FROM_DIAGRAMA',
-                        'DocumentoOrigem': pair_origin_ids,
-                    })
+                pair_content = send_to_llm(pair_data)
+               
                 if not isinstance(pair_content, str):
                     pair_content = '' if pair_content is None else '\n<!-- -->\n'.join(pair_content)
 
@@ -555,6 +548,7 @@ class DocumentoViewSet(ModelViewSet):
                     pair_content = pair_previous.arquivo or ''
 
                 pair_data['arquivo'] = pair_content
+            # Se for criação simples, o par continua com mesmo conteúdo que o seu anterior
             else:
                 pair_data['geradoIA'] = False
                 if pair_previous:
@@ -590,7 +584,7 @@ class DocumentoViewSet(ModelViewSet):
                 old_doc.parUC_CD.vMaisRecente = False
                 old_doc.parUC_CD.save(update_fields=['vMaisRecente'])
 
-        response_data = {'documento': serializer_main.data}
+        response_data = {'main': serializer_main.data}
         if pair_doc:
             response_data['parUC_CD'] = serializer_pair.data
 

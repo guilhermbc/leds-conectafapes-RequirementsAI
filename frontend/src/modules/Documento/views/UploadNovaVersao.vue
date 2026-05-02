@@ -37,8 +37,8 @@ const DocumentoOrigem = ref<number[]>([])
 const parUC_CDId = ref('')
 const parUC_CDArquivo = ref('')
 const TipoDocumentoAction = ref<'ATUALIZAR' | 'SIMPLES'>('ATUALIZAR')
-const storytellingUpload = ref<'TEXTO' | 'AUDIO'>('TEXTO')
 
+const arquivoSelecionado = ref<File | null>(null)
 const conteudoMarkdown = ref('')
 
 const carregando = ref(false)
@@ -87,6 +87,19 @@ function onFileSelected(event: Event) {
   const target = event.target as HTMLInputElement | null
   const file = target?.files?.[0]
   if (!file) return
+
+  const isTexto =
+    file.type.startsWith('text/') ||
+    file.name.endsWith('.md') ||
+    file.name.endsWith('.markdown') ||
+    file.name.endsWith('.txt')
+
+  if (!isTexto) {
+    alert('Selecione um arquivo de texto válido')
+    return
+  }
+
+  arquivoSelecionado.value = file
 
   const reader = new FileReader()
 
@@ -199,8 +212,14 @@ const salvar = async () => {
              border-2 border-dashed border-gray-400 rounded-xl cursor-pointer 
              hover:bg-gray-100 transition"
     >
-      <span class="text-gray-700 font-medium"> {{ $t('document.editModal.contentLabel') }} </span>
-      <span class="text-xs text-gray-500">({{ $t('document.editModal.contentLabel2') }})</span>
+      <div v-if="!conteudoMarkdown" class="text-center">
+        <p class="text-gray-700 font-medium"> {{ $t('document.editModal.contentLabel') }} </p >
+        <p  class="text-xs text-gray-500">({{ $t('document.editModal.contentLabel2') }}) </p >
+      </div>
+
+      <div v-else>
+        <p class="text-gray-700 font-medium">{{ arquivoSelecionado?.name }}</p>
+      </div>
 
       <input
         type="file"
@@ -209,26 +228,6 @@ const salvar = async () => {
         @change="onFileSelected"
       />
     </label>
-
-    <div v-if="TipoDocumento === 'MINIMUNDO'">
-      <label class="block mb-4 cursor-pointer">
-        <input type="radio" value="TEXTO" v-model="TipoDocumentoAction" class="mr-3 mt-1 float-left" />
-        
-        <span class="text-base leading-relaxed">
-          {{ $t('document.editModal.updateAI') }}
-          <span class="font-bold">{{ $t('document.editModal.updateAIBold') }}</span>
-        </span>
-      </label>
-
-      <label class="block mb-4 cursor-pointer">
-        <input type="radio" value="AUDIO" v-model="TipoDocumentoAction" class="mr-3 mt-1 float-left" />
-        
-        <span class="text-base leading-relaxed">
-          {{ $t('document.editModal.updateAI') }}
-          <span class="font-bold">{{ $t('document.editModal.updateAIBold') }}</span>
-        </span>
-      </label>
-    </div>
 
     <div v-if="TipoDocumento === 'CASO_USO' || TipoDocumento === 'DIAGRAMA_CLASSE'" class="mb-4 rounded-lg border border-gray-300 p-4 bg-gray-50">
       <p v-if="TipoDocumento === 'CASO_USO'" class="font-medium mb-3"> {{ $t('document.editModal.updateCDChoicesTitle') }}</p>

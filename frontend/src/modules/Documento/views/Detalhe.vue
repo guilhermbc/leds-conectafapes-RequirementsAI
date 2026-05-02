@@ -294,7 +294,7 @@ audio {
             />
 
             <button
-              v-if="documento?.TipoDocumento == 'MINIMUNDO'"
+              v-if="documento?.TipoDocumento === 'MINIMUNDO'"
               class="bg-blue-600 text-white px-4 py-2 rounded-md shadow
                     hover:bg-blue-700 transition cursor-pointer
                     disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
@@ -305,11 +305,11 @@ audio {
             </button>
 
             <button
-              v-if="documento?.TipoDocumento == 'REQUISITOS'"
+              v-if="documento?.TipoDocumento === 'REQUISITOS'"
               class="bg-blue-600 text-white px-4 py-2 rounded-md shadow
                     hover:bg-blue-700 transition cursor-pointer
                     disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
-              @click="abrirModalNovaVersaoIA"
+              @click="abrirModalGerarProximoDocumento"
               :disabled="!isGerarProximoArtefatoDisponivel"
             >
               {{ $t('document.generateNewUCandCD') }}
@@ -372,7 +372,7 @@ audio {
           </p>
           
           <button class="w-full mt-2 rounded-lg px-2.5 py-1 text-sm font-semibold transition-colors duration-200 cursor-pointer
-               bg-blue-900 text-blue-100 hover:bg-blue-950 
+               bg-blue-900 border border-blue-700 text-blue-100 hover:bg-blue-950 
                dark:bg-blue-200 dark:text-blue-900 dark:hover:bg-blue-300"
                @click="abrirModalNovaVersaoIA">
             {{ $t('document.sidebar.generateNewStorytelling') }}
