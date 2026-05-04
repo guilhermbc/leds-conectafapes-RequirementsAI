@@ -2,6 +2,7 @@
 import { ref, onBeforeMount, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
+import { toast } from 'vue-sonner'
 
 // Tentativa de integrar um editor markdown, está em stand by por enquanto
 // import MarkdownEditor from '@/components/MarkdownEditor.vue'
@@ -111,6 +112,10 @@ const carregarDocumentosSeguintes = async () => {
   } finally {
     loading.value = false
   }
+}
+
+function onSalvo(documento: Documento) {
+  carregarDocumento()
 }
 
 const irParaSeguinte = async () => {
@@ -289,7 +294,7 @@ audio {
 
             <UploadNovaVersao
               v-model="mostrarModalUploadNovaVersao"
-              @salvo="irParaSeguinte()"
+              @salvo="onSalvo"
               :documentoId="route.params.id as string"
             />
 

@@ -65,6 +65,9 @@
       "confirmationMessage": "Are you sure you want to generate a new version of",
       "generateButton": "Generate"
     },
+    "notification": {
+      "created": "{nome} created succesfully!"
+    },
     "cancel": "Cancel"
   }
 }

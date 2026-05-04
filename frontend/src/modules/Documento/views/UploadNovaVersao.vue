@@ -5,6 +5,7 @@ import {
   obterDocumento,
 } from '../controllers/documento'
 import { criarFormDataDocumento, formatarTipoDocumento} from '@/utils/formatacoesDocumentos';
+import type { Documento } from '../types/documento';
 
 const props = defineProps<{
   modelValue: boolean
@@ -13,7 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:modelValue", value:boolean): void
-  (e: "salvo"): void
+  (e: "salvo", documento: Documento): void
 }>()
 
 const close = () => {
@@ -188,7 +189,9 @@ const salvar = async () => {
     // }
 
     if (response) {
-      emit("salvo")
+      if (response.status == 201) {
+        emit("salvo", response.data)
+      }
       closeForced()
     }
   }

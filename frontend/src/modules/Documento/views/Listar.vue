@@ -4,6 +4,7 @@ import Criar from './Criar.vue'
 import { obterModulo, listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos'
+import { toast } from 'vue-sonner';
 
 const props = defineProps<{
   moduloId?: string | number
@@ -84,6 +85,11 @@ function abrirModal(){
   mostrarModal.value = true
 } 
 
+function onSalvo() {
+  carregarDocumentos()
+  toast.success('Documento criado com sucesso!')
+}
+
 </script>
 
 <template>
@@ -100,7 +106,7 @@ function abrirModal(){
       </button>
 
       <!-- Modal -->
-      <Criar v-model="mostrarModal" @salvo="carregarDocumentos" :moduloId="moduloId ?? ''"/>
+      <Criar v-model="mostrarModal" @salvo="onSalvo" :moduloId="moduloId ?? ''"/>
     </div>
 
     <!-- Últimos Documentos -->

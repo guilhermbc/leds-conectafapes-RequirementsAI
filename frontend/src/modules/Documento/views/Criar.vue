@@ -4,6 +4,10 @@ import type { Documento } from '../types/documento'
 import { criarDocumento } from '../controllers/documento'
 import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
 import { formatarTipoDocumento, formatarVersao, criarFormDataDocumento } from '@/utils/formatacoesDocumentos';
+import { toast } from 'vue-sonner';
+import { useNotificationStore } from '@/stores/notification';
+
+const notification = useNotificationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -174,9 +178,12 @@ const salvar = async () => {
       })
       
       const response = await criarDocumento(formDataToSend)
-      console.log('Resposta da criação de documento:', response)
       
       if (response && response.status === 201) {
+        notification.notify("document.notification.created", {
+          tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
+          versao: formatarVersao(response.data.vMajor, response.data.vMinor)
+        })
         emit('salvo')
         close()
       }

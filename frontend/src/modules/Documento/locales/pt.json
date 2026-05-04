@@ -66,6 +66,9 @@
       "confirmationMessage": "Tem certeza que deseja gerar uma nova versão de",
       "generateButton": "Gerar"
     },
+    "notification": {
+      "created": "{nome} criado com sucesso!"
+    },
     "cancel": "Cancelar"
   }
 }
