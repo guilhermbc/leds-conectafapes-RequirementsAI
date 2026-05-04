@@ -34,6 +34,10 @@ from webhook_server.webhook_server_functions.revision_functions import (
     # expected data: report: str, report_validateuc: str, diagrama_classes_final: str
     run_graphRv_with_trace as run_rev
 )
+from webhook_server.webhook_server_functions.use_case_and_class_diagram_functions import (
+    # expected data: minimundo: str, report: str
+    run_graphUCandCD_with_trace as run_uc_cd
+)
 
 logger = logging.getLogger(__name__)
 

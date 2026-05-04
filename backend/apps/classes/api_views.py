@@ -310,10 +310,7 @@ class DocumentoViewSet(ModelViewSet):
                     doc_anterior.parUC_CD.vMaisRecente = False
                     doc_anterior.parUC_CD.save(update_fields=['vMaisRecente'])
 
-            return Response({
-                "caso_uso": serializer_uc.data,
-                "diagrama_classe": serializer_cd.data
-            }, status=201)
+            return Response(serializer_cd.data, status=201)
 
             
         # Se for qualquer outro caso, joga pra essa função que vai criar os dois documentos adequadamente, com IA ou não
