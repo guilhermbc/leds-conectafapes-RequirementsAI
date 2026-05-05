@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Create .env File # Para que as variáveis a serem utilizadas adequadamente, elas devem ser armazenadas na aba Secrets da organização. Contate um membro do time DevOps.
         run: | 
