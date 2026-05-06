@@ -4,10 +4,12 @@ import type { Documento } from '../types/documento'
 import { criarDocumento } from '../controllers/documento'
 import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
 import { formatarTipoDocumento, formatarVersao, criarFormDataDocumento } from '@/utils/formatacoesDocumentos';
-import { toast } from 'vue-sonner';
-import { useNotificationStore } from '@/stores/notification';
 
-const notification = useNotificationStore()
+import { useLoadingStore } from '@/stores/loading'
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
+
+const loading = useLoadingStore()
+const store = useDocumentGenerationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -165,6 +167,7 @@ const salvar = async () => {
         DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value.id))
       }
 
+      loading.start('document.notification.loading')
       const formDataToSend = criarFormDataDocumento({
         vMajor: 1,
         vMinor: 0,
@@ -177,14 +180,9 @@ const salvar = async () => {
         DocumentoOrigem: DocumentoOrigem.value,
       })
       
-      const response = await criarDocumento(formDataToSend)
+      const response = await store.generate(formDataToSend)
       
       if (response && response.status === 201) {
-        notification.notify("document.notification.created", {
-          tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
-          versao: formatarVersao(response.data.vMajor, response.data.vMinor)
-        })
-        emit('salvo')
         close()
       }
     } else {
@@ -291,6 +289,7 @@ const salvar = async () => {
     }
   } finally {
     carregando.value = false
+    loading.stop()
   }
 }
 

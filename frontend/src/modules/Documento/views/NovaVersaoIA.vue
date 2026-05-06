@@ -4,7 +4,12 @@ import {
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
-import { formatarTipoDocumento, getNomeArquivo, criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
+import { formatarTipoDocumento, formatarVersao, getNomeArquivo, criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
+import { useNotificationStore } from '@/stores/notification';
+import { useLoadingStore } from '@/stores/loading'
+
+const loading = useLoadingStore()
+const notification = useNotificationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -70,14 +75,15 @@ const salvar = async () => {
   if (carregando.value) return
 
   carregando.value = true
-
+  loading.start('document.notification.loading')
+  
   try{
     const formDataToSend = criarFormDataDocumento({
       vMajor: vMajor.value,
       vMinor: vMinor.value,
       geradoIA: true,
       arquivo: '',
-      // arquivoAudio: arquivoAudio.value,
+      arquivoAudio: arquivoAudio.value,
       TipoDocumento: TipoDocumento.value,
       DocumentoAnterior: id.value,
       Modulo: Modulo.value,
@@ -85,11 +91,19 @@ const salvar = async () => {
     })
     const response = await criarDocumento(formDataToSend)
 
+    if (response && response.status === 201) {
+      notification.notify("document.notification.created", {
+        tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
+        versao: formatarVersao(response.data.vMajor, response.data.vMinor)
+      })
+    }
+
     emit("salvo")
     close()
     
   } finally {
     carregando.value = false
+    loading.stop()
   }
 }
 

@@ -4,8 +4,13 @@ import {
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
-import { criarFormDataDocumento, formatarTipoDocumento} from '@/utils/formatacoesDocumentos';
+import { criarFormDataDocumento, formatarTipoDocumento, formatarVersao} from '@/utils/formatacoesDocumentos';
 import type { Documento } from '../types/documento';
+import { useNotificationStore } from '@/stores/notification';
+import { useLoadingStore } from '@/stores/loading'
+
+const loading = useLoadingStore()
+const notification = useNotificationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -116,6 +121,8 @@ const salvar = async () => {
   if (carregando.value) return
 
   carregando.value = true
+  loading.start('document.notification.loading')
+
   let TipoDocumentoParaEnviar = TipoDocumento.value
 
   try {
@@ -139,7 +146,6 @@ const salvar = async () => {
     })
 
     let response = await criarDocumento(formDataToSend)
-    console.log('Resposta da criação de documento:', response)
 
     // if (response && response.status === 201) {
     //   // Atualização do par UC/CD relacionado, caso seja um documento de Caso de Uso ou Diagrama de Classe
@@ -190,6 +196,10 @@ const salvar = async () => {
 
     if (response) {
       if (response.status == 201) {
+        notification.notify("document.notification.created", {
+          tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
+          versao: formatarVersao(response.data.vMajor, response.data.vMinor)
+        })
         emit("salvo", response.data)
       }
       closeForced()
@@ -197,6 +207,7 @@ const salvar = async () => {
   }
   finally {
     carregando.value = false
+    loading.stop()
   }
 }
 </script>

@@ -8,6 +8,12 @@ import {
 import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
 import { criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
 import type { Documento } from '../types/documento';
+import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
+import { useNotificationStore } from '@/stores/notification';
+import { useLoadingStore } from '@/stores/loading'
+
+const loading = useLoadingStore()
+const notification = useNotificationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -77,6 +83,7 @@ const salvar = async () => {
   if (carregando.value) return
 
   carregando.value = true
+  loading.start('document.notification.loading')
 
   try {
     let documentoAnteriorId: string | number | null = null
@@ -119,16 +126,20 @@ const salvar = async () => {
     })
 
     const response = await criarDocumento(formDataToSend)
-    console.log('Resposta da criação do documento:', response)
 
     emit('salvo')
     close()
 
     if (response && response.data && response.data.id) {
+    notification.notify("document.notification.created", {
+        tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
+        versao: formatarVersao(response.data.vMajor, response.data.vMinor)
+      })
       await router.push({ name: 'documento-detalhe', params: { id: response.data.id } })
     }
   } finally {
     carregando.value = false
+    loading.stop()
   }
 }
 </script>

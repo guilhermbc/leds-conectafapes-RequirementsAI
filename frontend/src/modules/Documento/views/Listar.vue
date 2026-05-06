@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, computed} from 'vue'
+import { ref, onBeforeMount, computed, watch} from 'vue'
 import Criar from './Criar.vue'
 import { obterModulo, listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo'
 import type { Documento } from '../types/documento'
 import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos'
-import { toast } from 'vue-sonner';
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
+import { useLoadingStore } from '@/stores/loading'
+
+const store = useDocumentGenerationStore()
+const loading = useLoadingStore()
 
 const props = defineProps<{
   moduloId?: string | number
@@ -55,6 +59,9 @@ const documentosPorTipo = computed(() => {
 
 // Verificar se o botão de criar documento deve ser desabilitado
 const isDisabled = computed(() => {
+  if (store.isGenerating) {
+    return true
+  }
   const tiposArtefatosCriados: string[] = []
   for (const doc of documentos.value) {
     if (!tiposArtefatosCriados.includes(doc.TipoDocumento)) {
@@ -81,13 +88,30 @@ const mostrarModal = ref(false)
 
 onBeforeMount(carregarDocumentos)
 
+watch(
+  () => store.lastCreatedId,
+  async (id) => {
+    if (id) {
+      await carregarDocumentos()
+      store.clearLastCreated()
+    }
+  }
+)
+
+watch(
+  () => store.isGenerating,
+  (val) => {
+    if (val) loading.start('document.notification.loading')
+    else loading.stop()
+  }
+)
+
 function abrirModal(){
   mostrarModal.value = true
 } 
 
 function onSalvo() {
   carregarDocumentos()
-  toast.success('Documento criado com sucesso!')
 }
 
 </script>

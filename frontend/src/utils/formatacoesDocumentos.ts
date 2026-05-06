@@ -102,7 +102,12 @@ export function formatarTipoDocumento(tipo: string): string {
 
 // Função para extrair o nome do arquivo de uma URL
 export const getNomeArquivo = (url: any) => {
-  if (!url) return ''
+  if (url instanceof File) {
+    return url.name
+  }
+
+  if (!url || typeof url !== 'string') return ''
+
   return url.split('/').pop()
 }
 

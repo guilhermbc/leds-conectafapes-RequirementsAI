@@ -67,7 +67,9 @@
       "generateButton": "Gerar"
     },
     "notification": {
-      "created": "{nome} criado com sucesso!"
+      "loading": "Gerando artefato... Fique à vontade para navegar!",
+      "created": "{nome} criado com sucesso!",
+      "open": "Abrir"
     },
     "cancel": "Cancelar"
   }
