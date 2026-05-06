@@ -28,6 +28,7 @@ from rest_framework import generics
 from rest_framework import filters
 import django_filters.rest_framework
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -329,9 +330,11 @@ class DocumentoViewSet(ModelViewSet):
             "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
         })
 
+        arquivo_para_reusar = None
+
         if not arquivoAudio:
             data.pop('arquivoAudio', None)
-        
+
         documento_anterior = data.get('DocumentoAnterior')
 
         # Força sempre lista no data, e nunca string
@@ -347,18 +350,26 @@ class DocumentoViewSet(ModelViewSet):
 
                 temp_path = temp.name
 
-            data['audio_path'] = temp_path  # substitui origemAudio
+            data['audio_path'] = temp_path
             
             logger.info("Temp path criado", extra={"path": temp_path})
             logger.info("Arquivo existe?", extra={"exists": os.path.exists(temp_path)})
+
         else:
             if documento_anterior:
                 doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
 
                 if data.get('TipoDocumento') == 'MINIMUNDO' and doc_anterior.arquivoAudio:
-                    data['arquivoAudio'] = doc_anterior.arquivoAudio
-                else:
-                    data.pop('arquivoAudio', None)
+                    arquivo_para_reusar = doc_anterior.arquivoAudio
+
+                    import tempfile
+
+                    with open(doc_anterior.arquivoAudio.path, 'rb') as original:
+                        with tempfile.NamedTemporaryFile(delete=False) as temp:
+                            temp.write(original.read())
+                            temp_path = temp.name
+
+                    data['audio_path'] = temp_path
 
         # Se for CASO_USO/DIAGRAMA_CLASSE, enviar para um método separado
         if data.get('TipoDocumento') in ['CASO_USO_E_DIAGRAMA_CLASSE', # Ambos gerados juntos, por IA
@@ -447,6 +458,10 @@ class DocumentoViewSet(ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save(user=self.request.user)
+
+        if arquivo_para_reusar:
+            instance.arquivoAudio = arquivo_para_reusar
+            instance.save(update_fields=['arquivoAudio'])
 
         # Atualizar parUC_CD relacionado, caso seja UC ou CD gerado por IA
         if data.get('parUC_CD') and (data.get('TipoDocumento') == 'CASO_USO' or data.get('TipoDocumento') == 'DIAGRAMA_CLASSE') and generated_by_ai:
