@@ -29,7 +29,7 @@ jobs:
       - name: Pre-clean workspace
         run: sudo rm -rf "$GITHUB_WORKSPACE"/.??* "$GITHUB_WORKSPACE"/* || true
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Fix workspace permissions
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
@@ -63,7 +63,7 @@ jobs:
       - name: Pre-clean workspace
         run: sudo rm -rf "$GITHUB_WORKSPACE"/.??* "$GITHUB_WORKSPACE"/* || true
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Fix workspace permissions
         run: sudo chown -R $USER:$USER "$GITHUB_WORKSPACE" || true
@@ -118,7 +118,7 @@ jobs:
           echo "target_branch=develop" >> $GITHUB_OUTPUT  
 
       - name: Checkout infra repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ env.INFRA_REPO }}
           token: ${{ secrets.INFRA_PUSH_TOKEN }}
