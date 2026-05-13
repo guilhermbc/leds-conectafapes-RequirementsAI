@@ -37,9 +37,9 @@ jobs:
       - name: Prepare Frontend .env
         run: |
           if [ "${{ github.ref_name }}" == "main" ]; then
-             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+             BASE_URL="https://backend-rai.leds.dev.br"
           else
-             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+             BASE_URL="https://backend-rai.leds.dev.br"
           fi
           
           OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}
@@ -71,9 +71,9 @@ jobs:
       - name: Prepare Frontend .env
         run: |
           if [ "${{ github.ref_name }}" == "main" ]; then
-             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+             BASE_URL="https://backend-rai.leds.dev.br"
           else
-             BASE_URL="https://backend-rai.conectafapes.leds.dev.br"
+             BASE_URL="https://backend-rai.leds.dev.br"
           fi
           
           OAUTH_CLIENT_ID=${{ secrets.CLIENT_ID }}
