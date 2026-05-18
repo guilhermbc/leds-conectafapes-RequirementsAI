@@ -34,9 +34,14 @@ from webhook_server.webhook_server_functions.revision_functions import (
     # expected data: report: str, report_validateuc: str, diagrama_classes_final: str
     run_graphRv_with_trace as run_rev
 )
-from webhook_server.webhook_server_functions.use_case_and_class_diagram_functions import (
+from webhook_server.webhook_server_functions.uccd_functions import (
     # expected data: minimundo: str, report: str
     run_graphUCandCD_with_trace as run_uc_cd
+)
+# Grafos de UC, CD e Revisão Simplificada juntos
+from webhook_server.webhook_server_functions.simplified_uccd_functions import (
+    # expected data: minimundo: str, report: str
+    run_graphUCandCD_with_trace as run_simplified_uc_cd
 )
 
 logger = logging.getLogger(__name__)
@@ -89,6 +94,8 @@ def update_version(doc_old_v: Documento) -> tuple[int, int]:
     print('update')
 
     return doc_old_v.vMajor, doc_old_v.vMinor + 1
+
+
 
 def send_to_llm(data: dict) -> str | tuple:
     result = None
@@ -169,6 +176,7 @@ def send_to_llm(data: dict) -> str | tuple:
                 except:
                     result = None
 
+            # Atualizar Caso de Uso com base no upload de um novo Diagrama de Classes
             case 'CASO_USO':
                 try:
                     if data.get('DocumentoOrigem'):
@@ -181,9 +189,7 @@ def send_to_llm(data: dict) -> str | tuple:
 
                         for docId in data.get('DocumentoOrigem'):
                             doc = Documento.objects.get(pk=docId)
-                            if doc.TipoDocumento == 'MINIMUNDO':
-                                originMw = doc.arquivo
-                            elif doc.TipoDocumento == 'REQUISITOS':
+                            if doc.TipoDocumento == 'REQUISITOS':
                                 originRq = doc.arquivo
 
                         uc_data = run_rev({
@@ -194,9 +200,9 @@ def send_to_llm(data: dict) -> str | tuple:
 
                         if uc_data and isinstance(uc_data, dict):
                             state = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
-                            descricao_uc = state_rev.get("cdinuc_description_revised")
-                            tabela_uc = state_rev.get("cdinuc_table_revised")
-                            diagrama_uc = state_rev.get("cdinuc_diagram_revised")
+                            descricao_uc = state.get("cdinuc_description_revised")
+                            tabela_uc = state.get("cdinuc_table_revised")
+                            diagrama_uc = state.get("cdinuc_diagram_revised")
 
                             result = (diagrama_uc, tabela_uc, descricao_uc)
                 except:
@@ -221,8 +227,20 @@ def send_to_llm(data: dict) -> str | tuple:
                                 originMw = doc.arquivo
                             elif doc.TipoDocumento == 'REQUISITOS':
                                 originRq = doc.arquivo
-                            elif doc.TipoDocumento == 'CASO_USO':
-                                _, originUcTable, originUcDescr = doc.arquivo.split('\n<!-- -->\n')
+
+                            if data.get('parUC_CD'):
+                                doc = Documento.objects.get(pk=data.get('parUC_CD'))
+                                partes = doc.arquivo.split('<!-- -->')
+
+                                print(f"Quantidade de partes do UC: {len(partes)}")
+
+                                if len(partes) >= 3:
+                                    _, originUcTable, originUcDescr, _ = partes
+                                else:
+                                    logger.error("Formato inesperado do arquivo", extra={
+                                        "arquivo": doc.arquivo
+                                    })
+
 
                         cd_data = run_dc({
                             'minimundo': originMw,
@@ -279,45 +297,60 @@ def send_to_llm(data: dict) -> str | tuple:
                             elif doc.TipoDocumento == 'REQUISITOS':
                                 originRq = doc.arquivo
 
-                        # 1. Gera CASO DE USO
-                        uc_data = run_uc({ 'minimundo': originMw, 'report': originRq })
+                        uccd_data = run_simplified_uc_cd({ 'minimundo': originMw, 'report': originRq })
 
-                        if uc_data and isinstance(uc_data, dict):
-                            state_uc = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
+                        if uccd_data and isinstance(uccd_data, dict):
+                            state = next(iter(uccd_data.values())) if len(uccd_data) == 1 else uccd_data
+                            descricao_uc = state.get("cdinuc_description_revised")
+                            tabela_uc = state.get("cdinuc_table_revised")
+                            diagrama_uc = state.get("usecases_diagram")
+                            diagrama_classes = state.get("diagrama_classes_revisado")
+
+                            result = {
+                                "caso_uso": (diagrama_uc, tabela_uc, descricao_uc),
+                                "diagrama_classe": diagrama_classes
+                            }
+
+                        # # 1. Gera CASO DE USO
+                        # uc_data = run_uc({ 'minimundo': originMw, 'report': originRq })
+
+                        # if uc_data and isinstance(uc_data, dict):
+                        #     state_uc = next(iter(uc_data.values())) if len(uc_data) == 1 else uc_data
                             
-                            diagrama_uc = state_uc.get("usecases_diagram")
-                            tabela_uc = state_uc.get("format_uc")
-                            descricao_uc = state_uc.get("report_validateuc")
+                        #     diagrama_uc = state_uc.get("usecases_diagram")
+                        #     tabela_uc = state_uc.get("format_uc")
+                        #     descricao_uc = state_uc.get("report_validateuc")
 
-                            # 2. Gera DIAGRAMA DE CLASSE usando resultado do UC
-                            cd_data = run_dc({
-                                'minimundo': originMw,
-                                'report': originRq,
-                                'format_uc': tabela_uc,
-                                'report_validateuc': descricao_uc
-                            })
+                        #     # 2. Gera DIAGRAMA DE CLASSE usando resultado do UC
+                        #     cd_data = run_dc({
+                        #         'minimundo': originMw,
+                        #         'report': originRq,
+                        #         'format_uc': tabela_uc,
+                        #         'report_validateuc': descricao_uc
+                        #     })
 
-                            if cd_data and isinstance(cd_data, dict):
-                                state_cd = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
-                                diagrama_classes = state_cd.get("diagrama_classes_final")
+                        #     if cd_data and isinstance(cd_data, dict):
+                        #         state_cd = next(iter(cd_data.values())) if len(cd_data) == 1 else cd_data
+                        #         diagrama_classes = state_cd.get("diagrama_classes_final")
 
-                                rev_data = run_rev({
-                                    'diagrama_classes_final': diagrama_classes,
-                                    'report': originRq,
-                                    'report_validateuc': descricao_uc
-                                })
+                        #         # 3. Gera revisão usando resultado do CD e do UC
+                        #         rev_data = run_rev({
+                        #             'diagrama_classes_final': diagrama_classes,
+                        #             'report': originRq,
+                        #             'report_validateuc': descricao_uc
+                        #         })
 
-                                if isinstance(rev_data, dict):
-                                    state_rev = next(iter(rev_data.values())) if len(rev_data) == 1 else cd_data
-                                    descricao_uc_revisada = state_rev.get("cdinuc_description_revised")
-                                    tabela_uc_revisada = state_rev.get("cdinuc_table_revised")
-                                    diagrama_uc_revisado = state_rev.get("cdinuc_diagram_revised")
-                                    diagrama_classes_revisado = state_rev.get("ucincd_revised")
+                        #         if isinstance(rev_data, dict):
+                        #             state_rev = next(iter(rev_data.values())) if len(rev_data) == 1 else cd_data
+                        #             descricao_uc_revisada = state_rev.get("cdinuc_description_revised")
+                        #             tabela_uc_revisada = state_rev.get("cdinuc_table_revised")
+                        #             diagrama_uc_revisado = state_rev.get("cdinuc_diagram_revised")
+                        #             diagrama_classes_revisado = state_rev.get("ucincd_revised")
 
-                                    result = {
-                                        "caso_uso": (diagrama_uc_revisado, tabela_uc_revisada, descricao_uc_revisada),
-                                        "diagrama_classe": diagrama_classes_revisado
-                                    }
+                        #             result = {
+                        #                 "caso_uso": (diagrama_uc_revisado, tabela_uc_revisada, descricao_uc_revisada),
+                        #                 "diagrama_classe": diagrama_classes_revisado
+                        #             }
                 except Exception as e:
                     print(e)
                     result = None

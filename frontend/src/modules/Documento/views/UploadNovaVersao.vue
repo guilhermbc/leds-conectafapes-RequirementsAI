@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch} from 'vue'
+import { useRouter } from 'vue-router'
 import {
   criarDocumento,
   obterDocumento,
@@ -8,9 +9,11 @@ import { criarFormDataDocumento, formatarTipoDocumento, formatarVersao} from '@/
 import type { Documento } from '../types/documento';
 import { useNotificationStore } from '@/stores/notification';
 import { useLoadingStore } from '@/stores/loading'
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
 
 const loading = useLoadingStore()
 const notification = useNotificationStore()
+const store = useDocumentGenerationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -22,6 +25,7 @@ const emit = defineEmits<{
   (e: "salvo", documento: Documento): void
 }>()
 
+const router = useRouter()
 const close = () => {
   if (carregando.value) return
   emit("update:modelValue", false)
@@ -59,6 +63,14 @@ watch(
 )
 
 // Métodos ------------------------------------------------------
+
+function isSaveDisabled() {
+  if (carregando.value) return true
+
+  if (!arquivoSelecionado.value) {
+    return true
+  }
+}
 
 const carregarDocumento = async () => {
   const documento = await obterDocumento(props.documentoId as string)
@@ -145,7 +157,8 @@ const salvar = async () => {
       DocumentoOrigem: DocumentoOrigem.value,
     })
 
-    let response = await criarDocumento(formDataToSend)
+    let response = await store.generate(formDataToSend)
+    console.log('Response from store.generate:', response)
 
     // if (response && response.status === 201) {
     //   // Atualização do par UC/CD relacionado, caso seja um documento de Caso de Uso ou Diagrama de Classe
@@ -195,12 +208,9 @@ const salvar = async () => {
     // }
 
     if (response) {
-      if (response.status == 201) {
-        notification.notify("document.notification.created", {
-          tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
-          versao: formatarVersao(response.data.vMajor, response.data.vMinor)
-        })
+      if (response.status == 201 && response.data && response.data.id) {
         emit("salvo", response.data)
+        // await router.push({ name: 'documento-detalhe', params: { id: response.data.id } })
       }
       closeForced()
     }
@@ -228,11 +238,14 @@ const salvar = async () => {
     >
       <div v-if="!conteudoMarkdown" class="text-center">
         <p class="text-gray-700 font-medium"> {{ $t('document.editModal.contentLabel') }} </p >
-        <p  class="text-xs text-gray-500">({{ $t('document.editModal.contentLabel2') }}) </p >
+        <p class="text-xs text-gray-500">({{ $t('document.editModal.contentLabel2') }}) </p >
       </div>
 
       <div v-else>
         <p class="text-gray-700 font-medium">{{ arquivoSelecionado?.name }}</p>
+      </div>
+      <div v-if="TipoDocumento === 'CASO_USO'">
+        <p class="text-xs text-yellow-700 text-center mt-1"> ({{ $t('document.editModal.updateUCwarning') }}) </p>
       </div>
 
       <input
@@ -281,9 +294,9 @@ const salvar = async () => {
       </button>
 
        <button
-        class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 
-        transition cursor-pointer"
-        :disabled="carregando" 
+        class="px-5 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900 transition cursor-pointer
+        disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="isSaveDisabled()" 
         @click="salvar"
       >
         {{ $t('document.editModal.editButton') }}

@@ -74,6 +74,18 @@ class Documento(PolymorphicModel, models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='documentos')
 
     def atualizar_obsolescencia(self):
+        documento_anterior = self.DocumentoAnterior
+
+        # Herda obsolescência da versão anterior
+        # exceto se foi regenerado por IA
+        if (
+            documento_anterior
+            and documento_anterior.obsoleto
+            and not self.geradoIA
+        ):
+            self.obsoleto = True
+            return
+
         origens = self.DocumentoOrigem.all()
 
         if not origens.exists():

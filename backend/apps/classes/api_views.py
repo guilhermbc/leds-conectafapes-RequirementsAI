@@ -15,6 +15,7 @@ from .serializers import (
 
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from django.db.models import Case, When, IntegerField
 from rest_framework.decorators import action
 from rest_framework.viewsets import ViewSet, ModelViewSet
 from rest_framework.response import Response
@@ -124,49 +125,26 @@ class ModuloViewSet(ModelViewSet):
         self.check_object_permissions(self.request, obj)
         return obj
     
-    @action(detail=False, methods=['get'], url_path=r'get_last_docs/(?P<modulo_id>\d+)', filter_backends = [])
+    @action(detail=False, methods=['get'], url_path=r'get_last_docs/(?P<modulo_id>\d+)', filter_backends=[])
     def get_last_docs(self, request, modulo_id=None):
-        
+
         mod = get_object_or_404(Modulo, id=int(modulo_id))
 
-        docs: list[Documento] = list(mod.modulo_documento.all())
+        docs = mod.modulo_documento.filter(
+            vMaisRecente=True
+        ).order_by(
+            Case(
+                When(TipoDocumento='MINIMUNDO', then=0),
+                When(TipoDocumento='REQUISITOS', then=1),
+                When(TipoDocumento='CASO_USO', then=2),
+                When(TipoDocumento='DIAGRAMA_CLASSE', then=3),
+                output_field=IntegerField()
+            )
+        )
 
-        separated_docs = {tipo: [] for tipo, _ in DOCS.choices}
-
-        for d in docs:
-            tipo = d.TipoDocumento
-            if tipo in separated_docs:
-                separated_docs[tipo].append(d)
-
-        latest_docs: list[Documento] = []
-
-        def get_latest(docs: list[Documento], hi_major: int = 0) -> Documento:
-            for d in docs:
-                if d.vMajor > hi_major:
-                    hi_major = d.vMajor
-            
-            hi_minor_index = 0
-            hi_minor = -1
-            i = 0
-            while i < len(docs):
-                if (docs[i].vMajor == hi_major) and (docs[i].vMinor > hi_minor):
-                    hi_minor = docs[i].vMinor
-                    hi_minor_index = i                
-                i += 1
-
-            return docs[hi_minor_index]
-
-        for key, elem in list(separated_docs.items()):
-            try:
-                latest_docs.append(get_latest(elem))
-            except:
-                pass
-
-        major = max((d.vMajor for d in latest_docs), default=None)
-
-        result = [d for d in latest_docs if d.vMajor == major]
-
-        return Response(DocumentoReadSerializer(result, many=True).data)
+        return Response(
+            DocumentoReadSerializer(docs, many=True).data
+        )
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -250,25 +228,36 @@ class DocumentoViewSet(ModelViewSet):
             for element in caso_uso_result:
                 result_string_uc += element + '\n<!-- -->\n'
 
+            # Versionamento
+            vMajor, vMinor = 1, 0
+
+            doc_origem_id = data.get('DocumentoOrigem')[-1]
+            doc_origem = get_object_or_404(Documento, id=doc_origem_id)
+            vMajorOrigem = doc_origem.vMajor
+            vMinorOrigem = doc_origem.vMinor
+            vMajorAnteriorUC = 0
+            vMinorAnteriorUC = 0
+
             if previous_uc_id:
                 previous_uc = get_object_or_404(Documento, id=previous_uc_id)
-                vMajor_uc, vMinor_uc = update_version(previous_uc)
-            else:
-                vMajor_uc, vMinor_uc = 1, 0
+                # Como UC e CD têm sempre a mesma versão, pode-se utilizar a mesma versão para ambos
+                vMajorAnteriorUC = previous_uc.vMajor
+                vMinorAnteriorUC = previous_uc.vMinor
 
-            if previous_cd_id:
-                previous_cd = get_object_or_404(Documento, id=previous_cd_id)
-                vMajor_cd, vMinor_cd = update_version(previous_cd)
+            if (vMajorOrigem, vMinorOrigem) >= (vMajorAnteriorUC, vMinorAnteriorUC):
+                vMajor = vMajorOrigem
+                vMinor = vMinorOrigem
             else:
-                vMajor_cd, vMinor_cd = 1, 0
+                vMajor = vMajorAnteriorUC
+                vMinor = vMinorAnteriorUC + 1
 
             # CASO USO
             data_uc = data.copy()
             data_uc.update({
                 'arquivo': result_string_uc,
                 'TipoDocumento': 'CASO_USO',
-                'vMajor': vMajor_uc,
-                'vMinor': vMinor_uc,
+                'vMajor': vMajor,
+                'vMinor': vMinor,
                 'geradoIA': True,
                 'vMaisRecente': True,
                 'DocumentoAnterior': previous_uc_id,
@@ -283,8 +272,8 @@ class DocumentoViewSet(ModelViewSet):
             data_cd.update({
                 'arquivo': diagrama_classe_result,
                 'TipoDocumento': 'DIAGRAMA_CLASSE',
-                'vMajor': vMajor_cd,
-                'vMinor': vMinor_cd,
+                'vMajor': vMajor,
+                'vMinor': vMinor,
                 'geradoIA': True,
                 'vMaisRecente': True,
                 'DocumentoAnterior': previous_cd_id,
@@ -403,22 +392,38 @@ class DocumentoViewSet(ModelViewSet):
             result = send_to_llm(data)
             generated_by_ai = True
 
-            if data.get('TipoDocumento') == 'MINIMUNDO' and data.get('audio_path') and documento_anterior:
-                doc_anterior = get_object_or_404(Documento, id=documento_anterior)
-                vMajor, vMinor = version_from_audio(doc_anterior)
+            vMajor = 1
+            vMinor = 0
 
-            elif documento_anterior:
-                doc_anterior_obj = get_object_or_404(Documento, id=documento_anterior)
-                vMajor, vMinor = update_version(doc_anterior_obj)
+            if is_empty_or_null(documento_anterior):
+                vMajorAnterior = 0
+                vMinorAnterior = 0
+            else:
+                doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
+                vMajorAnterior = doc_anterior.vMajor
+                vMinorAnterior = doc_anterior.vMinor
 
-            elif data['DocumentoOrigem'] and len(data['DocumentoOrigem']) != 0:
-                doc_origem_id = data['DocumentoOrigem'][-1]
-                doc_origem = get_object_or_404(Documento, id=doc_origem_id)
-                vMajor, vMinor = version_from_another_doc(doc_origem)
+            # Geração de uma nova Narrativa de Domínio
+            if data.get('TipoDocumento') == 'MINIMUNDO' and data.get('audio_path'):
+                # Baseada em novo áudio
+                if documento_anterior:
+                    vMajor = vMajorAnterior + 1
+                    vMinor = 0
+                #Se não tiver DocumentoAnterior, fica 1.0
 
             else:
-                vMajor = 1
-                vMinor = 0
+                doc_origem_id = data['DocumentoOrigem'][-1]
+                doc_origem = get_object_or_404(Documento, id=doc_origem_id) 
+                vMajorOrigem = doc_origem.vMajor
+                vMinorOrigem = doc_origem.vMinor
+
+                if (vMajorOrigem, vMinorOrigem) >= (vMajorAnterior, vMinorAnterior):
+                    vMajor = vMajorOrigem
+                    vMinor = vMinorOrigem
+
+                else:
+                    vMajor = vMajorAnterior
+                    vMinor = vMinorAnterior + 1
 
         # Se não deve ser gerado por IA
         else:
@@ -529,12 +534,14 @@ class DocumentoViewSet(ModelViewSet):
         pair_doc = None
         if is_update or pair_previous:
             # A princípio, o par recebe os mesmos dados do documento principal, 
-            # exceto pelo tipo e pelo relacionamento de versão com o documento anterior do par (se existir)
+            # exceto pelo tipo, pelo relacionamento de versão com o documento anterior do par (se existir),
+            # vMaisRecente e parUC_CD
             pair_data = data.copy()
             pair_data.update({
                 'TipoDocumento': pair_tipo,
                 'DocumentoAnterior': getattr(pair_previous, 'id', None),
                 'vMaisRecente': True,
+                'parUC_CD': main_doc.id,
             })
 
             # Se for atualização, o par é gerado por IA.
@@ -551,7 +558,10 @@ class DocumentoViewSet(ModelViewSet):
                 # if main_doc.id not in pair_origin_ids:
                 #     pair_origin_ids.append(main_doc.id)
 
+                print("\n\nDados enviados para IA:", pair_data)
                 pair_content = send_to_llm(pair_data)
+                print("Pair_content:", pair_content, "\n\n")
+
                
                 if not isinstance(pair_content, str):
                     pair_content = '' if pair_content is None else '\n<!-- -->\n'.join(pair_content)
@@ -596,9 +606,9 @@ class DocumentoViewSet(ModelViewSet):
                 old_doc.parUC_CD.vMaisRecente = False
                 old_doc.parUC_CD.save(update_fields=['vMaisRecente'])
 
-        response_data = {'main': serializer_main.data}
-        if pair_doc:
-            response_data['parUC_CD'] = serializer_pair.data
+        response_data = serializer_main.data
+        # if pair_doc:
+        #     response_data['parUC_CD'] = serializer_pair.data
 
         return Response(response_data, status=201)
 

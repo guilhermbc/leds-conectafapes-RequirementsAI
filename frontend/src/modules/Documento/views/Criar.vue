@@ -373,7 +373,7 @@ const onDrop = (event: any) => {
 
           <input
             type="file"
-            accept="audio/*"
+            accept=".mp3, .wav, .mp4, .mkv"
             ref="fileInput"
             @change="onFileChange"
             hidden
@@ -458,7 +458,7 @@ const onDrop = (event: any) => {
 
             <input
               type="file"
-              accept="audio/*"
+              accept=".mp3,.wav,.mp4, .mkv"
               ref="fileInput"
               @change="onFileChange"
               hidden

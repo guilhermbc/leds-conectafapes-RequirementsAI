@@ -80,7 +80,6 @@ const carregarDocumentos = async () => {
   const ultimosDocs = await listarUltimosDocumentos(props.moduloId as string)
 
   ultimosDocumentos.value = ultimosDocs
-  console.log('Documentos carregados:', ultimosDocumentos.value)
   documentos.value = modulo.modulo_documento
 }
 

@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  criarDocumento,
-  obterDocumento,
-} from '../controllers/documento'
+import { obterDocumento } from '../controllers/documento'
 import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
 import { criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
 import type { Documento } from '../types/documento';
-import { formatarTipoDocumento, formatarVersao } from '@/utils/formatacoesDocumentos';
-import { useNotificationStore } from '@/stores/notification';
 import { useLoadingStore } from '@/stores/loading'
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
 
 const loading = useLoadingStore()
-const notification = useNotificationStore()
+const store = useDocumentGenerationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -125,17 +121,12 @@ const salvar = async () => {
       DocumentoOrigem: documentoOrigemIds,
     })
 
-    const response = await criarDocumento(formDataToSend)
+    const response = await store.generate(formDataToSend)
 
     emit('salvo')
     close()
 
     if (response && response.data && response.data.id) {
-    notification.notify("document.notification.created", {
-        tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
-        versao: formatarVersao(response.data.vMajor, response.data.vMinor)
-      })
-      await router.push({ name: 'documento-detalhe', params: { id: response.data.id } })
     }
   } finally {
     carregando.value = false

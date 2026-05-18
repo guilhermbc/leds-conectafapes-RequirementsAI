@@ -16,7 +16,7 @@ export const useDocumentGenerationStore = defineStore('docGen', {
 
       try {
         const response = await criarDocumento(data)
-
+        
         if (response && response.data && response.data.id) { 
             this.lastCreatedId = response.data.id
             this.lastCreatedData = response.data

@@ -5,11 +5,12 @@ import {
   obterDocumento,
 } from '../controllers/documento'
 import { formatarTipoDocumento, formatarVersao, getNomeArquivo, criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
-import { useNotificationStore } from '@/stores/notification';
+
 import { useLoadingStore } from '@/stores/loading'
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
 
 const loading = useLoadingStore()
-const notification = useNotificationStore()
+const stores = useDocumentGenerationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -89,18 +90,12 @@ const salvar = async () => {
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
-    const response = await criarDocumento(formDataToSend)
+    const response = await stores.generate(formDataToSend)
 
     if (response && response.status === 201) {
-      notification.notify("document.notification.created", {
-        tipoKey: formatarTipoDocumento(response.data.TipoDocumento),
-        versao: formatarVersao(response.data.vMajor, response.data.vMinor)
-      })
+      emit("salvo")
     }
-
-    emit("salvo")
-    close()
-    
+    close() 
   } finally {
     carregando.value = false
     loading.stop()
@@ -153,7 +148,7 @@ const onDrop = (event: any) => {
 
           <input
             type="file"
-            accept="audio/*"
+            accept=".mp3, .wav, .mp4, .mkv"
             ref="fileInput"
             @change="onFileChange"
             hidden

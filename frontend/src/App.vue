@@ -26,19 +26,12 @@ watch(
     const nome = `${tipoTraduzido} (${versao})`
 
     const mensagem = t(key, { nome })
-    const id = notification.params.id
 
     toast.success(mensagem, {
       duration: 6000,
       closeButton: true,
-      action: {
-        label: t('document.notification.open'),
-        onClick: () => {
-          router.push({ name: 'documento-detalhe', params: { id } })
-        }
       },
-    })
-
+    )
     notification.clear()
   }
 )

@@ -2,7 +2,6 @@
 import { ref, onBeforeMount, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
-import { toast } from 'vue-sonner'
 
 // Tentativa de integrar um editor markdown, está em stand by por enquanto
 // import MarkdownEditor from '@/components/MarkdownEditor.vue'
@@ -19,9 +18,12 @@ import UploadNovaVersao from './UploadNovaVersao.vue'
 import { formatarTipoDocumento, formatarVersao, getNomeArquivo } from '@/utils/formatacoesDocumentos';
 import GerarProximoDocumento from './GerarProximoDocumento.vue'
 
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
+
 const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
+const store = useDocumentGenerationStore()
 
 const documentoId = ref(route.params.id as string)
 const documento = ref<Documento | null>(null)
@@ -37,7 +39,9 @@ const projeto = ref<Projeto | null>(null)
 const loading = ref(true)
 
 const isGerarProximoArtefatoDisponivel = computed(() => {
+  if (store.isGenerating) return false
   if (documento.value?.obsoleto) return false
+  if (!documento.value?.vMaisRecente) return false
 
   if (documento.value?.TipoDocumento === 'MINIMUNDO') {
     const requisito = ultimosDocsModulo.value.find(doc => doc.TipoDocumento === 'REQUISITOS')
@@ -150,6 +154,16 @@ watch(
   () => route.params.id,
   () => {
     carregarDocumento()
+  }
+)
+
+watch(
+  () => store.lastCreatedId,
+  async (id) => {
+    if (id) {
+      await carregarDocumento()
+      store.clearLastCreated()
+    }
   }
 )
 
@@ -378,8 +392,12 @@ audio {
           
           <button class="w-full mt-2 rounded-lg px-2.5 py-1 text-sm font-semibold transition-colors duration-200 cursor-pointer
                bg-blue-900 border border-blue-700 text-blue-100 hover:bg-blue-950 
-               dark:bg-blue-200 dark:text-blue-900 dark:hover:bg-blue-300"
-               @click="abrirModalNovaVersaoIA">
+               dark:bg-blue-200 dark:text-blue-900 dark:hover:bg-blue-300
+               disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
+               @click="abrirModalNovaVersaoIA"
+               :disabled="store.isGenerating"
+               >
+               
             {{ $t('document.sidebar.generateNewStorytelling') }}
           </button>
 
