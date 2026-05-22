@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, watch} from 'vue'
-import {
-  criarDocumento,
-  obterDocumento,
-} from '../controllers/documento'
-import { formatarTipoDocumento, formatarVersao, getNomeArquivo, criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
-
+import { computed, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { obterDocumento } from '../controllers/documento'
+import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
+import { criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
+import type { Documento } from '../types/documento';
 import { useLoadingStore } from '@/stores/loading'
 import { useDocumentGenerationStore } from '@/stores/documentGeneration'
 
 const loading = useLoadingStore()
-const stores = useDocumentGenerationStore()
+const store = useDocumentGenerationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -22,9 +21,8 @@ const emit = defineEmits<{
   (e: "salvo"): void
 }>()
 
+const router = useRouter()
 const close = () => emit("update:modelValue", false)
-
-const fileInput = ref<HTMLInputElement | null>(null)
 
 // Campos do documento
 const id = ref('')
@@ -34,6 +32,8 @@ const arquivoAudio = ref<File | null>(null)
 const TipoDocumento = ref('')
 const Modulo = ref('')
 const DocumentoOrigem = ref<number[]>([])
+
+const ultimosDocumentosModulo = ref<Documento[]>([])
 
 const carregando = ref(false)
 
@@ -67,9 +67,12 @@ const carregarDocumento = async () => {
     ? documento.Modulo.id
     : documento.Modulo
 
+  DocumentoOrigem.value = []
   for (const docOrigem of documento.DocumentoOrigem) {
     DocumentoOrigem.value.push(docOrigem.id)
   }
+
+  ultimosDocumentosModulo.value = await listarUltimosDocumentos(Modulo.value)
 }
 
 const salvar = async () => {
@@ -77,89 +80,72 @@ const salvar = async () => {
 
   carregando.value = true
   loading.start('document.notification.loading')
-  
-  try{
+
+  try {
+    let documentoAnteriorId: string | number | null = null
+    let tipoDocumentoParaEnviar = TipoDocumento.value
+    let documentoOrigemIds: Array<string | number> = DocumentoOrigem.value
+
+    if (TipoDocumento.value === 'MINIMUNDO') {
+      tipoDocumentoParaEnviar = 'REQUISITOS'
+      documentoAnteriorId = ultimosDocumentosModulo.value.find(
+        (documento) => documento.TipoDocumento === 'REQUISITOS'
+      )?.id ?? null
+      documentoOrigemIds = [id.value]
+    } else if (TipoDocumento.value === 'REQUISITOS') {
+      tipoDocumentoParaEnviar = 'CASO_USO_E_DIAGRAMA_CLASSE'
+      const casoUso = ultimosDocumentosModulo.value.find(
+        (documento) => documento.TipoDocumento === 'CASO_USO'
+      )
+      const diagramaClasse = ultimosDocumentosModulo.value.find(
+        (documento) => documento.TipoDocumento === 'DIAGRAMA_CLASSE'
+      )
+
+      if (casoUso && diagramaClasse) {
+        documentoAnteriorId = casoUso.id ?? null
+      } else {
+        documentoAnteriorId = null
+      }
+      documentoOrigemIds = [...DocumentoOrigem.value, id.value]
+    }
+    
     const formDataToSend = criarFormDataDocumento({
       vMajor: vMajor.value,
       vMinor: vMinor.value,
       geradoIA: true,
       arquivo: '',
-      arquivoAudio: arquivoAudio.value,
-      TipoDocumento: TipoDocumento.value,
-      DocumentoAnterior: id.value,
+      // arquivoAudio: arquivoAudio.value,
+      TipoDocumento: tipoDocumentoParaEnviar,
+      DocumentoAnterior: documentoAnteriorId,
       Modulo: Modulo.value,
-      DocumentoOrigem: DocumentoOrigem.value,
+      DocumentoOrigem: documentoOrigemIds,
     })
-    const response = await stores.generate(formDataToSend)
 
-    if (response && response.status === 201) {
-      emit("salvo")
+    const response = await store.generate(formDataToSend)
+
+    emit('salvo')
+    close()
+
+    if (response && response.data && response.data.id) {
     }
-    close() 
   } finally {
     carregando.value = false
     loading.stop()
-  }
-}
-
-
-const triggerFileInput = () => {
-  if (fileInput.value) {
-    fileInput?.value.click()
-  }
-}
-
-const onFileChange = (event: any) => {
-  const file = event.target.files[0]
-  if (file) {
-    arquivoAudio.value = file
-  }
-}
-
-const onDrop = (event: any) => {
-  const file = event.dataTransfer.files[0]
-  if (file) {
-    arquivoAudio.value = file
   }
 }
 </script>
 
 <template>
   <modal v-model="props.modelValue" @close="close">
-    <h2 class="text-xl font-bold mb-4">{{ $t('document.newAIVersionModal.title') }}</h2>
-
-    <div v-if="TipoDocumento == 'MINIMUNDO'" class="">
-      <h3 class="font-semibold">{{ $t('document.newAIVersionModal.sourceAudioTitle') }}</h3>
-      <!-- Drag & Drop de áudio -->
-        <div
-          class="drop-zone"
-          @click="triggerFileInput"
-          @dragover.prevent
-          @drop.prevent="onDrop"
-        >
-          <div v-if="!arquivoAudio">
-            <p class="text-gray-700 font-medium"> {{ $t('document.createModal.audioLabel') }}</p>
-            <p class="text-xs text-gray-500"> {{ $t('document.createModal.audioLabel2') }}</p>
-          </div>
-          
-          <div v-else>
-            <p class="text-gray-700 font-medium">{{ getNomeArquivo(arquivoAudio) }}</p>
-          </div>
-
-          <input
-            type="file"
-            accept=".mp3, .wav, .mp4, .mkv"
-            ref="fileInput"
-            @change="onFileChange"
-            hidden
-          />
-        </div>
-      
-    </div>
+    <h2 v-if="TipoDocumento == 'MINIMUNDO'" class="text-xl font-bold mb-4">{{ $t('document.generateNewRequirements') }}</h2>
+    <h2 v-if="TipoDocumento == 'REQUISITOS'" class="text-xl font-bold mb-4">{{ $t('document.generateNewUCandCD') }}</h2>
 
     <div>
       <h3 class="text-lg text-center font-semibold my-4"> 
-        {{ $t('document.newAIVersionModal.confirmationMessage') }} {{ $t(formatarTipoDocumento(TipoDocumento)) }}?
+        {{ $t('document.newAIVersionModal.confirmationMessage') }} 
+        
+        <span v-if="TipoDocumento == 'MINIMUNDO'">{{ $t('document.requirements') }}?</span>
+        <span v-if="TipoDocumento == 'REQUISITOS'">{{ $t('document.UCandCD') }}?</span>
       </h3>
     </div>
 
@@ -184,24 +170,3 @@ const onDrop = (event: any) => {
     
   </modal>
 </template>
-
-<style>
-.drop-zone {
-  border: 2px dashed #aaa;
-  margin-top: 8px;
-  padding: 20px;
-  cursor: pointer;
-  border-radius: 8px;
-  min-width: 200px;
-  min-height: 100px;
-
-  display: flex;
-  justify-content: center;   /* horizontal */
-  align-items: center;       /* vertical */
-  text-align: center;
-}
-
-.drop-zone:hover {
-  border-color: #666;
-}
-</style>

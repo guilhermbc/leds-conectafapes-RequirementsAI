@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { ref, watch, computed } from "vue"
-import { useI18n } from "vue-i18n"
 import { criarModulo, atualizarModulo } from "../controllers/modulo"
 import type { Modulo } from "../types/modulo"
 import type { Documento } from "@/modules/Documento/types/documento"
-import { useUiStore } from "@/stores/ui"
 
 const props = defineProps<{
   modelValue: boolean
@@ -18,8 +16,6 @@ const emit = defineEmits<{
 }>()
 
 const close = () => emit("update:modelValue", false)
-
-const ui = useUiStore()
 
 // Campos
 const id = ref("")
@@ -36,8 +32,6 @@ const primeiraMaiuscula = (valor: string) =>
 
 const regrasNome = [primeiraMaiuscula]
 
-const updateNomeValido = (v: boolean) => (nomeValido.value = v)
-
 // Quando receber um modulo, carregar os dados
 watch(
   () => props.modulo,
@@ -47,7 +41,7 @@ watch(
       nome.value = novo.nome
       descricao.value = novo.descricao
       modulo_documento.value = novo.modulo_documento
-      projeto.value = novo.projeto as string
+      projeto.value = novo.Projeto as string
       // Validar o nome carregado
       nomeValido.value = regrasNome.every((regra) => regra(novo.nome) === true)
     } else {
@@ -91,7 +85,7 @@ const salvar = async () => {
         nome: nome.value,
         descricao: descricao.value,
         modulo_documento: modulo_documento.value,
-        projeto: props.projetoId as string
+        Projeto: props.projetoId as string
       })
     }
 

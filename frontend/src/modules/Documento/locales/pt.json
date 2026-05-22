@@ -4,7 +4,12 @@
     "allDocumentsTitle": "Todos os Artefatos Relacionados a Requisitos",
     "new": "Iniciar Especificação de Requisitos e Análise",
     "none": "Nenhum artefato encontrado.",
+    "deprecated": "Dessincronizado",
     "uploadNewVersion": "Upload de Nova Versão",
+    "generateNewRequirements": "Gerar Requisitos com IA",
+    "generateNewUseCases": "Gerar Casos de Uso com IA",
+    "generateNewClassDiagram": "Gerar Diagrama de Classes com IA",
+    "generateNewUCandCD": "Gerar Casos de Uso e Classes com IA",
     "generateNewAIVersion": "Gerar Nova Versão com IA",
     "download": "Download",
     "contentText": "Conteúdo do Artefato",
@@ -15,7 +20,9 @@
     "UCandCD": "Casos de Uso e Diagrama de Classes",
     "sidebar": {
       "sourceDocuments": "Artefatos de Origem",
+      "generateNewStorytelling": "Gerar Nova Narrativa com Novo Áudio",
       "previousVersion": "Versão Anterior",
+      "pairUC_CD": "Par Caso de Uso/Diagrama de Classes",
       "noPreviousVersion": "Nenhuma versão anterior",
       "nextVersion": "Próxima Versão",
       "noNextVersion": "Nenhuma próxima versão"
@@ -28,7 +35,7 @@
       "dropdownLabel": "Selecionar tipo de artefato",
       "audioSource": "Origem de Áudio",
       "audioLabel": "Clique para selecionar um arquivo de áudio ou arraste e solte aqui",
-      "audioLabel2": ".mp3 ou .wav",
+      "audioLabel2": ".mp3, .wav, .mp4 or .mkv",
       "sourcedDomainStorytelling": "Narrativa de Domínio de Origem",
       "sourceRequirements": "Requisitos de Origem",
       "sourceUseCases": "Casos de Uso de Origem",
@@ -43,6 +50,13 @@
       "subtitle": "Faça upload de uma nova versão do artefato",
       "contentLabel": "Clique para selecionar um arquivo markdown ou arraste e solte aqui",
       "contentLabel2": ".md ou .markdown",
+      "updateUCwarning": "As seções do arquivo de Casos de Uso (Diagrama, Tabela e Descrição) devem estar separadas por ''<!-- -->''",
+      "updateUCChoicesTitle": "Os Casos de Uso também devem ser ajustados às novas mudanças. Como você deseja prosseguir?",
+      "updateCDChoicesTitle": "O Diagrama de Classes também devem se ajustado às novas mudanças. Como você deseja prosseguir?",
+      "updateAI": "Incrementar versão e",
+      "updateAIBold": "ajustar com IA.",
+      "updateSimple": "Incrementar versão, mas",
+      "updateSimpleBold": "manter o conteúdo inalterado.",
       "confirmationMessage": "Tem certeza que deseja fazer upload desta nova versão de",
       "editButton": "Salvar Alterações"
     },
@@ -52,6 +66,11 @@
       "sourceAudio": "Áudio de Origem",
       "confirmationMessage": "Tem certeza que deseja gerar uma nova versão de",
       "generateButton": "Gerar"
+    },
+    "notification": {
+      "loading": "Gerando artefato... Fique à vontade para navegar!",
+      "created": "{nome} criado com sucesso!",
+      "open": "Abrir"
     },
     "cancel": "Cancelar"
   }
