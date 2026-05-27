@@ -4,6 +4,7 @@ from .models import (
     Projeto,
     Modulo,
     Documento,
+    DocumentoGenerationJob,
     DOCS
 )
 from .serializers import (
@@ -614,6 +615,17 @@ class DocumentoViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class DocumentGenerationJobViewSet(
+    ReadOnlyModelViewSet
+):
+    queryset = (
+        DocumentoGenerationJob.objects.all()
+    )
+
+    serializer_class = (
+        DocumentoGenerationJobSerializer
+    )
     
 class UserViewSet(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer

@@ -133,3 +133,34 @@ class Documento(PolymorphicModel, models.Model):
     class Meta:
         db_table = 'documento'
 
+class DocumentoGenerationJob(models.Model):
+    id = models.UUIDField(primary_key=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", "Pending"),
+            ("RUNNING", "Running"),
+            ("SUCCESS", "Success"),
+            ("FAILED", "Failed")
+        ]
+    )
+
+    progress = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    finished_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    error = models.TextField(
+        null=True,
+        blank=True
+    )
+
+    result_file = models.FileField(
+        null=True,
+        blank=True
+    )

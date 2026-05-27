@@ -9,7 +9,13 @@ SECRET_KEY = config(
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-if config("USE_SQLITE", default=True, cast=bool):
+USE_SQLITE = config(
+    "USE_SQLITE",
+    default=False,
+    cast=bool
+)
+
+if config(USE_SQLITE):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
