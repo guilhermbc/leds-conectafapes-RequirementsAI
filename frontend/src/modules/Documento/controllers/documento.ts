@@ -7,8 +7,9 @@ import {
   obterDocumento as _obterDocumento,
   atualizarDocumento as _atualizarDocumento,
   excluirDocumento as _excluirDocumento,
+  getJobStatus as _getJobStatus,
 } from '../api/documento'
-import type { Documento, DocumentoCreateReq, DocumentoCreateRes } from '../types/documento'
+import type { Documento, DocumentoCreateReq, DocumentoCreateRes, DocumentoGenerationJob, DocumentoGenerationJobRes} from '../types/documento'
 import { useUiStore } from '@/stores/ui'
 import { AxiosError } from 'axios'
 
@@ -90,4 +91,13 @@ export const excluirDocumentos = async (ids: string[]) => {
   } catch (error) {
     throw error
   }
-}    
+}
+
+export const getJobStatus = async (jobId: string) => {
+  try {
+    const { data } = await _getJobStatus(jobId)
+    return data as unknown as DocumentoGenerationJob
+  } catch (error) {
+    throw error
+  }
+}

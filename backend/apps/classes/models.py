@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
 
+from backend.rai import settings
+
 User = get_user_model()
 
 class DOCS(models.TextChoices):
@@ -136,6 +138,12 @@ class Documento(PolymorphicModel, models.Model):
 class DocumentoGenerationJob(models.Model):
     id = models.UUIDField(primary_key=True)
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='documento_generation_jobs'
+    )
+
     status = models.CharField(
         max_length=20,
         choices=[
@@ -160,7 +168,10 @@ class DocumentoGenerationJob(models.Model):
         blank=True
     )
 
-    result_file = models.FileField(
+    documento = models.ForeignKey(
+        Documento,
         null=True,
-        blank=True
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="generation_jobs"
     )
