@@ -206,6 +206,12 @@ class DocumentoViewSet(ModelViewSet):
         arquivoAudio = request.FILES.get('arquivoAudio')
         documento_anterior = data.get('DocumentoAnterior')
 
+        logger.info("FILES:", extra={"files": request.FILES})
+        logger.info("audio:", extra={
+            "existeAudio": bool(request.FILES.get('arquivoAudio')),
+            "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
+        })
+
         arquivo_para_reusar = None
 
         if not arquivoAudio:
@@ -223,7 +229,7 @@ class DocumentoViewSet(ModelViewSet):
                 doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
 
                 if data.get('TipoDocumento') == 'MINIMUNDO' and doc_anterior.arquivoAudio:
-                    arquivo_para_reusar = doc_anterior.arquivoAudio
+                    # arquivo_para_reusar = doc_anterior.arquivoAudio
                     arquivo_para_reusar_path = doc_anterior.arquivoAudio.path
                 
                     with open(doc_anterior.arquivoAudio.path, 'rb') as original:

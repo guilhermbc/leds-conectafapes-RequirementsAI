@@ -1,6 +1,7 @@
 import os
 import logging
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
 from models import Documento
@@ -15,101 +16,63 @@ from utils import (
     version_from_another_doc, 
     update_version)
 
-logger = logging.getLogger(__name__)
 
 class DocumentoGenerationService:
 
-    def get_serializer_class(self):
-        if self.action in ['list', 'retrieve']:
-            return DocumentoReadSerializer
-        return DocumentoWriteSerializer
-    
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    @staticmethod
+    # data contém: documento_data(dados do documento) e 
+    # arquivo_para_reusar_path(caminho do arquivo caso seja conveniente o reúso)
+    def generate_documento(data, user_id, job=None):
+        User = get_user_model()
+        user = User.objects.get(id=user_id)
 
-    def generate_documento(self, request):
-        data = request.data.dict()
+        data_documento = data.get("data_documento")
+        arquivo_para_reusar_path = data.get("arquivo_para_reusar_path")
+
         arquivoAudio = request.FILES.get('arquivoAudio')
-        documentos_origem = request.data.getlist('DocumentoOrigem')
-
-        logger.info("FILES:", extra={"files": request.FILES})
-        logger.info("audio:", extra={
-            "existeAudio": bool(request.FILES.get('arquivoAudio')),
-            "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
-        })
+        documentos_origem = data_documento('DocumentoOrigem')
 
         arquivo_para_reusar = None
 
         if not arquivoAudio:
-            data.pop('arquivoAudio', None)
+            data_documento.pop('arquivoAudio', None)
 
-        documento_anterior = data.get('DocumentoAnterior')
+        documento_anterior = data_documento.get('DocumentoAnterior')
 
         # Força sempre lista no data, e nunca string
-        data['DocumentoOrigem'] = documentos_origem
-
-        # Criar path temporário se houver upload
-        if arquivoAudio:
-            import tempfile
-
-            with tempfile.NamedTemporaryFile(delete=False) as temp:
-                for chunk in arquivoAudio.chunks():
-                    temp.write(chunk)
-
-                temp_path = temp.name
-
-            data['audio_path'] = temp_path
-            
-            logger.info("Temp path criado", extra={"path": temp_path})
-            logger.info("Arquivo existe?", extra={"exists": os.path.exists(temp_path)})
-
-        else:
-            if documento_anterior:
-                doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
-
-                if data.get('TipoDocumento') == 'MINIMUNDO' and doc_anterior.arquivoAudio:
-                    arquivo_para_reusar = doc_anterior.arquivoAudio
-
-                    import tempfile
-
-                    with open(doc_anterior.arquivoAudio.path, 'rb') as original:
-                        with tempfile.NamedTemporaryFile(delete=False) as temp:
-                            temp.write(original.read())
-                            temp_path = temp.name
-
-                    data['audio_path'] = temp_path
+        data_documento['DocumentoOrigem'] = documentos_origem
 
         # Se for CASO_USO/DIAGRAMA_CLASSE, enviar para um método separado
-        if data.get('TipoDocumento') in ['CASO_USO_E_DIAGRAMA_CLASSE', # Ambos gerados juntos, por IA
+        if data_documento.get('TipoDocumento') in ['CASO_USO_E_DIAGRAMA_CLASSE', # Ambos gerados juntos, por IA
                                          'CASO_USO_SIMPLES', # Upload do UC e incremento de versão do CD relacionado, sem usar IA
                                          'DIAGRAMA_CLASSE_SIMPLES', # Upload do CD e incremento de versão do UC relacionado, sem usar IA
                                          'CASO_USO_ATUALIZAR', # Upload do UC e geração de nova versão do CD relacionado com IA
                                          'DIAGRAMA_CLASSE_ATUALIZAR']: # Upload do CD e geração de nova versão do UC relacionado com IA
-            return self._create_caso_uso_com_classes(data)
+            return DocumentoGenerationService._create_caso_uso_com_classes(data=data_documento, user=user, job=job)
         
         # Definir parUC_CD
-        if (data.get('TipoDocumento') == 'CASO_USO' or data.get('TipoDocumento') == 'DIAGRAMA_CLASSE'):
+        if (data_documento.get('TipoDocumento') == 'CASO_USO' or data_documento.get('TipoDocumento') == 'DIAGRAMA_CLASSE'):
                 # Se foi passado, utilize ele
-                if data.get('parUC_CD'):
-                    par_doc_id = data.get('parUC_CD')
+                if data_documento.get('parUC_CD'):
+                    par_doc_id = data_documento.get('parUC_CD')
                     par_doc = get_object_or_404(Documento, id=par_doc_id)
-                    data['parUC_CD'] = par_doc.id
+                    data_documento['parUC_CD'] = par_doc.id
                 # Se não foi passado, tente manter o par da versão anterior
                 else:
                     if documento_anterior:
                         doc_anterior = get_object_or_404(Documento, id=documento_anterior)
                         if (doc_anterior.TipoDocumento in ['CASO_USO', 'DIAGRAMA_CLASSE']) and doc_anterior.parUC_CD:
-                            data['parUC_CD'] = doc_anterior.parUC_CD.id
+                            data_documento['parUC_CD'] = doc_anterior.parUC_CD.id
                         else:
-                            data['parUC_CD'] = None
+                            data_documento['parUC_CD'] = None
                     else:
-                        data['parUC_CD'] = None
+                        data_documento['parUC_CD'] = None
 
         # Casos simples
         # Se deve ser gerado por IA
-        if is_empty_or_null(data.get('arquivo')):
+        if is_empty_or_null(data_documento.get('arquivo')):
             # Chamada do job assíncrono
-            result_string = ( DocumentoGenerationService.generate_ai_content(data) )
+            result_string = send_to_llm(data_documento)
             generated_by_ai = True
 
             vMajor = 1
@@ -124,7 +87,7 @@ class DocumentoGenerationService:
                 vMinorAnterior = doc_anterior.vMinor
 
             # Geração de uma nova Narrativa de Domínio
-            if data.get('TipoDocumento') == 'MINIMUNDO' and data.get('audio_path'):
+            if data_documento.get('TipoDocumento') == 'MINIMUNDO' and data_documento.get('audio_path'):
                 # Baseada em novo áudio
                 if documento_anterior:
                     vMajor = vMajorAnterior + 1
@@ -132,7 +95,7 @@ class DocumentoGenerationService:
                 #Se não tiver DocumentoAnterior, fica 1.0
 
             else:
-                doc_origem_id = data['DocumentoOrigem'][-1]
+                doc_origem_id = data_documento['DocumentoOrigem'][-1]
                 doc_origem = get_object_or_404(Documento, id=doc_origem_id) 
                 vMajorOrigem = doc_origem.vMajor
                 vMinorOrigem = doc_origem.vMinor
@@ -148,7 +111,7 @@ class DocumentoGenerationService:
         # Se não deve ser gerado por IA
         else:
             generated_by_ai = False
-            result_string = data.get('arquivo')
+            result_string = data_documento.get('arquivo')
 
             # Incremento Minor
             if documento_anterior:
@@ -156,8 +119,8 @@ class DocumentoGenerationService:
                 doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
                 vMajor, vMinor = update_version(doc_anterior)
 
-            elif data.get('DocumentoOrigem') and len(data.get('DocumentoOrigem')) != 0:
-                doc_origem_id = data.get('DocumentoOrigem')[-1]
+            elif data_documento.get('DocumentoOrigem') and len(data_documento.get('DocumentoOrigem')) != 0:
+                doc_origem_id = data_documento.get('DocumentoOrigem')[-1]
                 doc_origem = get_object_or_404(Documento, id=doc_origem_id)
                 vMajor, vMinor = version_from_another_doc(doc_origem)
 
@@ -173,24 +136,24 @@ class DocumentoGenerationService:
         # else:
         #     result_string = result
 
-        data['vMajor'] = vMajor
-        data['vMinor'] = vMinor
-        data['arquivo'] = result_string
-        data['geradoIA'] = generated_by_ai
-        data['vMaisRecente'] = True
+        data_documento['vMajor'] = vMajor
+        data_documento['vMinor'] = vMinor
+        data_documento['arquivo'] = result_string
+        data_documento['geradoIA'] = generated_by_ai
+        data_documento['vMaisRecente'] = True
 
         # IMPORTANTE: passar data, não request.data
-        serializer = self.get_serializer(data=data)
+        serializer = DocumentoWriteSerializer(data=data_documento)
         serializer.is_valid(raise_exception=True)
-        instance = serializer.save(user=self.request.user)
+        instance = serializer.save(user=user)
 
         if arquivo_para_reusar:
             instance.arquivoAudio = arquivo_para_reusar
             instance.save(update_fields=['arquivoAudio'])
 
         # Atualizar parUC_CD relacionado, caso seja UC ou CD gerado por IA
-        if data.get('parUC_CD') and (data.get('TipoDocumento') == 'CASO_USO' or data.get('TipoDocumento') == 'DIAGRAMA_CLASSE') and generated_by_ai:
-            par_doc_id = data.get('parUC_CD')
+        if data_documento.get('parUC_CD') and (data_documento.get('TipoDocumento') == 'CASO_USO' or data_documento.get('TipoDocumento') == 'DIAGRAMA_CLASSE') and generated_by_ai:
+            par_doc_id = data_documento.get('parUC_CD')
             par_doc = get_object_or_404(Documento, id=par_doc_id)
             par_doc.parUC_CD = instance
             par_doc.save(update_fields=['parUC_CD'])
@@ -204,7 +167,8 @@ class DocumentoGenerationService:
 
         return instance
     
-    def _create_caso_uso_com_classes(self, data):
+    @staticmethod
+    def _create_caso_uso_com_classes(data, user, job):
         documento_anterior = data.get("DocumentoAnterior")
         previous_uc_id = None
         previous_cd_id = None
@@ -275,9 +239,9 @@ class DocumentoGenerationService:
                 'DocumentoAnterior': previous_uc_id,
             })
 
-            serializer_uc = self.get_serializer(data=data_uc)
+            serializer_uc = DocumentoWriteSerializer(data=data)
             serializer_uc.is_valid(raise_exception=True)
-            self.perform_create(serializer_uc)
+            serializer_uc.save(user=user)
 
             # CLASSES
             data_cd = data.copy()
@@ -291,9 +255,9 @@ class DocumentoGenerationService:
                 'DocumentoAnterior': previous_cd_id,
             })
 
-            serializer_cd = self.get_serializer(data=data_cd)
+            serializer_cd = DocumentoWriteSerializer(data=data)
             serializer_cd.is_valid(raise_exception=True)
-            self.perform_create(serializer_cd)
+            serializer_cd.save(user=user)
 
             uc_instance = serializer_uc.instance
             cd_instance = serializer_cd.instance
@@ -317,9 +281,11 @@ class DocumentoGenerationService:
             
         # Se for qualquer outro caso, joga pra essa função que vai criar os dois documentos adequadamente, com IA ou não
         else:
-            return self._create_uploaded_uc_cd(data)
+            return DocumentoGenerationService._create_uploaded_uc_cd(data=data, user=user, job=job)
     
-    def _create_uploaded_uc_cd(self, data):
+
+    @staticmethod
+    def _create_uploaded_uc_cd(data, user, job):
         tipo_documento = data.get('TipoDocumento')
         is_caso_uso = tipo_documento.startswith('CASO_USO')
         is_update = tipo_documento.endswith('_ATUALIZAR')
@@ -341,14 +307,14 @@ class DocumentoGenerationService:
         })
 
         # Definir versão do documento principal
-        vMajor, vMinor = self._compute_uploaded_version(data_main)
+        vMajor, vMinor = DocumentoGenerationService._compute_uploaded_version(data=data_main)
         data_main['vMajor'] = vMajor
         data_main['vMinor'] = vMinor
 
         # Criar o documento principal
-        serializer_main = self.get_serializer(data=data_main)
+        serializer_main = DocumentoWriteSerializer(data=data)
         serializer_main.is_valid(raise_exception=True)
-        self.perform_create(serializer_main)
+        serializer_main.save(user=user)
         main_doc = serializer_main.instance
 
         # Criar o documento par
@@ -409,9 +375,9 @@ class DocumentoGenerationService:
             pair_data['vMajor'] = pair_vMajor
             pair_data['vMinor'] = pair_vMinor
 
-            serializer_pair = self.get_serializer(data=pair_data)
+            serializer_pair = DocumentoWriteSerializer(data=data)
             serializer_pair.is_valid(raise_exception=True)
-            self.perform_create(serializer_pair)
+            serializer_pair.save(user=user)
             pair_doc = serializer_pair.instance
 
             main_doc.parUC_CD = pair_doc
@@ -433,7 +399,8 @@ class DocumentoGenerationService:
 
         return main_doc
     
-    def _compute_uploaded_version(self, data):
+    @staticmethod
+    def _compute_uploaded_version(data):
         documento_anterior = data.get('DocumentoAnterior')
 
         if documento_anterior:

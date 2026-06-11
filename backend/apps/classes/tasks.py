@@ -9,6 +9,8 @@ from .services.document_generation_service import (
 )
 
 @shared_task
+# payload contém: documento_data(dados do documento) e 
+# arquivo_para_reusar_path(caminho do arquivo caso seja conveniente o reúso)
 def generate_documento(job_id, user_id, payload):
 
     job = DocumentoGenerationJob.objects.get(id=job_id)
@@ -26,7 +28,7 @@ def generate_documento(job_id, user_id, payload):
         
         documento = (
             DocumentoGenerationService.generate_documento(
-                data=payload,
+                data_documento=payload,
                 user_id=user_id,
                 job=job
             )
