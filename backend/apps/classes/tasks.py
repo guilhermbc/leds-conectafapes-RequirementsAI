@@ -9,9 +9,13 @@ from .services.document_generation_service import (
 )
 
 @shared_task
-# payload contém: documento_data(dados do documento) e 
-# arquivo_para_reusar_path(caminho do arquivo caso seja conveniente o reúso)
+# payload: {
+#     "documento_data": Dados do documento passados na requisição,
+#     "audio_path": "Caminho do arquivo de áudio do upload" (opcional, somente se houver upload),
+#     "arquivoAudio_name": "Nome do áudio a ser reusado" (opcional, para novos minimundos sem upload de áudio)
+# }
 def generate_documento(job_id, user_id, payload):
+    audio_path = payload.get("audio_path")
 
     job = DocumentoGenerationJob.objects.get(id=job_id)
 
@@ -28,7 +32,7 @@ def generate_documento(job_id, user_id, payload):
         
         documento = (
             DocumentoGenerationService.generate_documento(
-                data_documento=payload,
+                payload=payload,
                 user_id=user_id,
                 job=job
             )
@@ -65,14 +69,10 @@ def generate_documento(job_id, user_id, payload):
                 "finished_at"
             ]
         )
-
         raise
 
     finally:
         audio_path = payload.get("audio_path")
 
-        if (
-            audio_path
-            and os.path.exists(audio_path)
-        ):
+        if (audio_path and os.path.exists(audio_path)):
             os.remove(audio_path)

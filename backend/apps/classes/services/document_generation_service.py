@@ -1,16 +1,13 @@
 import os
-import logging
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
+from django.core.files import File
 
-from models import Documento
-from serializers import (
-    DocumentoReadSerializer,
-    DocumentoWriteSerializer,
-)
+from ..models import Documento
+from ..serializers import (DocumentoWriteSerializer)
 
-from utils import (
+from ..utils import (
     is_empty_or_null, 
     send_to_llm, 
     version_from_another_doc, 
@@ -19,24 +16,28 @@ from utils import (
 
 class DocumentoGenerationService:
 
+    # payload: {
+    #     "documento_data": Dados do documento passados na requisição,
+    #     "audio_path": "Caminho do arquivo de áudio do upload" (opcional, somente se houver upload),
+    #     "arquivoAudio_name": "Nome do áudio a ser reusado" (opcional, para novos minimundos sem upload de áudio)
+    # }
     @staticmethod
-    # data contém: documento_data(dados do documento) e 
-    # arquivo_para_reusar_path(caminho do arquivo caso seja conveniente o reúso)
-    def generate_documento(data, user_id, job=None):
+    def generate_documento(payload, user_id, job=None):
         User = get_user_model()
         user = User.objects.get(id=user_id)
 
-        data_documento = data.get("data_documento")
-        arquivo_para_reusar_path = data.get("arquivo_para_reusar_path")
+        data_documento = payload.get("documento_data")
+        audio_path = payload.get("audio_path")
 
-        arquivoAudio = request.FILES.get('arquivoAudio')
-        documentos_origem = data_documento('DocumentoOrigem')
+        # Utilizado dentro de send_to_llm
+        if audio_path:
+            data_documento['audio_path'] = audio_path
 
-        arquivo_para_reusar = None
+        # Só tem valor caso seja um novo MINIMUNDO sem upload de áudio, 
+        # mas com DocumentoAnterior, onde é conveniente reutilizar o áudio
+        arquivoAudio_name = payload.get("arquivoAudio_name")
 
-        if not arquivoAudio:
-            data_documento.pop('arquivoAudio', None)
-
+        documentos_origem = data_documento.get('DocumentoOrigem')
         documento_anterior = data_documento.get('DocumentoAnterior')
 
         # Força sempre lista no data, e nunca string
@@ -71,7 +72,6 @@ class DocumentoGenerationService:
         # Casos simples
         # Se deve ser gerado por IA
         if is_empty_or_null(data_documento.get('arquivo')):
-            # Chamada do job assíncrono
             result_string = send_to_llm(data_documento)
             generated_by_ai = True
 
@@ -93,7 +93,7 @@ class DocumentoGenerationService:
                     vMajor = vMajorAnterior + 1
                     vMinor = 0
                 #Se não tiver DocumentoAnterior, fica 1.0
-
+                    
             else:
                 doc_origem_id = data_documento['DocumentoOrigem'][-1]
                 doc_origem = get_object_or_404(Documento, id=doc_origem_id) 
@@ -142,14 +142,26 @@ class DocumentoGenerationService:
         data_documento['geradoIA'] = generated_by_ai
         data_documento['vMaisRecente'] = True
 
-        # IMPORTANTE: passar data, não request.data
         serializer = DocumentoWriteSerializer(data=data_documento)
         serializer.is_valid(raise_exception=True)
         instance = serializer.save(user=user)
 
-        if arquivo_para_reusar:
-            instance.arquivoAudio = arquivo_para_reusar
-            instance.save(update_fields=['arquivoAudio'])
+        # Caso tenha arquivo de áudio do upload, salvar no campo arquivoAudio
+        if audio_path:
+            with open(audio_path, "rb") as f:
+                instance.arquivoAudio.save(
+                    os.path.basename(audio_path),
+                    File(f),
+                    save=False
+                )
+        # (Reuso) Apontar para arquivo de áudio do DocumentoAnterior (só para MINIMUNDO)
+        elif arquivoAudio_name:
+            instance.arquivoAudio.name = arquivoAudio_name
+        # Em outros casos, garantir que é None
+        else:
+            instance.arquivoAudio = None
+        
+        instance.save(update_fields=['arquivoAudio'])
 
         # Atualizar parUC_CD relacionado, caso seja UC ou CD gerado por IA
         if data_documento.get('parUC_CD') and (data_documento.get('TipoDocumento') == 'CASO_USO' or data_documento.get('TipoDocumento') == 'DIAGRAMA_CLASSE') and generated_by_ai:
@@ -239,7 +251,7 @@ class DocumentoGenerationService:
                 'DocumentoAnterior': previous_uc_id,
             })
 
-            serializer_uc = DocumentoWriteSerializer(data=data)
+            serializer_uc = DocumentoWriteSerializer(data=data_uc)
             serializer_uc.is_valid(raise_exception=True)
             serializer_uc.save(user=user)
 
@@ -255,7 +267,7 @@ class DocumentoGenerationService:
                 'DocumentoAnterior': previous_cd_id,
             })
 
-            serializer_cd = DocumentoWriteSerializer(data=data)
+            serializer_cd = DocumentoWriteSerializer(data=data_cd)
             serializer_cd.is_valid(raise_exception=True)
             serializer_cd.save(user=user)
 
@@ -312,7 +324,7 @@ class DocumentoGenerationService:
         data_main['vMinor'] = vMinor
 
         # Criar o documento principal
-        serializer_main = DocumentoWriteSerializer(data=data)
+        serializer_main = DocumentoWriteSerializer(data=data_main)
         serializer_main.is_valid(raise_exception=True)
         serializer_main.save(user=user)
         main_doc = serializer_main.instance
@@ -375,7 +387,7 @@ class DocumentoGenerationService:
             pair_data['vMajor'] = pair_vMajor
             pair_data['vMinor'] = pair_vMinor
 
-            serializer_pair = DocumentoWriteSerializer(data=data)
+            serializer_pair = DocumentoWriteSerializer(data=pair_data)
             serializer_pair.is_valid(raise_exception=True)
             serializer_pair.save(user=user)
             pair_doc = serializer_pair.instance

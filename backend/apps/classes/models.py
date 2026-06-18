@@ -1,9 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
 
-from backend.rai import settings
 
 User = get_user_model()
 

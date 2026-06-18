@@ -40,6 +40,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS')
 CSRF_TRUSTED_ORIGINS = csrf_origins.split(',') if csrf_origins else []
 
+CELERY_TASK_ALWAYS_EAGER = config(
+    "CELERY_TASK_ALWAYS_EAGER",
+    default=False,
+    cast=bool
+)
+
+CELERY_TASK_EAGER_PROPAGATES = config(
+    "CELERY_TASK_EAGER_PROPAGATES",
+    default=False,
+    cast=bool
+)
+
 # Avisa o Django que o Ingress está recebendo HTTPS e mandando HTTP pro Pod
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 

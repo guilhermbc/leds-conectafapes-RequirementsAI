@@ -1,3 +1,4 @@
+import json
 import os
 
 from .models import (
@@ -202,9 +203,18 @@ class DocumentoViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        data = request.data.dict()
+        data = {}
+
+        for key, value in request.data.items():
+            if key != "arquivoAudio":
+                data[key] = value
+
         arquivoAudio = request.FILES.get('arquivoAudio')
         documento_anterior = data.get('DocumentoAnterior')
+        
+        documentos_origem = request.data.getlist('DocumentoOrigem')
+        # Força sempre lista no data, e nunca string
+        data['DocumentoOrigem'] = documentos_origem
 
         logger.info("FILES:", extra={"files": request.FILES})
         logger.info("audio:", extra={
@@ -212,50 +222,58 @@ class DocumentoViewSet(ModelViewSet):
             "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
         })
 
-        arquivo_para_reusar = None
-
         if not arquivoAudio:
             data.pop('arquivoAudio', None)
 
+        # Payload para a task
+        payload = {
+            "documento_data": data
+        }
+        
         # Criar path temporário se houver upload
         if arquivoAudio:
             with tempfile.NamedTemporaryFile(delete=False) as temp:
+
                 for chunk in arquivoAudio.chunks():
                     temp.write(chunk)
 
-                data['audio_path'] = temp.name
-        else:
-            if documento_anterior:
-                doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
+                payload["audio_path"] = temp.name
 
-                if data.get('TipoDocumento') == 'MINIMUNDO' and doc_anterior.arquivoAudio:
-                    # arquivo_para_reusar = doc_anterior.arquivoAudio
-                    arquivo_para_reusar_path = doc_anterior.arquivoAudio.path
-                
-                    with open(doc_anterior.arquivoAudio.path, 'rb') as original:
-                        with tempfile.NamedTemporaryFile(delete=False) as temp:
-                            temp.write(original.read())
-                            temp_path = temp.name
+        # Reuso de arquivo senão houver upload e tiver documento anterior
+        elif documento_anterior:
+            doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
+            
+            if (data.get("TipoDocumento") == "MINIMUNDO" and doc_anterior.arquivoAudio):
+                payload["arquivoAudio_name"] = (doc_anterior.arquivoAudio.name)
 
-                    data['audio_path'] = temp_path
+        try:
+            json.dumps(payload)
+        except TypeError as e:
+            print("Payload inválido:", e)
 
-        payload = {
-            "documento_data": data,
-            "arquivo_para_reusar_path": arquivo_para_reusar_path,
-        }
+            for key, value in payload.items():
+                print(key, type(value))
+
+                if isinstance(value, dict):
+                    for subkey, subvalue in value.items():
+                        print(
+                            f"  {subkey}: {type(subvalue)}"
+                        )
+
+            raise
 
         job = DocumentoGenerationJob.objects.create(
             id=uuid.uuid4(),
             user=request.user,
             status="PENDING"
         )
-
+        
         generate_documento_task.delay(
             job_id=str(job.id),
             user_id=request.user.id,
             payload=payload
         )
-
+        
         return Response(
             {
                 "job_id": str(job.id),
