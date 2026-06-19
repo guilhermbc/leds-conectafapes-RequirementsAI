@@ -1,24 +1,28 @@
-site_name: 'LEDS ConectaFAPES Requirements AI'
+site_name: RequirementsAI
+site_author: LEDS, Guilherme Borges, Nicolas Botelho
+
+theme:
+  name: material
+
 nav:
-  - 'Overview': 'index.md'
-  - 'Pipeline Overview': 'pipeline_overview.md'
-  - 'Graphical Representation': 'graphical_representation.md'
-  - 'Folder Structure': 'folder_structure.md'
-  - 'Running the Project':
-    - 'Requirements': 'Running the Project/requirements.md'
-    - 'How to Run': 'Running the Project/how_to.md'
-  - 'Configuring the Project': 'configuring.md'
-  - 'Creating Virtual Environment':
-    - 'Using Python': 'Creating Virtual Environment/python_venv.md'
-    - 'Using Docker Compose': 'Creating Virtual Environment/docker_venv.md'
-    - 'Manual Execution':
-      - 'Backend (FastAPI)': 'Creating Virtual Environment/Manual Execution/manual_fast_api.md'
-      - 'Frontend (Streamlit)': 'Creating Virtual Environment/Manual Execution/manual_stream_lit.md'
-  - 'Agents and Components': 'agents_and_components.md'
-  - 'Input Files (audio or video)': 'input_files.md'
-  - 'Backend Routes Usage': 'backend_create_routes.md'
-  - 'Models': 'model.md'
-  - 'References': 'references.md'
-  - 'Contribution': 'contribution.md'
-plugins:
-  - techdocs-core
+  - Home: index.md
+
+  - Getting Started:
+      - Requirements: getting-started/requirements.md
+      - Installation: getting-started/installation.md
+      - Configuration: getting-started/configuration.md
+      - Running the Project: getting-started/running.md
+
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Pipeline Overview: architecture/pipeline-overview.md
+      - Workflow Graph: architecture/workflow-graph.md
+      - Folder Structure: architecture/folder-structure.md
+      - Agents and Components: architecture/agents-and-components.md
+      - Backend API: architecture/backend-api.md
+
+  - User Guide: user-guide/usage.md
+
+  - References: references.md
+
+  - Contributing: contribution.md
