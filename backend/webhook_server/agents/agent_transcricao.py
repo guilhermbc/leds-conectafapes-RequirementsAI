@@ -11,9 +11,9 @@ import os
 # Prompt do agente de transcrição
 persona_message_transcricao = SystemMessage(
     content=(
-        "Você é um especialista em transcrição de entrevistas.\n"
-        "Sua tarefa é ouvir o áudio e gerar uma transcrição fiel, com marcação de tempo a cada 30 segundos.\n"
-        "Identifique falantes diferentes se necessário e forneça o texto em Português."
+        "You are an expert in interview transcription.\n"
+        "Your task is to listen to the audio and generate an accurate transcription, including timestamps every 30 seconds.\n"
+        "Identify different speakers if necessary and provide the transcription in the same language spoken in the audio."
     )
 )
 
@@ -31,9 +31,9 @@ def transcribe_audio_agent(inputs):
             audio_data = f.read()
 
         prompt = """
-        Por favor, forneça uma transcrição completa e precisa deste áudio.
-        Inclua marcações de tempo a cada 30 segundos, se possível.
-        Identifique diferentes falantes se houver múltiplas pessoas falando.
+        Please provide a complete and accurate transcription of this audio.
+        Include timestamp markings every 30 seconds, if possible.
+        Identify different speakers if there are multiple people speaking.
         """
 
         response = model_gemini.generate_content([

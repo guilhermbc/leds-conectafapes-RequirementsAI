@@ -5,6 +5,12 @@ import { criarDocumento } from '../controllers/documento'
 import { listarUltimosDocumentos } from '@/modules/Modulo/controllers/modulo';
 import { formatarTipoDocumento, formatarVersao, criarFormDataDocumento } from '@/utils/formatacoesDocumentos';
 
+import { useLoadingStore } from '@/stores/loading'
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
+
+const loading = useLoadingStore()
+const store = useDocumentGenerationStore()
+
 const props = defineProps<{
   modelValue: boolean
   moduloId: number | string
@@ -161,6 +167,7 @@ const salvar = async () => {
         DocumentoOrigem.value.push(Number(diagramaDeClasse_origem.value.id))
       }
 
+      loading.start('document.notification.loading')
       const formDataToSend = criarFormDataDocumento({
         vMajor: 1,
         vMinor: 0,
@@ -173,10 +180,9 @@ const salvar = async () => {
         DocumentoOrigem: DocumentoOrigem.value,
       })
       
-      const response = await criarDocumento(formDataToSend)
+      const response = await store.generate(formDataToSend)
       
       if (response && response.status === 201) {
-        emit('salvo')
         close()
       }
     } else {
@@ -283,6 +289,7 @@ const salvar = async () => {
     }
   } finally {
     carregando.value = false
+    loading.stop()
   }
 }
 
@@ -311,7 +318,7 @@ const onDrop = (event: any) => {
   <modal v-model="props.modelValue" @close="close">
     <h2 class="text-xl font-bold mb-4"> {{ $t('document.createModal.title') }} </h2>
 
-    <div class="mb-4 font-semibold">
+    <!-- <div class="mb-4 font-semibold">
       <label class="mr-4">
         <input type="radio" v-model="modoCriacao" value="individual" />
         {{ $t('document.createModal.specificOption') }}
@@ -320,7 +327,7 @@ const onDrop = (event: any) => {
         <input type="radio" v-model="modoCriacao" value="todos" />
         {{ $t('document.createModal.allOption') }}
       </label>
-    </div>
+    </div> -->
 
     <div v-if="modoCriacao === 'individual'">
       <h3 class="font-semibold"> {{ $t('document.createModal.dropdownTitle') }}:</h3>
@@ -366,7 +373,7 @@ const onDrop = (event: any) => {
 
           <input
             type="file"
-            accept="audio/*"
+            accept=".mp3, .wav, .mp4, .mkv"
             ref="fileInput"
             @change="onFileChange"
             hidden
@@ -451,7 +458,7 @@ const onDrop = (event: any) => {
 
             <input
               type="file"
-              accept="audio/*"
+              accept=".mp3,.wav,.mp4, .mkv"
               ref="fileInput"
               @change="onFileChange"
               hidden

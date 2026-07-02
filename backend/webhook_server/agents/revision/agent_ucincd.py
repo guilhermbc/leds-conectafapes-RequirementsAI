@@ -88,6 +88,7 @@ classDiagram
     - Prefer nouns for names.
     - Do not invent behavior beyond what is supported by the use cases.
     - Do not include additional comments in the contents of the generated document, except in the final section titled **Questions and Validations**.
+    - DO NOT include comments like "This document presents..." or "The following diagram shows..." in the generated content. Focus on providing the revised diagram, data dictionary, constraints, and questions directly.
 
     **Output Format**: Markdown document with the following sections (the section titles must be written in the language of the use cases and class diagram):
     - ## Class Diagram (Mermaid)

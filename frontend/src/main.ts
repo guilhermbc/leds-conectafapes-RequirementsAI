@@ -8,6 +8,7 @@
 import { registerPlugins } from '@/plugins'
 import 'github-markdown-css/github-markdown.css'
 import '@/assets/markdown-overrides.css'
+import 'vue-sonner/style.css'
 
 // Components
 import App from './App.vue'

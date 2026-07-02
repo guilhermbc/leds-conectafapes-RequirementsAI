@@ -19,7 +19,7 @@ const sair = async () => {
 </script>
 
 <template>
-  <div class="flex flex-row w-screen h-screen">
+  <div class="flex flex-row w-full min-h-screen overflow-x-hidden">
     <nav class="fixed top-0 left-0 w-full h-14 bg-blue-800 border-b-2 border-blue-1000 flex items-center justify-between px-4 z-50 text-white">
       <!-- Nome do projeto -->
       <span class="text-lg font-semibold">
@@ -35,8 +35,10 @@ const sair = async () => {
         <p-button class="w-[80px] bg-blue-950 hover:bg-blue-500 transition cursor-pointer" @click="sair"> {{ $t('navigation.logout') }} </p-button>
       </div>
     </nav>
-    <main class="flex justify-center items-center w-full">
-      <router-view />
+    <main class="flex justify-center items-start w-full pt-10 px-4">
+      <div class="w-full max-w-[1600px]">
+        <router-view />
+      </div>
     </main>
   </div>
 </template>

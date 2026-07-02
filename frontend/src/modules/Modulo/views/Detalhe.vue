@@ -3,6 +3,7 @@ import { ref, onBeforeMount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 import { obterModulo } from '../controllers/modulo'
+import type { Projeto } from '../../Projeto/types/projeto'
 import type { Modulo } from '../types/modulo'
 import ListarDocumento from '../../Documento/views/Listar.vue'
 import Criar from './Criar.vue'
@@ -13,6 +14,7 @@ const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
 
+const projeto = ref<Projeto | null>(null)
 const modulo = ref<Modulo | null>(null)
 
 const loading = ref(true)
@@ -33,6 +35,8 @@ const carregarModulo = async () => {
     const data = await obterModulo(id)
     // Para obter o 'dado' desejado, use modulo.value.dado
     modulo.value = Array.isArray(data) ? data[0] : data
+    projeto.value = typeof modulo.value?.Projeto === 'string' ? null : modulo.value?.Projeto as Projeto
+
   } catch (error) {
     console.error('Error loading modulo:', error)
     ui.exibirAlerta({ message: 'Erro ao carregar módulo', color: 'error' })
@@ -74,6 +78,34 @@ onBeforeMount(carregarModulo)
     </div>
 
     <div v-else-if="modulo">
+      <!-- Breadcrumbs -->
+      <div class="text-lg text-gray-800 mb-5">
+        <router-link 
+          to="/Projeto/home"
+          class="hover:text-blue-600 hover:underline"
+        >
+          Home
+        </router-link>
+
+        >
+          
+        <router-link 
+          :to="`/Projeto/${projeto?.id}`"
+          class="hover:text-blue-600 hover:underline"
+        >
+          {{ projeto?.nome }}
+        </router-link>
+
+        >
+          
+        <router-link 
+        :to="`/Modulo/${modulo.id}`"
+          class="hover:text-blue-600 hover:underline"
+        >
+          {{ modulo.nome }}
+        </router-link>
+      </div>
+
       <div class="flex items-start mb-6 w-full">
         
         <!-- Botão voltar -->
