@@ -1,15 +1,19 @@
-# Documentação da Plataforma LEDS
+# Requirement AssIstant (RAI) Documentation
 
-Este repositório armazena os arquivos-fonte LEDS ConectaFAPES Requirements AI.
+This repository contains the source files for the **Requirement AssIstant (RAI)** documentation.
 
-## Acesso à Documentação
+## Documentation
 
-O conteúdo deste repositório é escrito em Markdown e formatado para ser renderizado pelo plugin TechDocs no Backstage.
+The documentation is written in Markdown and built using **MkDocs** with the **Material for MkDocs** theme.
 
-Para consultar a documentação de forma navegável e formatada, acesse o portal oficial do Backstage em:
+The latest published version is available at:
 
-**[workstage.leds.dev.br](https://workstage.leds.dev.br/docs/default/component/leds-conectafapes-requirementsai)**
+**https://leds-conectafapes.github.io/leds-conectafapes-RequirementsAI/**
 
-## Funcionamento
+## Repository Structure
 
-Os arquivos de documentação (Markdown, YAML, imagens) estão localizados no diretório `docs/`. Qualquer alteração (push ou merge) neste repositório aciona o Backstage para reconstruir e atualizar o site de documentação.
+The documentation source files (Markdown, configuration files, and images) are located in the `docs/` directory. The documentation configuration is defined in the `mkdocs.yml` file at the repository root.
+
+## Automatic Deployment
+
+Whenever changes are pushed or merged into the default branch, GitHub Actions automatically rebuilds and republishes the documentation, ensuring that the published website always reflects the latest version of the repository.
