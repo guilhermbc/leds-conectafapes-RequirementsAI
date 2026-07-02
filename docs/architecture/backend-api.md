@@ -1,4 +1,5 @@
-# Exemplo de Uso das Rotas (*Example of use of the routes*)
+# Routes Use Examples
+
 ## Projeto
 ```json
 {
@@ -57,7 +58,7 @@
 }
 ```
 
-### Diagrama de Classe
+### Diagrama de Classes
 ```json
 {
   "arquivo": "",
@@ -70,17 +71,16 @@
 ]
 }
 ```
-
-### Projeto de Interface
+### Caso de Uso e Diagrama de Classes
 ```json
 {
   "arquivo": "",
   "origemAudio": "",
-  "TipoDocumento": "PROTOTIPO_INTERFACE",
+  "TipoDocumento": "CASO_USO_E_DIAGRAMA_CLASSE",
   "DocumentoAnterior": null,
   "Modulo": 1,
   "DocumentoOrigem": [
-  2, 3, 4
+  1, 2
 ]
 }
 ```

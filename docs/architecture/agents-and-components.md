@@ -1,66 +1,55 @@
-## Miniworld Agents
+# Agents and Components
 
-1. **Audio Transcription:** Read and transcribe the audio file. Returns the transcription of the audio; and
-2. **Generate Miniworld:** Based in the transcription, creates a description of the software.
+This page describes the specialized LLM agents used by Requirement AssIstant (RAI). Each generation workflow is composed of multiple agents, where each agent is responsible for a specific task in the artifact generation pipeline.
 
-## Requirements Tables Agents
+---
 
-1. **Analyze Documentation:** Given the miniworld (also called Domain Narrative), returns the identified Functional Requirements (FRs), Non Functional Requirements (NFRs) and the Business Rules (BRs);
-2. **Extract Requirements:** Given the identified requirements, returns 3 formated requirements tables, one for each type of requirement (FR, NFR and BR);
-3. **Prioritize Requirements:** Given the formated requirements tables, give each requirement a priority level (Low, Mid or High); and
-4. **Refine Requirements:** Given the formated and prioritized requirements tables, run a final revision before returning the requirements tables to the user.
+# Domain Storytelling Workflow
 
-## Use Cases Agents
+| Agent                            | Responsibility                                         |
+| -------------------------------- | ------------------------------------------------------ |
+| **Audio Transcription**          | Transcribes the uploaded audio or video into text.     |
+| **Generate Domain Storytelling** | Produces a domain storytelling from the transcription. |
 
-1. **Identify Use Cases:** Given the Miniworld and the Requirements Tables, identifies the use cases and their actors;
-2. **Identift Events:** Given the Miniworld, the Requirements Tables and the identified use cases, identifies the events of each use case;
-3. **Validate Use Cases:** Given the identified use cases and their events, returns a formated and reviewed description of each use case;
-4. **Format Use Cases:** Given the formated description of the use cases, returns a table with the main informations of each use case; and
-5. **Generate Use Cases Diagram:** Given the use cases table, returns the use cases diagram in PlantUML.
+---
 
-## Class Diagram Agents
+# Requirements Workflow
 
-1. **Identify Classes:** Given the Miniworld and the Requirements Tables, identifies the classes, their attributes and their relations with other classes;
-2. **Extract Class Diagram:** Given the identifies classes, returns a class diagram with them and the data dictionary for the said class diagram;
-3. **Revise Class Diagram:** Given the class diagram, adds the needed integrity constraints to it; and
-4. **Refine Class Diagram:** Given the class diagram with the integrity constraints, do a final revision to it.
+| Agent                       | Responsibility                                                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Analyze Documentation**   | Identifies functional requirements, non-functional requirements, and business rules from the domain storytelling. |
+| **Extract Requirements**    | Organizes the identified requirements into structured requirement tables.                                         |
+| **Prioritize Requirements** | Assigns a priority level (Low, Medium, or High) to each requirement.                                              |
+| **Refine Requirements**     | Reviews and refines the generated requirements before producing the final artifact.                               |
 
-## Interface Prototype Agents
+---
 
-1. **Interface:** Given the Requirements Tables, the Use Case Description and the Class Diagram, creates a SPA HTML to be the interface prototype for the system; and
-2. **Interface Description:** Given the Use Case Description and the SPA code, returns a description of the interface prototype.
+# Use Case Workflow
 
------
+| Agent                         | Responsibility                                             |
+| ----------------------------- | ---------------------------------------------------------- |
+| **Identify Use Cases**        | Identifies use cases and their corresponding actors.       |
+| **Identify Events**           | Identifies the flow of events for each use case.           |
+| **Validate Use Cases**        | Reviews and validates the generated use case descriptions. |
+| **Format Use Cases**          | Produces a structured table summarizing the use cases.     |
+| **Generate Use Case Diagram** | Generates the use case diagram in PlantUML format.         |
 
-## Input Files (audio or video)
+---
 
-### Miniworld Generation
-  - `shared/uploads/*.mkv` – Interview videos
-  - `*.wav`, `*.mp3` – Interview audio
+# Class Diagram Workflow
 
-### Requirements Generation
-  - Miniworld - Markdown document
+| Agent                     | Responsibility                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------- |
+| **Identify Classes**      | Identifies classes, attributes, and relationships from the generated artifacts. |
+| **Extract Class Diagram** | Generates the class diagram and its corresponding data dictionary.              |
+| **Revise Class Diagram**  | Adds integrity constraints to the generated class diagram.                      |
+| **Refine Class Diagram**  | Performs a final review and refinement of the class diagram before delivery.    |
 
-### Use Cases Generation
-  - Miniworld - Markdown document
-  - Requirements - Markdown document
+# Revision Workflow
 
-### Class Diagram Generation
-  - Miniworld - Markdown document
-  - Requirements - Markdown document
-  - Use Cases - Markdown document
-
-### Interface Prototype Generation
-  - Miniworld - Markdown document
-  - Requirements - Markdown document
-  - Use Cases - Markdown document
-  - Class Diagram - Markdown document
------
-
-## References
-
-  - [LangGraph](https://langchain-ai.github.io/langgraph/)
-  - [Gemini API](https://ai.google.dev/)
-  - [LangSmith Traceable](https://docs.smith.langchain.com/)
-  - [Streamlit](https://streamlit.io/)
-  - [FastAPI](https://fastapi.tiangolo.com/)
+| Agent                           | Responsibility                                                                     |
+| ------------------------------- | ---------------------------------------------------------------------------------- |
+| **Revise Use Case Description** | Given a class diagram, search for and fixes inconsistencies in the UC description. |
+| **Revise Use Case Table**       | Given a class diagram, search for and fixes inconsistencies in the UC table.       |
+| **Revise Use Case Diagram**     | Given a class diagram, search for and fixes inconsistencies in the UC diagram.     |
+| **Revise Class Diagram**        | Given use cases, search for and fixes inconsistencies in the class diagram.        |

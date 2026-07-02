@@ -1,6 +1,6 @@
 # Requirements
 
-Before running RequirementsAI, make sure your environment meets the following requirements.
+Before running Requirement AssIstant (RAI), make sure your environment meets the following requirements.
 
 ## Mandatory Requirements
 
