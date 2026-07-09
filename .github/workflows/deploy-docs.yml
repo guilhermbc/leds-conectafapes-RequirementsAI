@@ -1,8 +1,14 @@
 name: Deploy MkDocs
 
 on:
+  pull_request:
+    branches:
+      - develop
+      - main
+
   push:
     branches:
+      - develop
       - main
 
 permissions:
@@ -25,9 +31,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install mkdocs-material mkdocs-techdocs-core
+      - run: pip install mkdocs mkdocs-material
 
-      - run: mkdocs build
+      - run: mkdocs build --strict
 
       - uses: actions/upload-pages-artifact@v3
         with:
