@@ -43,7 +43,7 @@ const arquivoAudio = ref<File | null>(null)
 const TipoDocumento = ref('')
 const Modulo = ref('')
 const DocumentoAnterior = ref('')
-const DocumentoOrigem = ref<number[]>([])
+const DocumentoOrigem = ref<string[]>([])
 const parUC_CDId = ref('')
 const parUC_CDArquivo = ref('')
 const TipoDocumentoAction = ref<'ATUALIZAR' | 'SIMPLES'>('ATUALIZAR')
@@ -97,7 +97,12 @@ const carregarDocumento = async () => {
   TipoDocumentoAction.value = 'ATUALIZAR'
 
   for (const docOrigem of documento.DocumentoOrigem) {
-    DocumentoOrigem.value.push(docOrigem.id)
+    if (docOrigem && typeof docOrigem.id === 'string') {
+      DocumentoOrigem.value.push(docOrigem.id)
+    } else if (docOrigem && docOrigem.id != null) {
+      // coerce to string if possible
+      DocumentoOrigem.value.push(String(docOrigem.id))
+    }
   }
 }
 
@@ -207,13 +212,9 @@ const salvar = async () => {
     //   })
     // }
 
-    if (response) {
-      if (response.status == 201 && response.data && response.data.id) {
-        emit("salvo", response.data)
-        // await router.push({ name: 'documento-detalhe', params: { id: response.data.id } })
-      }
-      closeForced()
-    }
+    emit("salvo", response)
+    // await router.push({ name: 'documento-detalhe', params: { id: response.data.id } })
+    closeForced()
   }
   finally {
     carregando.value = false

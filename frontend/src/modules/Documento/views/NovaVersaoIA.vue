@@ -92,7 +92,7 @@ const salvar = async () => {
     })
     const response = await stores.generate(formDataToSend)
 
-    if (response && response.status === 201) {
+    if (response) {
       emit("salvo")
     }
     close() 

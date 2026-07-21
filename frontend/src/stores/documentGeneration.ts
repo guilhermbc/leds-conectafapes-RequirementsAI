@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { criarDocumento , getJobStatus, obterDocumento} from '../modules/Documento/controllers/documento'
+import type { Documento } from '@/modules/Documento/types/documento'
 
 export const useDocumentGenerationStore =
 defineStore('docGen', {
@@ -16,8 +17,8 @@ defineStore('docGen', {
   }),
 
   actions: {
-    async generate(data: any) {
-      if (this.isGenerating) return
+    async generate(data: any): Promise<Documento> {
+      if (this.isGenerating) throw new Error('Generation already in progress')
       this.isGenerating = true
       this.error = null
       this.currentJobStatus = 'PENDING'
@@ -29,26 +30,38 @@ defineStore('docGen', {
           throw new Error('Erro ao gerar documento')
         }
 
-        if (!('job_id' in response.data)) {
-          throw new Error('Resposta não contém job_id')
+        // Resposta síncrona: já recebi o Documento
+        if ("id" in response.data) {
+          this.lastCreatedData = response.data
+          this.lastCreatedId = response.data.id ?? null
+          this.isGenerating = false
+
+          return response.data
         }
 
-        const jobId = response.data.job_id
-        this.currentJobId = jobId
-        await this.pollJob(jobId)
+        // Resposta assíncrona: preciso esperar o Job
+        if ("job_id" in response.data) {
+          this.currentJobId = response.data.job_id
 
-        return response
+          const documento = await this.pollJob(response.data.job_id)
+
+          this.isGenerating = false
+          return documento
+        }
+
+        throw new Error("Resposta inválida da API.")
 
       } catch (err: any) {
         this.error = err?.message || 'Erro ao gerar documento'
-        this.isGenerating = false
 
         throw err
+      } finally {
+        this.isGenerating = false
       }
     },
 
-    async pollJob(jobId: string) {
-      return new Promise((resolve, reject) => {
+    async pollJob(jobId: string): Promise<Documento> {
+      return new Promise<Documento>((resolve, reject) => {
 
         this.pollingInterval = setInterval(
           async () => {
@@ -62,7 +75,6 @@ defineStore('docGen', {
               if (job.status === 'SUCCESS') {
                 clearInterval(this.pollingInterval)
                 if (!job.documento_id) {
-                    this.isGenerating = false
                     reject(
                         new Error(
                             'Job finalizado sem documento associado.'
@@ -71,26 +83,25 @@ defineStore('docGen', {
                     return
                 }
 
-                const documento = await obterDocumento(job.documento_id)
+                const documento = await obterDocumento(job.documento_id) as Documento
+                
+                console.log('Documento gerado:', documento)
                 
                 this.lastCreatedData = documento
                 this.lastCreatedId = documento.id || null
-                this.isGenerating = false
-                
+
                 resolve(documento)
             }
 
               if (job.status === 'FAILED') {
                 clearInterval(this.pollingInterval)
                 this.error = job.error || 'Erro na geração'
-                this.isGenerating = false
 
                 reject(job.error)
               }
 
             } catch (err) {
               clearInterval(this.pollingInterval)
-              this.isGenerating = false
 
               reject(err)
             }
