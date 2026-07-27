@@ -146,6 +146,7 @@ jobs:
           
           sed -i -E "s|^([[:space:]]*)image:.*frontend.*|\1image: ${IMAGE_FRONTEND}@${DIGEST_FRONTEND}|" frontend/deployment.yaml
           sed -i -E "s|^([[:space:]]*)image:.*backend.*|\1image: ${IMAGE_BACKEND}@${DIGEST_BACKEND}|" backend/deployment.yaml
+          sed -i -E "s|^([[:space:]]*)image:.*requirementsai-backend.*|\1image: ${IMAGE_BACKEND}@${DIGEST_BACKEND}|" celery/deployment.yaml
 
       - name: Commit and push changes
         working-directory: infra
