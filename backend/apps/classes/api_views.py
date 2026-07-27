@@ -33,7 +33,6 @@ from .pagination import CustomPagination
 from rest_framework import generics
 from rest_framework import filters
 import django_filters.rest_framework
-import tempfile
 import logging
 import requests
 import uuid
@@ -42,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 from rest_framework.permissions import AllowAny # for testing
 from .filters import DocumentoFilter
-from .utils import is_empty_or_null, send_to_llm, version_from_another_doc, version_from_audio, update_version
+from .utils import is_empty_or_null, send_to_llm, version_from_another_doc, version_from_audio, update_version, persist_uploaded_audio
 
 class HealthViewSet(ViewSet):
 
@@ -230,14 +229,12 @@ class DocumentoViewSet(ModelViewSet):
             "documento_data": data
         }
         
-        # Criar path temporário se houver upload
+        # Persistir o áudio em um diretório compartilhado para o worker do Celery
         if arquivoAudio:
-            with tempfile.NamedTemporaryFile(delete=False) as temp:
-
-                for chunk in arquivoAudio.chunks():
-                    temp.write(chunk)
-
-                payload["audio_path"] = temp.name
+            payload["audio_path"] = persist_uploaded_audio(
+                arquivoAudio,
+                filename=getattr(arquivoAudio, 'name', None)
+            )
 
         # Reuso de arquivo senão houver upload e tiver documento anterior
         elif documento_anterior:

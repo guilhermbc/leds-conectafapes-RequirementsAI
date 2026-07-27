@@ -178,7 +178,9 @@ ERRORS_MESSAGES = {
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+SHARED_UPLOADS_ROOT = os.getenv('SHARED_UPLOADS_ROOT', '/app/shared/uploads')
+MEDIA_ROOT = os.path.join(SHARED_UPLOADS_ROOT, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%d/%m/%Y',

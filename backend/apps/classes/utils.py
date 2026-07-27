@@ -1,5 +1,6 @@
 import os
 import logging
+import uuid
 from os import path
 from hashids import Hashids
 from django.conf import settings
@@ -70,6 +71,22 @@ def is_empty_or_null(string: str) -> bool:
     Verify if a string is empty or if its a None
     '''
     return not (string and string.strip())
+
+
+def persist_uploaded_audio(audio_file, filename: str | None = None) -> str:
+    shared_root = Path('/app/shared/uploads') if Path('/app/shared/uploads').exists() else Path(settings.MEDIA_ROOT)
+    audio_dir = shared_root / 'tmp_audio'
+    audio_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = Path(filename or getattr(audio_file, 'name', 'audio')).name or 'audio'
+    destination = audio_dir / f'{uuid.uuid4().hex}_{safe_name}'
+
+    with destination.open('wb+') as target_file:
+        for chunk in getattr(audio_file, 'chunks', lambda: [audio_file.read()])():
+            target_file.write(chunk)
+
+    return str(destination)
+
 
 def version_from_another_doc(doc_origin: Documento, doc_old_v: Documento | None = None) -> tuple[int, int]:
     print('from another document')
