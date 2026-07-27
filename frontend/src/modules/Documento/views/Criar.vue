@@ -180,61 +180,59 @@ const salvar = async () => {
         DocumentoOrigem: DocumentoOrigem.value,
       })
       
-      const response = await store.generate(formDataToSend)
+      await store.generate(formDataToSend)
+      close()
       
-      if (response && response.status === 201) {
-        close()
-      }
     } else {
       // Criar todos os documentos
 
-      const idsDocumentosCriados: number[] = []
+      // const idsDocumentosCriados: number[] = []
       
-      let formData = criarFormDataDocumento({
-        vMajor: 1,
-        vMinor: 0,
-        geradoIA: true,
-        arquivo: '',
-        arquivoAudio: arquivoAudio.value,
-        TipoDocumento: 'MINIMUNDO',
-        DocumentoAnterior: null,
-        Modulo: props.moduloId as string,
-        DocumentoOrigem: [],
-      })
+      // let formData = criarFormDataDocumento({
+      //   vMajor: 1,
+      //   vMinor: 0,
+      //   geradoIA: true,
+      //   arquivo: '',
+      //   arquivoAudio: arquivoAudio.value,
+      //   TipoDocumento: 'MINIMUNDO',
+      //   DocumentoAnterior: null,
+      //   Modulo: props.moduloId as string,
+      //   DocumentoOrigem: [],
+      // })
       
-      let response = await criarDocumento(formData)
+      // let response = await criarDocumento(formData)
 
-      if (response) {
-        idsDocumentosCriados.push(Number(response.data.id))
-        formData =  criarFormDataDocumento({
-          vMajor: 1,
-          vMinor: 0,
-          geradoIA: true,
-          arquivo: '',
-          arquivoAudio: null,
-          TipoDocumento: 'REQUISITOS',
-          DocumentoAnterior: null,
-          Modulo: props.moduloId as string,
-          DocumentoOrigem: idsDocumentosCriados,
-        })
-        response = await criarDocumento(formData)
-      }
+      // if (response) {
+      //   idsDocumentosCriados.push(Number(response.data.id))
+      //   formData =  criarFormDataDocumento({
+      //     vMajor: 1,
+      //     vMinor: 0,
+      //     geradoIA: true,
+      //     arquivo: '',
+      //     arquivoAudio: null,
+      //     TipoDocumento: 'REQUISITOS',
+      //     DocumentoAnterior: null,
+      //     Modulo: props.moduloId as string,
+      //     DocumentoOrigem: idsDocumentosCriados,
+      //   })
+      //   response = await criarDocumento(formData)
+      // }
 
-      if (response) {
-        idsDocumentosCriados.push(Number(response.data.id))
-        formData = criarFormDataDocumento({
-          vMajor: 1,
-          vMinor: 0,
-          geradoIA: true,
-          arquivo: '',
-          arquivoAudio: null,
-          TipoDocumento: 'CASO_USO_E_DIAGRAMA_CLASSE',
-          DocumentoAnterior: null,
-          Modulo: props.moduloId as string,
-          DocumentoOrigem: idsDocumentosCriados,
-        })
-        response = await criarDocumento(formData)
-      }
+      // if (response) {
+      //   idsDocumentosCriados.push(Number(response.data.id))
+      //   formData = criarFormDataDocumento({
+      //     vMajor: 1,
+      //     vMinor: 0,
+      //     geradoIA: true,
+      //     arquivo: '',
+      //     arquivoAudio: null,
+      //     TipoDocumento: 'CASO_USO_E_DIAGRAMA_CLASSE',
+      //     DocumentoAnterior: null,
+      //     Modulo: props.moduloId as string,
+      //     DocumentoOrigem: idsDocumentosCriados,
+      //   })
+      //   response = await criarDocumento(formData)
+      // }
 
       // if (response) {
       //   idsDocumentosCriados.push(Number(response.data.id))

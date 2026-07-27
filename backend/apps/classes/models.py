@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
+
 
 User = get_user_model()
 
@@ -133,3 +135,43 @@ class Documento(PolymorphicModel, models.Model):
     class Meta:
         db_table = 'documento'
 
+class DocumentoGenerationJob(models.Model):
+    id = models.UUIDField(primary_key=True)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='documento_generation_jobs'
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", "Pending"),
+            ("RUNNING", "Running"),
+            ("SUCCESS", "Success"),
+            ("FAILED", "Failed")
+        ]
+    )
+
+    progress = models.IntegerField(default=0)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    finished_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+    error = models.TextField(
+        null=True,
+        blank=True
+    )
+
+    documento = models.ForeignKey(
+        Documento,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="generation_jobs"
+    )

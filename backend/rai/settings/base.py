@@ -40,6 +40,28 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS')
 CSRF_TRUSTED_ORIGINS = csrf_origins.split(',') if csrf_origins else []
 
+CELERY_ENABLED = config(
+    "CELERY_ENABLED",
+    default=False,
+    cast=bool
+)
+
+CELERY_TASK_ALWAYS_EAGER = config(
+    "CELERY_TASK_ALWAYS_EAGER",
+    default=not CELERY_ENABLED,
+    cast=bool
+)
+
+CELERY_TASK_EAGER_PROPAGATES = config(
+    "CELERY_TASK_EAGER_PROPAGATES",
+    default=not CELERY_ENABLED,
+    cast=bool
+)
+
+if CELERY_ENABLED:
+    CELERY_BROKER_URL = config("CELERY_BROKER_URL")
+    CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND")
+
 # Avisa o Django que o Ingress está recebendo HTTPS e mandando HTTP pro Pod
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -156,7 +178,9 @@ ERRORS_MESSAGES = {
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+SHARED_UPLOADS_ROOT = os.getenv('SHARED_UPLOADS_ROOT', '/app/shared/uploads')
+MEDIA_ROOT = os.path.join(SHARED_UPLOADS_ROOT, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 REST_FRAMEWORK = {
     'DATETIME_FORMAT': '%d/%m/%Y',
@@ -195,11 +219,6 @@ URL = config('URL')
 URL_VALIDATION = config('URL_VALIDATION')
 
 HASHIDS_SALT = config('HASHIDS_SALT')
-
-CORS_ALLOWED_ORIGINS = [
-    config("CORS_ORIGIN"),
-]
-
 
 LOGGING = {
     "version": 1,

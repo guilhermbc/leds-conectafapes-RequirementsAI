@@ -4,9 +4,14 @@ set -e
 
 echo "Waiting for PostgreSQL..."
 
-# Espera o banco subir
-while ! nc -z $DB_HOST_PRODUCTION $DB_PORT_PRODUCTION; do
-  sleep 1
+if [ -z "$DB_HOST_PRODUCTION" ] || [ -z "$DB_PORT_PRODUCTION" ]; then
+    echo "DB_HOST_PRODUCTION ou DB_PORT_PRODUCTION não definidos."
+    exit 1
+fi
+
+until nc -z "$DB_HOST_PRODUCTION" "$DB_PORT_PRODUCTION"; do
+    echo "Waiting for PostgreSQL..."
+    sleep 1
 done
 
 echo "PostgreSQL started"

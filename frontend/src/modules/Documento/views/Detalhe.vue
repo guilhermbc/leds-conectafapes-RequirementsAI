@@ -104,7 +104,7 @@ const carregarDocumentosSeguintes = async () => {
     documentosSeguintes.value = []
     // Lista de documentos seguintes
     for (const doc of documentos){
-      if (String(doc.DocumentoAnterior?.id) === documentoId.value){
+      if (typeof doc.DocumentoAnterior === 'object' && doc.DocumentoAnterior !== null && String(doc.DocumentoAnterior.id) === documentoId.value){
         documentosSeguintes.value.push(doc)
       }
     }

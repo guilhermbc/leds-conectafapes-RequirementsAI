@@ -69,7 +69,9 @@ const carregarDocumento = async () => {
 
   DocumentoOrigem.value = []
   for (const docOrigem of documento.DocumentoOrigem) {
-    DocumentoOrigem.value.push(docOrigem.id)
+    if (docOrigem.id !== undefined) {
+      DocumentoOrigem.value.push(Number(docOrigem.id))
+    }
   }
 
   ultimosDocumentosModulo.value = await listarUltimosDocumentos(Modulo.value)
@@ -121,13 +123,10 @@ const salvar = async () => {
       DocumentoOrigem: documentoOrigemIds,
     })
 
-    const response = await store.generate(formDataToSend)
-
+    await store.generate(formDataToSend)
     emit('salvo')
     close()
 
-    if (response && response.data && response.data.id) {
-    }
   } finally {
     carregando.value = false
     loading.stop()

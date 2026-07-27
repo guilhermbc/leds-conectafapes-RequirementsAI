@@ -33,7 +33,7 @@ const vMinor = ref()
 const arquivoAudio = ref<File | null>(null)
 const TipoDocumento = ref('')
 const Modulo = ref('')
-const DocumentoOrigem = ref<number[]>([])
+const DocumentoOrigem = ref<string[]>([])
 
 const carregando = ref(false)
 
@@ -68,7 +68,7 @@ const carregarDocumento = async () => {
     : documento.Modulo
 
   for (const docOrigem of documento.DocumentoOrigem) {
-    DocumentoOrigem.value.push(docOrigem.id)
+    DocumentoOrigem.value.push(docOrigem.id as string)
   }
 }
 
@@ -92,7 +92,7 @@ const salvar = async () => {
     })
     const response = await stores.generate(formDataToSend)
 
-    if (response && response.status === 201) {
+    if (response) {
       emit("salvo")
     }
     close() 
