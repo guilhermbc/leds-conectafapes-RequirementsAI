@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onBeforeMount, watch } from 'vue'
+import { ref, onBeforeMount, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 
@@ -8,21 +8,56 @@ import { useUiStore } from '@/stores/ui'
 import MarkdownViewer from '@/components/MarkdownViewer.vue'
 
 import { obterDocumento } from '../controllers/documento'
-import { obterModulo } from '@/modules/Modulo/controllers/modulo'
+import { obterModulo, listarUltimosDocumentos} from '@/modules/Modulo/controllers/modulo'
+import { obterProjeto } from '@/modules/Projeto/controllers/projeto'
+import type { Projeto } from '@/modules/Projeto/types/projeto'
+import type { Modulo } from '@/modules/Modulo/types/modulo'
 import type { Documento } from '../types/documento'
 import NovaVersaoIA from './NovaVersaoIA.vue'
 import UploadNovaVersao from './UploadNovaVersao.vue'
 import { formatarTipoDocumento, formatarVersao, getNomeArquivo } from '@/utils/formatacoesDocumentos';
+import GerarProximoDocumento from './GerarProximoDocumento.vue'
+
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
 
 const route = useRoute()
 const router = useRouter()
 const ui = useUiStore()
+const store = useDocumentGenerationStore()
 
 const documentoId = ref(route.params.id as string)
 const documento = ref<Documento | null>(null)
+// Próximas versões do documento atual (documentos que têm o documento atual como DocumentoAnterior)
 const documentosSeguintes = ref<Documento[]>([])
 
+// Últimos documentos do módulo (para verificar se o botão de gerar nova versão deve ser habilitado ou não)
+const ultimosDocsModulo = ref<Documento[]>([])
+
+const modulo = ref<Modulo | null>(null)
+const projeto = ref<Projeto | null>(null)
+
 const loading = ref(true)
+
+const isGerarProximoArtefatoDisponivel = computed(() => {
+  if (store.isGenerating) return false
+  if (documento.value?.obsoleto) return false
+  if (!documento.value?.vMaisRecente) return false
+
+  if (documento.value?.TipoDocumento === 'MINIMUNDO') {
+    const requisito = ultimosDocsModulo.value.find(doc => doc.TipoDocumento === 'REQUISITOS')
+    if (!requisito) return true
+    return requisito.obsoleto === true
+  }
+
+  if (documento.value?.TipoDocumento === 'REQUISITOS') {
+    const casoUso = ultimosDocsModulo.value.find(doc => doc.TipoDocumento === 'CASO_USO')
+    const diagramaClasse = ultimosDocsModulo.value.find(doc => doc.TipoDocumento === 'DIAGRAMA_CLASSE')
+    if (!casoUso || !diagramaClasse) return true
+    return casoUso.obsoleto === true || diagramaClasse.obsoleto === true
+  }
+
+  return false
+})
 
 const voltar = () => {
   if (window.history.length > 1) {
@@ -40,6 +75,11 @@ const carregarDocumento = async () => {
 
     const data = await obterDocumento(documentoId.value)
     documento.value = Array.isArray(data) ? data[0] : data
+    modulo.value = typeof documento.value?.Modulo === 'string' ? null : documento.value?.Modulo as Modulo
+    projeto.value = await obterProjeto(modulo.value?.Projeto as string)
+
+    // Carrega os últimos documentos do módulo
+    ultimosDocsModulo.value = await listarUltimosDocumentos(modulo.value?.id as string)
 
     await carregarDocumentosSeguintes()
   }
@@ -64,7 +104,7 @@ const carregarDocumentosSeguintes = async () => {
     documentosSeguintes.value = []
     // Lista de documentos seguintes
     for (const doc of documentos){
-      if (String(doc.DocumentoAnterior?.id) === documentoId.value){
+      if (typeof doc.DocumentoAnterior === 'object' && doc.DocumentoAnterior !== null && String(doc.DocumentoAnterior.id) === documentoId.value){
         documentosSeguintes.value.push(doc)
       }
     }
@@ -76,6 +116,10 @@ const carregarDocumentosSeguintes = async () => {
   } finally {
     loading.value = false
   }
+}
+
+function onSalvo(documento: Documento) {
+  carregarDocumento()
 }
 
 const irParaSeguinte = async () => {
@@ -113,6 +157,16 @@ watch(
   }
 )
 
+watch(
+  () => store.lastCreatedId,
+  async (id) => {
+    if (id) {
+      await carregarDocumento()
+      store.clearLastCreated()
+    }
+  }
+)
+
 const mostrarModalUploadNovaVersao = ref(false)
 
 function abrirModalUploadNovaVersao(){
@@ -124,6 +178,12 @@ const mostrarModalNovaVersaoIA = ref(false)
 
 function abrirModalNovaVersaoIA(){
   mostrarModalNovaVersaoIA.value = true
+}
+
+const mostrarModalGerarProximoDocumento = ref(false)
+
+function abrirModalGerarProximoDocumento(){
+  mostrarModalGerarProximoDocumento.value = true
 }
 
 function baixarMarkdown() {
@@ -167,11 +227,11 @@ function textoAposHtml(conteudo: string): string {
   }
 
   const retorno = conteudo.slice(index + fechamento.length).trim()
-  console.log('Conteúdo extraído após </html>:', retorno)
   return retorno
 }
 
 </script>
+
 
 <style scoped>
 audio {
@@ -182,8 +242,46 @@ audio {
 
 
 <template>
-  <div class="flex my-auto mt-20 w-11/12 gap-6 items-start">
-    <div class="w-10/12 mb-0 p-4 border border-1 border-gray-500 rounded-lg">
+  <div class="w-full my-auto mt-20 p-4">
+    <!-- Breadcrumbs -->
+    <div class="text-lg text-gray-800 mb-5">
+      <router-link 
+        to="/Projeto/home"
+        class="hover:text-blue-600 hover:underline"
+      >
+      Home
+    </router-link>
+
+    >
+      
+    <router-link 
+      :to="`/Projeto/${projeto?.id}`"
+      class="hover:text-blue-600 hover:underline"
+    >
+      {{ projeto?.nome }}
+    </router-link>
+
+    >
+      
+    <router-link 
+    :to="`/Modulo/${modulo?.id}`"
+      class="hover:text-blue-600 hover:underline"
+    >
+      {{ modulo?.nome }}
+    </router-link>
+
+    >
+
+    <router-link 
+      :to="`/Documento/${documento?.id}`"
+      class="hover:text-blue-600 hover:underline"
+    >
+      {{ $t(formatarTipoDocumento(documento?.TipoDocumento || '')) }} (v{{ formatarVersao(documento?.vMajor || 0, documento?.vMinor || 0) }})
+    </router-link>
+  </div>
+  
+    <div class="flex w-full gap-6 items-start">
+      <div class="flex-1 min-w-0 p-4 border border-gray-500 rounded-lg">
       <!-- Cabeçalho com alinhamento correto -->
       <div class="flex items-start justify-between mb-6 w-full">
 
@@ -210,21 +308,34 @@ audio {
 
             <UploadNovaVersao
               v-model="mostrarModalUploadNovaVersao"
-              @salvo="irParaSeguinte()"
+              @salvo="onSalvo"
               :documentoId="route.params.id as string"
             />
 
             <button
+              v-if="documento?.TipoDocumento === 'MINIMUNDO'"
               class="bg-blue-600 text-white px-4 py-2 rounded-md shadow
-                    hover:bg-blue-700 transition cursor-pointer"
-              @click="abrirModalNovaVersaoIA"
+                    hover:bg-blue-700 transition cursor-pointer
+                    disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
+              @click="abrirModalGerarProximoDocumento"
+              :disabled="!isGerarProximoArtefatoDisponivel"
             >
-              {{ $t('document.generateNewAIVersion') }}
+              {{ $t('document.generateNewRequirements') }}
             </button>
 
-            <NovaVersaoIA
-              v-model="mostrarModalNovaVersaoIA"
-              @salvo="irParaSeguinte()"
+            <button
+              v-if="documento?.TipoDocumento === 'REQUISITOS'"
+              class="bg-blue-600 text-white px-4 py-2 rounded-md shadow
+                    hover:bg-blue-700 transition cursor-pointer
+                    disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
+              @click="abrirModalGerarProximoDocumento"
+              :disabled="!isGerarProximoArtefatoDisponivel"
+            >
+              {{ $t('document.generateNewUCandCD') }}
+            </button>
+
+            <GerarProximoDocumento
+              v-model="mostrarModalGerarProximoDocumento"
               :documentoId="route.params.id as string"
             />
           </div>
@@ -268,15 +379,34 @@ audio {
     </div>
 
     <!-- Barra lateral com informações de documentos relacionados -->
-    <div class="border border-1 border-gray-500 p-2 rounded-lg w-2/12">
+    <div class="border border-1 border-gray-500 p-2 rounded-lg w-3/12">
       
       <!-- Documento Origem -->
       <div class="mb-4">
         <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.sourceDocuments') }}:</p>
         <!-- Se o documento for um minimundo -->
-        <p v-if="documento?.TipoDocumento === 'MINIMUNDO'" class="text-gray-500 italic ml-2">
-          {{ getNomeArquivo(documento?.arquivoAudio) }}
-        </p>
+        <div v-if="documento?.TipoDocumento === 'MINIMUNDO'">
+          <p class="text-gray-500 italic ml-2 break-words">
+            {{ getNomeArquivo(documento?.arquivoAudio) }}
+          </p>
+          
+          <button class="w-full mt-2 rounded-lg px-2.5 py-1 text-sm font-semibold transition-colors duration-200 cursor-pointer
+               bg-blue-900 border border-blue-700 text-blue-100 hover:bg-blue-950 
+               dark:bg-blue-200 dark:text-blue-900 dark:hover:bg-blue-300
+               disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed disabled:hover:bg-gray-400 disabled:opacity-70"
+               @click="abrirModalNovaVersaoIA"
+               :disabled="store.isGenerating"
+               >
+               
+            {{ $t('document.sidebar.generateNewStorytelling') }}
+          </button>
+
+          <NovaVersaoIA
+              v-model="mostrarModalNovaVersaoIA"
+              :documentoId="route.params.id as string"
+          />
+        </div>
+        
         <ul v-else-if="documento?.TipoDocumento !== 'MINIMUNDO' && documento?.DocumentoOrigem?.length" class="list-disc ml-6 text-blue-600">
           <li v-for="origem in documento.DocumentoOrigem" :key="origem.id">
             <RouterLink :to="`/Documento/${origem.id}`" class="hover:underline">
@@ -285,6 +415,19 @@ audio {
           </li>
         </ul>
         <p v-else class="text-gray-500 italic ml-2">Sem documentos de origem.</p>
+      </div>
+
+
+      <!-- Par UC/CD -->
+       <div v-if="documento?.parUC_CD" class="mb-4">
+        <p class="text-gray-600 font-medium mb-1">{{ $t('document.sidebar.pairUC_CD') }}:</p>
+        <ul class="list-disc ml-6 text-blue-600">
+          <li>
+            <RouterLink :to="`/Documento/${documento.parUC_CD.id}`" class="text-blue-600 hover:underline">
+              {{ $t(formatarTipoDocumento(documento.parUC_CD.TipoDocumento)) }} (v{{ formatarVersao(documento.parUC_CD.vMajor, documento.parUC_CD.vMinor) }})
+            </RouterLink>
+          </li>
+        </ul>
       </div>
 
       <!-- Documento Anterior -->
@@ -322,5 +465,7 @@ audio {
         </ul>
       </div>
     </div>
+  </div>           
   </div>
+  
 </template>

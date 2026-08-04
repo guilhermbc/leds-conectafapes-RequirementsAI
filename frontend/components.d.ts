@@ -10,6 +10,7 @@ declare module 'vue' {
     Card: typeof import('./src/components/Card.vue')['default']
     DataTable: typeof import('./src/components/DataTable.vue')['default']
     GenericTextInput: typeof import('./src/components/GenericTextInput.vue')['default']
+    GlobalLoader: typeof import('./src/components/GlobalLoader.vue')['default']
     IconNav: typeof import('./src/components/icons/IconNav.vue')['default']
     MarkdownViewer: typeof import('./src/components/MarkdownViewer.vue')['default']
     Modal: typeof import('./src/components/Modal.vue')['default']

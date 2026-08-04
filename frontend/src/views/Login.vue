@@ -131,13 +131,14 @@ const entrar = async () => {
             {{ $t('register.button') }}
           </button>
 
-          <button
+      
+          <!-- <button
             class="text-sm text-blue-700 hover:underline transition cursor-pointer"
             @click="esqueciSenha"
           >
             {{ $t('login.forgot')}}
-          </button>
-        </div>
+          </button> -->
+        </div> 
 
         <button
           class="px-5 py-2 bg-blue-800 text-white rounded-lg 

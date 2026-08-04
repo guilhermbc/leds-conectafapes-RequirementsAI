@@ -10,6 +10,7 @@ behave==1.2.7.dev6
 behave-django==1.7.0
 blinker==1.9.0
 cachetools==5.5.2
+celery==5.5.3
 certifi==2025.4.26
 cffi==2.0.0
 charset-normalizer==3.4.2
@@ -110,6 +111,7 @@ python-dotenv==1.1.0
 pytz==2025.2
 PyYAML==6.0.2
 questionary==2.1.1
+redis==6.2.0
 referencing==0.36.2
 regex==2024.11.6
 requests==2.32.3

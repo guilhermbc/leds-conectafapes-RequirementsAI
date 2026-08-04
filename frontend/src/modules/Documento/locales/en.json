@@ -4,8 +4,12 @@
     "allDocumentsTitle": "All Requirement-Related Artifacts",
     "new": "Start Requirements Specification and Analysis",
     "none": "No Requirement-Related Artifacts found.",
+    "deprecated": "Out of Sync",
     "uploadNewVersion": "Upload New Version",
-    "generateNewAIVersion": "Generate New Version with AI",
+    "generateNewRequirements": "Generate Requirements with AI",
+    "generateNewUseCases": "Generate Use Cases with AI",
+    "generateNewClassDiagram": "Generate Class Diagram with AI",
+    "generateNewUCandCD": "Generate Use Cases and Classes with AI",
     "download": "Download",
     "contentText": "Requirement-Related Artifact's Content",
     "domainStorytelling": "Domain Storytelling",
@@ -15,7 +19,9 @@
     "UCandCD": "Use Cases and Class Diagram",
     "sidebar": {
       "sourceDocuments": "Source Artifacts",
+      "generateNewStorytelling": "Generate New Storytelling with New Audio",
       "previousVersion": "Previous Version",
+      "pairUC_CD": "Use Cases/Class Diagram Pair",
       "noPreviousVersion": "No previous version",
       "nextVersion": "Next Version",
       "noNextVersion": "No next version"
@@ -28,7 +34,7 @@
       "dropdownLabel": "Select Requirement-Related Artifact type",
       "audioSource": "Audio Source",
       "audioLabel": "Click to select an audio file or drag and drop it here",
-      "audioLabel2": ".mp3 or .wav",
+      "audioLabel2": ".mp3, .wav, .mp4 or .mkv",
       "sourcedDomainStorytelling": "Source Domain Storytelling",
       "sourceRequirements": "Source Requirements",
       "sourceUseCases": "Source Use Cases",
@@ -43,6 +49,13 @@
       "subtitle": "Upload a new version of the Requirement-Related Artifact",
       "contentLabel": "Click to select a markdown file or drag and drop it here",
       "contentLabel2": ".md or .markdown",
+      "updateUCwarning": "The sections of the Use Cases file (Diagram, Table and Description) must be separated by ''<!-- -->''",
+      "updateUCChoicesTitle": "Use Cases must also be adjusted to the new changes. How would you like to proceed?",
+      "updateCDChoicesTitle": "Class Diagram must also be adjusted to the new changes. How would you like to proceed?",
+      "updateAI": "Increment version and",
+      "updateAIBold": "update with AI.",
+      "updateSimple": "Increment version, but",
+      "updateSimpleBold": "keep the content unchanged.",
       "confirmationMessage": "Are you sure you want to upload this new version of",
       "editButton": "Save Changes"
     },
@@ -52,6 +65,11 @@
       "sourceAudio": "Source Audio",
       "confirmationMessage": "Are you sure you want to generate a new version of",
       "generateButton": "Generate"
+    },
+    "notification": {
+      "loading": "Generating artifact... Feel free to navigate!",
+      "created": "{nome} created succesfully!",
+      "open": "Open"
     },
     "cancel": "Cancel"
   }

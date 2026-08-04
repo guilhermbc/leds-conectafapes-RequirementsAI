@@ -1,22 +1,28 @@
+import json
 import os
 
 from .models import (
     Projeto,
     Modulo,
     Documento,
+    DocumentoGenerationJob,
     DOCS
 )
 from .serializers import (
     ProjetoReadSerializer, ProjetoWriteSerializer,
     ModuloReadSerializer, ModuloWriteSerializer,
     DocumentoReadSerializer, DocumentoWriteSerializer,
-    UserRegisterSerializer
+    DocumentoGenerationJobSerializer,
+    UserRegisterSerializer,
 )
+
+from .tasks import generate_documento as generate_documento_task
 
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from django.db.models import Case, When, IntegerField
 from rest_framework.decorators import action
-from rest_framework.viewsets import ViewSet, ModelViewSet
+from rest_framework.viewsets import ViewSet, ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.response import Response
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -28,12 +34,14 @@ from rest_framework import generics
 from rest_framework import filters
 import django_filters.rest_framework
 import logging
+import requests
+import uuid
 
 logger = logging.getLogger(__name__)
 
 from rest_framework.permissions import AllowAny # for testing
 from .filters import DocumentoFilter
-from .utils import is_empty_or_null, send_to_llm, version_from_another_doc, version_from_audio, update_version
+from .utils import is_empty_or_null, send_to_llm, version_from_another_doc, version_from_audio, update_version, persist_uploaded_audio
 
 class HealthViewSet(ViewSet):
 
@@ -123,49 +131,26 @@ class ModuloViewSet(ModelViewSet):
         self.check_object_permissions(self.request, obj)
         return obj
     
-    @action(detail=False, methods=['get'], url_path=r'get_last_docs/(?P<modulo_id>\d+)', filter_backends = [])
+    @action(detail=False, methods=['get'], url_path=r'get_last_docs/(?P<modulo_id>\d+)', filter_backends=[])
     def get_last_docs(self, request, modulo_id=None):
-        
+
         mod = get_object_or_404(Modulo, id=int(modulo_id))
 
-        docs: list[Documento] = list(mod.modulo_documento.all())
+        docs = mod.modulo_documento.filter(
+            vMaisRecente=True
+        ).order_by(
+            Case(
+                When(TipoDocumento='MINIMUNDO', then=0),
+                When(TipoDocumento='REQUISITOS', then=1),
+                When(TipoDocumento='CASO_USO', then=2),
+                When(TipoDocumento='DIAGRAMA_CLASSE', then=3),
+                output_field=IntegerField()
+            )
+        )
 
-        separated_docs = {tipo: [] for tipo, _ in DOCS.choices}
-
-        for d in docs:
-            tipo = d.TipoDocumento
-            if tipo in separated_docs:
-                separated_docs[tipo].append(d)
-
-        latest_docs: list[Documento] = []
-
-        def get_latest(docs: list[Documento], hi_major: int = 0) -> Documento:
-            for d in docs:
-                if d.vMajor > hi_major:
-                    hi_major = d.vMajor
-            
-            hi_minor_index = 0
-            hi_minor = -1
-            i = 0
-            while i < len(docs):
-                if (docs[i].vMajor == hi_major) and (docs[i].vMinor > hi_minor):
-                    hi_minor = docs[i].vMinor
-                    hi_minor_index = i                
-                i += 1
-
-            return docs[hi_minor_index]
-
-        for key, elem in list(separated_docs.items()):
-            try:
-                latest_docs.append(get_latest(elem))
-            except:
-                pass
-
-        major = max((d.vMajor for d in latest_docs), default=None)
-
-        result = [d for d in latest_docs if d.vMajor == major]
-
-        return Response(DocumentoReadSerializer(result, many=True).data)
+        return Response(
+            DocumentoReadSerializer(docs, many=True).data
+        )
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -191,9 +176,11 @@ class DocumentoViewSet(ModelViewSet):
         'vMinor',
         'geradoIA',
         'vMaisRecente',
+        'obsoleto',
         'TipoDocumento',
         'DocumentoAnterior',
         'DocumentoOrigem',
+        'parUC_CD',
         'Modulo',
     ]
     search_fields = ['versao', 'arquivo']
@@ -204,192 +191,107 @@ class DocumentoViewSet(ModelViewSet):
         user = self.request.user
         if not user.is_authenticated:
             return Documento.objects.none()
-        
-        
         return Documento.objects.filter(user=user)
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return DocumentoReadSerializer
         return DocumentoWriteSerializer
-
-    def _create_caso_uso_com_classes(self, data):
-        documento_anterior = data.get("DocumentoAnterior")
-        
-        result = send_to_llm({
-            **data,
-            'TipoDocumento': 'CASO_USO_E_DIAGRAMA_CLASSE'
-        })
-
-        if not result:
-            return Response({'error': 'Erro ao gerar documentos'}, status=500)
-
-        caso_uso_result = result.get('caso_uso')
-        diagrama_classe_result = result.get('diagrama_classe')
-
-        # montar UC
-        result_string_uc = ''
-        for element in caso_uso_result:
-            result_string_uc += element + '\n<!-- -->\n'
-
-        vMajor, vMinor = 1, 0
-
-        # CASO USO
-        data_uc = data.copy()
-        data_uc.update({
-            'arquivo': result_string_uc,
-            'TipoDocumento': 'CASO_USO',
-            'vMajor': vMajor,
-            'vMinor': vMinor,
-            'geradoIA': True,
-            'vMaisRecente': True
-        })
-
-        serializer_uc = self.get_serializer(data=data_uc)
-        serializer_uc.is_valid(raise_exception=True)
-        self.perform_create(serializer_uc)
-
-        # CLASSES
-        data_cd = data.copy()
-        data_cd.update({
-            'arquivo': diagrama_classe_result,
-            'TipoDocumento': 'DIAGRAMA_CLASSE',
-            'vMajor': vMajor,
-            'vMinor': vMinor,
-            'geradoIA': True,
-            'vMaisRecente': True
-        })
-
-        serializer_cd = self.get_serializer(data=data_cd)
-        serializer_cd.is_valid(raise_exception=True)
-        self.perform_create(serializer_cd)
-
-        # Atualizar estado de novidade do documento anterior
-        if documento_anterior:
-            Documento.objects.filter(id=documento_anterior).update(vMaisRecente=False)
-
-        return Response({
-            "caso_uso": serializer_uc.data,
-            "diagrama_classe": serializer_cd.data
-        }, status=201)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        data = request.data.dict()
+        data = {}
+
+        for key, value in request.data.items():
+            if key != "arquivoAudio":
+                data[key] = value
+
         arquivoAudio = request.FILES.get('arquivoAudio')
+        documento_anterior = data.get('DocumentoAnterior')
+        
         documentos_origem = request.data.getlist('DocumentoOrigem')
+        # Força sempre lista no data, e nunca string
+        data['DocumentoOrigem'] = documentos_origem
 
         logger.info("FILES:", extra={"files": request.FILES})
         logger.info("audio:", extra={
             "existeAudio": bool(request.FILES.get('arquivoAudio')),
             "sizeAudio": getattr(request.FILES.get('arquivoAudio'), 'size', None)
-})
+        })
 
         if not arquivoAudio:
             data.pop('arquivoAudio', None)
+
+        # Payload para a task
+        payload = {
+            "documento_data": data
+        }
         
-        documento_anterior = data.get('DocumentoAnterior')
-
-        # Força sempre lista no data, e nunca string
-        data['DocumentoOrigem'] = documentos_origem
-
-        # Criar path temporário se houver upload
+        # Persistir o áudio em um diretório compartilhado para o worker do Celery
         if arquivoAudio:
-            import tempfile
+            payload["audio_path"] = persist_uploaded_audio(
+                arquivoAudio,
+                filename=getattr(arquivoAudio, 'name', None)
+            )
 
-            with tempfile.NamedTemporaryFile(delete=False) as temp:
-                for chunk in arquivoAudio.chunks():
-                    temp.write(chunk)
-
-                temp_path = temp.name
-
-            data['audio_path'] = temp_path  # substitui origemAudio
+        # Reuso de arquivo senão houver upload e tiver documento anterior
+        elif documento_anterior:
+            doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
             
-            logger.info("Temp path criado", extra={"path": temp_path})
-            logger.info("Arquivo existe?", extra={"exists": os.path.exists(temp_path)})
-        else:
-            if documento_anterior:
-                doc_anterior = get_object_or_404(Documento, pk=documento_anterior)
+            if (data.get("TipoDocumento") == "MINIMUNDO" and doc_anterior.arquivoAudio):
+                payload["arquivoAudio_name"] = (doc_anterior.arquivoAudio.name)
 
-                if data.get('TipoDocumento') == 'MINIMUNDO' and doc_anterior.arquivoAudio:
-                    data['arquivoAudio'] = doc_anterior.arquivoAudio
-                else:
-                    data.pop('arquivoAudio', None)
+        try:
+            json.dumps(payload)
+        except TypeError as e:
+            print("Payload inválido:", e)
 
-        # Se for CASO_USO/DIAGRAMA_CLASSE, enviar para um método separado
-        if data.get('TipoDocumento') == 'CASO_USO_E_DIAGRAMA_CLASSE' and is_empty_or_null(data.get('arquivo')):
-            return self._create_caso_uso_com_classes(data)
+            for key, value in payload.items():
+                print(key, type(value))
 
-        # Casos simples
-        # Se deve ser gerado por IA
-        if is_empty_or_null(data.get('arquivo')):
-            result = send_to_llm(data)
-            generated_by_ai = True
+                if isinstance(value, dict):
+                    for subkey, subvalue in value.items():
+                        print(
+                            f"  {subkey}: {type(subvalue)}"
+                        )
 
-            if data['DocumentoOrigem'] and len(data['DocumentoOrigem']) != 0:
-                doc_origem_id = data['DocumentoOrigem'][-1]
-                doc_origem = get_object_or_404(Documento, id=doc_origem_id)
-                
-                vMajor, vMinor = version_from_another_doc(
-                    doc_origem,
-                    documento_anterior
-                )
+            raise
 
-            elif data.get('audio_path') and documento_anterior:  # 👈 ALTERADO
-                doc_anterior_id = documento_anterior
-                doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
-                vMajor, vMinor = version_from_audio(doc_anterior)
+        job = DocumentoGenerationJob.objects.create(
+            id=uuid.uuid4(),
+            user=request.user,
+            status="PENDING"
+        )
+        
+        generate_documento_task.delay(
+            job_id=str(job.id),
+            user_id=request.user.id,
+            payload=payload
+        )
+        
+        return Response(
+            {
+                "job_id": str(job.id),
+                "status": "PENDING"
+            },
+            status=202
+        )
 
-            else:
-                vMajor = 1
-                vMinor = 0
-
-        # Se não deve ser gerado por IA
-        else:
-            generated_by_ai = False
-            result = data.get('arquivo')
-
-            # Incremento Minor
-            if documento_anterior:
-                doc_anterior_id = documento_anterior
-                doc_anterior = get_object_or_404(Documento, id=doc_anterior_id)
-                vMajor, vMinor = update_version(doc_anterior)
-
-            elif data.get('DocumentoOrigem') and len(data.get('DocumentoOrigem')) != 0:
-                doc_origem_id = data.get('DocumentoOrigem')[-1]
-                doc_origem = get_object_or_404(Documento, id=doc_origem_id)
-                vMajor, vMinor = version_from_another_doc(doc_origem)
-
-            else:
-                vMajor = 1
-                vMinor = 0
-
-        # Mesma lógica de montagem
-        result_string = ''
-        if not isinstance(result, str):
-            for element in result:
-                result_string += element + '\n<!-- -->\n'
-        else:
-            result_string = result
-
-        data['vMajor'] = vMajor
-        data['vMinor'] = vMinor
-        data['arquivo'] = result_string
-        data['geradoIA'] = generated_by_ai
-        data['vMaisRecente'] = True
-
-        # 👇 IMPORTANTE: passar data, não request.data
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-
-        # Atualizar estado de novidade do documento anterior
-        if documento_anterior:
-            Documento.objects.filter(id=documento_anterior).update(vMaisRecente=False)
-
-        return Response(serializer.data, status=201)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+class DocumentoGenerationJobViewSet(ReadOnlyModelViewSet):
+    def get_queryset(self):
+        return (DocumentoGenerationJob.objects.filter(user=self.request.user))
+    
+    serializer_class = (DocumentoGenerationJobSerializer)
+    authentication_classes = [
+        OAuth2Authentication,
+        SessionAuthentication
+    ]
+    permission_classes = [
+        Or(IsAdminUser, TokenHasReadWriteScope)
+    ]
+    lookup_field = 'id'
     
 class UserViewSet(generics.CreateAPIView):
     serializer_class = UserRegisterSerializer

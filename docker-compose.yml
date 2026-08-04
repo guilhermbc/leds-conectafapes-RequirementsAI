@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
 
   rai_frontend:
@@ -15,7 +13,6 @@ services:
     networks:
       - lang_net
 
-
   rai_backend:
     build: ./backend
     env_file:
@@ -26,13 +23,33 @@ services:
       - ./shared/uploads:/app/shared/uploads
     depends_on:
       - db
-    environment:
-      DJANGO_SETTINGS_MODULE: rai.settings.production
+      - redis
     networks:
       lang_net:
         aliases:
           - requirementsai-backend-service
 
+  celery_worker:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    entrypoint: []  
+    command: celery -A rai worker -l info
+    volumes:
+      - ./shared/uploads:/app/shared/uploads
+    depends_on:
+      - db
+      - redis
+    networks:
+      - lang_net
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - lang_net
 
   db:
     image: postgres:15
@@ -48,10 +65,8 @@ services:
     networks:
       - lang_net
 
-
 volumes:
   postgres_data:
-
 
 networks:
   lang_net:

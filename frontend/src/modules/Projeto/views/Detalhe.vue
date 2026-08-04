@@ -78,6 +78,25 @@ onBeforeMount(carregarProjeto)
     </div>
 
     <div v-else-if="projeto">
+      <!-- Breadcrumbs -->
+      <div class="text-lg text-gray-800 mb-5">
+        <router-link 
+          to="/Projeto/home"
+          class="hover:text-blue-600 hover:underline"
+        >
+          Home
+        </router-link>
+
+        >
+
+        <router-link 
+          :to="`/Projeto/${projeto.id}`"
+          class="hover:text-blue-600 hover:underline"
+        >
+          {{ projeto.nome }}
+        </router-link>
+      </div> 
+
       <div class="flex items-start mb-6 w-full">
         
         <!-- Botão voltar -->

@@ -57,6 +57,31 @@ class DocumentoTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_paruc_cd_field_is_null_for_non_pair_document(self):
+        doc = Documento.objects.create(
+            TipoDocumento='REQUISITOS',
+            arquivo=self.faker.first_name(),
+            parUC_CD=self.documento_1
+        )
+        self.assertIsNone(Documento.objects.get(pk=doc.id).parUC_CD)
+
+    def test_paruc_cd_links_caso_uso_and_diagrama_classe(self):
+        caso_uso = Documento.objects.create(
+            TipoDocumento='CASO_USO',
+            arquivo=self.faker.first_name()
+        )
+        diagrama_classe = Documento.objects.create(
+            TipoDocumento='DIAGRAMA_CLASSE',
+            arquivo=self.faker.first_name()
+        )
+        caso_uso.parUC_CD = diagrama_classe
+        caso_uso.save()
+        diagrama_classe.parUC_CD = caso_uso
+        diagrama_classe.save()
+
+        self.assertEqual(caso_uso.parUC_CD_id, diagrama_classe.id)
+        self.assertEqual(diagrama_classe.parUC_CD_id, caso_uso.id)
+
     # retornando todos os elementos    
     def test_retrieve_all(self):
         response   = self.client.get(reverse('documento-api-list'))

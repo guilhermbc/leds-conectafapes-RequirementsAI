@@ -5,12 +5,29 @@ from .models import (
     Projeto,
     Modulo,
     Documento,
+    DocumentoGenerationJob,
 )
+class DocumentoGenerationJobSerializer(serializers.ModelSerializer):
 
+    documento_id = serializers.UUIDField(
+        source='documento.id',
+        read_only=True
+    )
+    class Meta:
+        model = DocumentoGenerationJob
+        fields = [
+            'id',
+            'status',
+            'progress',
+            'documento_id',
+            'error',
+            'created_at',
+            'finished_at',
+        ]
 class DocumentoWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Documento
-        fields = '__all__'
+        exclude = ("polymorphic_ctype",)
         read_only_fields = ("user",)
 
 class DocumentoReadSerializer(serializers.ModelSerializer):

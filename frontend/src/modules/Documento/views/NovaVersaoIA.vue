@@ -4,7 +4,13 @@ import {
   criarDocumento,
   obterDocumento,
 } from '../controllers/documento'
-import { formatarTipoDocumento, getNomeArquivo, criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
+import { formatarTipoDocumento, formatarVersao, getNomeArquivo, criarFormDataDocumento } from '@/utils/formatacoesDocumentos'
+
+import { useLoadingStore } from '@/stores/loading'
+import { useDocumentGenerationStore } from '@/stores/documentGeneration'
+
+const loading = useLoadingStore()
+const stores = useDocumentGenerationStore()
 
 const props = defineProps<{
   modelValue: boolean
@@ -27,7 +33,7 @@ const vMinor = ref()
 const arquivoAudio = ref<File | null>(null)
 const TipoDocumento = ref('')
 const Modulo = ref('')
-const DocumentoOrigem = ref<number[]>([])
+const DocumentoOrigem = ref<string[]>([])
 
 const carregando = ref(false)
 
@@ -62,7 +68,7 @@ const carregarDocumento = async () => {
     : documento.Modulo
 
   for (const docOrigem of documento.DocumentoOrigem) {
-    DocumentoOrigem.value.push(docOrigem.id)
+    DocumentoOrigem.value.push(docOrigem.id as string)
   }
 }
 
@@ -70,26 +76,29 @@ const salvar = async () => {
   if (carregando.value) return
 
   carregando.value = true
-
+  loading.start('document.notification.loading')
+  
   try{
     const formDataToSend = criarFormDataDocumento({
       vMajor: vMajor.value,
       vMinor: vMinor.value,
       geradoIA: true,
       arquivo: '',
-      // arquivoAudio: arquivoAudio.value,
+      arquivoAudio: arquivoAudio.value,
       TipoDocumento: TipoDocumento.value,
       DocumentoAnterior: id.value,
       Modulo: Modulo.value,
       DocumentoOrigem: DocumentoOrigem.value,
     })
-    const response = await criarDocumento(formDataToSend)
+    const response = await stores.generate(formDataToSend)
 
-    emit("salvo")
-    close()
-    
+    if (response) {
+      emit("salvo")
+    }
+    close() 
   } finally {
     carregando.value = false
+    loading.stop()
   }
 }
 
@@ -139,7 +148,7 @@ const onDrop = (event: any) => {
 
           <input
             type="file"
-            accept="audio/*"
+            accept=".mp3, .wav, .mp4, .mkv"
             ref="fileInput"
             @change="onFileChange"
             hidden
