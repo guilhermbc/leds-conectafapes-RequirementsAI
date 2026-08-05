@@ -88,7 +88,7 @@ onMounted(fetchConfig)
         <p class="text-sm text-gray-600 mt-1">{{ t('aiConfig.manage_description') }}</p>
       </div>
       <button
-        class="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition cursor-pointer"
+        class="px-4 py-2 border-gray-700 text-gray-700 rounded-lg hover:bg-gray-700 hover:text-white transition cursor-pointer"
         @click="router.push({ name: 'projeto-home' })"
       >
         {{ t('aiConfig.back') }}

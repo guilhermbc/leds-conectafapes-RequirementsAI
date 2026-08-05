@@ -26,7 +26,7 @@
     "title_configure": "Configure AI key",
     "title_configured": "AI key configuration",
     "manage_description": "Manage the API key used for AI requests.",
-    "back": "Back",
+    "back": "← Back",
     "provider_label": "Provider",
     "provider_gemini": "Gemini (Google)",
     "provider_openai": "OpenAI",

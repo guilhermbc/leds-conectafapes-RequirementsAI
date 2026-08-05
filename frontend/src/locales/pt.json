@@ -26,7 +26,7 @@
     "title_configure": "Configurar chave de IA",
     "title_configured": "Configuração de chave de IA",
     "manage_description": "Gerencie a chave de API usada para requisições de IA.",
-    "back": "Voltar",
+    "back": "← Voltar",
     "provider_label": "Fornecedor",
     "provider_gemini": "Gemini (Google)",
     "provider_openai": "OpenAI",
