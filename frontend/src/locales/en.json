@@ -4,7 +4,8 @@
     "password": "Password",
     "button": "Login",
     "forgot": "Forgot password",
-    "error": "Invalid username or password."
+    "error": "Invalid username or password.",
+    "loading": "Logging in..."
   },
   "register": {
     "username": "Username",
